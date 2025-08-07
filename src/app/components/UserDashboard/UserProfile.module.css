@@ -1,0 +1,470 @@
+.profileLayout {
+    display: flex;
+    gap: 30px;
+    padding: 20px;
+}
+
+/* --- Profile Sidebar (Left Column) --- */
+.profileSidebar {
+    width: 250px;
+    flex-shrink: 0;
+    background-color: #FFFFFF;
+    border: 1px solid #EAEAEA;
+    border-radius: 9px;
+    padding: 20px;
+    align-self: flex-start; /* Aligns to the top */
+    text-align: center;
+}
+
+.avatarSection {
+    text-align: center;
+    border-bottom: 1px solid #F0F0F0;
+    padding-bottom: 20px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.avatar {
+    border-radius: 50%;
+    margin-bottom: 10px;
+    border: 3px solid #FFFFFF;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        margin-left: 30%;
+
+}
+
+.profileName {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #12131A;
+}
+
+.profileNav {
+    display: flex;
+    flex-direction: column;
+}
+
+.navLink {
+    padding: 18px 25px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #8F8F8F;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.navLink:hover {
+    background-color: #F8F8F8;
+}
+
+.navLink.active {
+    font-weight: 700;
+    color: #ff0000; /* Fallback color */
+    background: linear-gradient(180deg, #2B66F6 -0.55%, #677AFF 121.03%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+}
+
+/* --- Main Content (Right Column) --- */
+.mainContent {
+    flex-grow: 1;
+}
+
+.contentHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.contentHeader h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.addButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #2B66F6;
+    color: #FFFFFF;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.cardContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.card {
+    background-color: #FFFFFF;
+    border: 1px solid #EAEAEA;
+    border-radius: 9px;
+    padding: 20px;
+}
+
+.cardHeader {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.companyLogo {
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.cardHeaderText {
+    flex-grow: 1;
+}
+
+.cardRole {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #000000;
+    margin: 0 0 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.verifiedIcon {
+    color: #34C759; /* Green checkmark */
+}
+
+.cardCompany, .cardDuration {
+    font-size: 0.9rem;
+    color: #555;
+    margin: 0 0 4px 0;
+}
+
+.cardDuration {
+    color: #858585;
+    font-size: 0.8rem;
+}
+
+.editButton {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.cardDescription {
+    margin: 15px 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #333;
+}
+
+.cardDescription a {
+    color: #2B66F6;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.cardSkills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.skillTag {
+    background-color: #FDF4F4; /* Light orange background */
+    color: #F04F52; /* Orange text */
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.centeredMessage {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #555;
+}
+/* --- ADD THESE NEW STYLES FOR THE BASIC PROFILE FORM --- */
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Creates a 2-column grid */
+  gap: 35px 60px; /* 25px row gap, 40px column gap */
+  margin-top: 20px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.inputGroup label {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #8F8F8F;
+  margin-bottom: 8px;
+}
+
+.formInput {
+  background-color: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 12px 15px;
+  font-size: 1.05rem;
+  color: #333;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 320px;
+}
+
+.formInput:focus {
+  border-color: #2B66F6;
+}
+
+.formInput:disabled {
+  background-color: #EAEAEA;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.saveButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #2B66F6;
+    color: #FFFFFF;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+.formSection {
+  /* This makes a grid item span all columns */
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+}
+
+.formTextarea {
+  background-color: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 12px 15px;
+  font-size: 0.95rem;
+  color: #333;
+  outline: none;
+  transition: border-color 0.2s;
+  min-height: 120px; /* Give it a decent default height */
+  resize: vertical; /* Allow vertical resizing */
+  font-family: 'DM Sans', sans-serif;
+}
+
+.formTextarea:focus {
+  border-color: #2B66F6;
+}
+
+.socialsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.inputWithIcon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputWithIcon svg {
+  position: absolute;
+  left: 15px;
+  color: #8F8F8F;
+}
+
+.inputWithIcon .formInput {
+  padding-left: 40px;
+  width: 100%;
+}
+
+/* --- ADD THESE NEW STYLES FOR THE SKILL REPOSITORY --- */
+
+.skillRepoLayout {
+  display: flex;
+  gap: 30px;
+}
+
+.skillsListContainer {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.seeAllLink {
+  color: #2B66F6;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.sectionDescription {
+  font-size: 0.9rem;
+  color: #8F8F8F;
+  margin-top: -15px;
+  margin-bottom: 20px;
+}
+
+.skillsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.skillCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #FBFBFB;
+  border: 1px solid #EAEAEA;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.skillIconWrapper {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #2B66F6 -0.55%, #677AFF 121.03%);
+  color: white;
+}
+
+.skillInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.skillName {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #4E4E4E;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.verifiedIconSmall {
+  color: #AEDD97;
+  stroke-width: 3;
+  width: 14px;
+  height: 14px;
+}
+
+.skillEndorsements {
+  font-size: 0.75rem;
+  color: #8F8F8F;
+}
+
+/* --- Styles for Right Column --- */
+.skillBadgesContainer {
+  width: 300px;
+  height: 500px;
+  flex-shrink: 0;
+  background-color: #FFFFFF;
+  border: 1px solid #EAEAEA;
+  border-radius: 9px;
+  padding: 20px;
+}
+
+.skillBadgesContainer h4 {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #121212;
+  margin: 0 0 15px 0;
+}
+
+.badgesWrapper {
+  display: flex;
+  gap: 35px;
+  margin-bottom: 20px;
+}
+
+.badge {
+  flex: 1;
+  background-color: #FFFFFF;
+  border: 1px solid #EAEAEA;
+  border-radius: 7px;
+  padding: 20px;
+  text-align: center;
+  padding-top: 40px;
+}
+
+.badgeCount {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2B66F6;
+  margin-bottom: 4px;
+}
+
+.badgeLabel {
+  font-size: 0.8rem;
+  color: #717171;
+}
+
+.radarChartContainer {
+  height: 220px; /* Give the chart a fixed height */
+}
+.cardBody {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.cardDescription {
+  flex-grow: 1; /* Allows the description to take up available space */
+  margin: 0; /* Reset margin as it's now a flex item */
+}
+
+.verifyButton {
+  background-color: #f0f5ff;
+  color: #2b66f6;
+  border: 1px solid #cce0ff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap; /* Prevents the text from wrapping */
+}
+
+.verifyButton:hover {
+  background-color: #e0eaff;
+  border-color: #a8c7ff;
+}

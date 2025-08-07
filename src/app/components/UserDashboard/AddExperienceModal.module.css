@@ -1,0 +1,133 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.modalContent {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 24px 30px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.modalHeader h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    font-size: 1.5rem;
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.inputGroup, .inputGroupFull {
+    display: flex;
+    flex-direction: column;
+}
+
+.inputGroupFull {
+    grid-column: 1 / -1; /* Span both columns */
+}
+
+.inputGroup label, .inputGroupFull label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.inputGroup input, .inputGroup select, .inputGroupFull textarea {
+    background-color: #F3F3F3;
+    border: 1px solid #EAEAEA;
+    border-radius: 6px;
+    padding: 12px 15px;
+    font-size: 0.95rem;
+    color: #333;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+}
+
+.inputGroup input:focus, .inputGroup select:focus, .inputGroupFull textarea:focus {
+    border-color: #2B66F6;
+}
+
+.checkboxGroup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.checkboxGroup input {
+    width: 16px;
+    height: 16px;
+}
+
+.modalFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.cancelButton, .submitButton {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: 1px solid #ddd;
+}
+
+.cancelButton {
+    background-color: #fff;
+    color: #555;
+}
+
+.submitButton {
+    background-color: #2B66F6;
+    color: #fff;
+    border-color: #2B66F6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.submitButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

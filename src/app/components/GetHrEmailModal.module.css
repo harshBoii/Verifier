@@ -1,0 +1,82 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background: #FFFFFF;
+    border-radius: 8px;
+    padding: 24px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.modalHeader h2 {
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+}
+
+.description {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 24px;
+}
+
+.optionsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.optionButton {
+    display: flex;
+    align-items: center;
+    text-align: left;
+    gap: 15px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    width: 100%;
+}
+
+.optionButton:hover {
+    background-color: #f0f5ff;
+    border-color: #2979FF;
+}
+
+.optionButton strong {
+    display: block;
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.optionButton span {
+    font-size: 0.85rem;
+    color: #666;
+}

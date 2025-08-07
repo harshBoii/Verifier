@@ -1,0 +1,206 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -- ENUMS for predefined, controlled lists --
+
+enum SkillCategory {
+  DEVELOPMENT_AND_TECH
+  DESIGN
+  VIDEO_EDITING
+  PRODUCT
+  MARKETING
+  BUSINESS
+  OTHERS
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum WorkType {
+  FULL_TIME
+  PART_TIME
+  INTERNSHIP
+  CONTRACT_BASED
+}
+
+enum VerificationStatus {
+  VERIFIED
+  UNVERIFIED
+}
+
+// --- NEWLY ADDED ENUM FOR USER ROLES ---
+enum Role {
+  ADMIN
+  SUPER_ADMIN
+  EMPLOYEE
+  COMPANY
+}
+
+enum SkillType {
+  INTEREST  
+  ROLE 
+}
+
+
+// -- MODELS (Tables) --
+
+
+model Campaign {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?  @db.Text
+  startDate   DateTime @map("start_date")
+  endDate     DateTime @map("end_date")
+  createdAt   DateTime @default(now())
+
+  // Relation: A campaign has many users (members) through the join table.
+  members CampaignUser[]
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int     @map("company_id")
+
+}
+
+model CampaignUser {
+  // Relation to User
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @map("user_id")
+
+  // Relation to Campaign
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaignId Int      @map("campaign_id")
+  
+  assignedAt DateTime @default(now()) @map("assigned_at")
+
+  // Define a composite primary key to ensure a user is only added once per campaign
+  @@id([userId, campaignId])
+}
+
+
+model Company {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+
+  // Relation: A company has many users (employees).
+  users User[]  @relation("CompanyUsers")
+
+  // Relation: A company has ONE designated admin (who is also a user).
+  admin   User? @relation("CompanyAdmin", fields: [adminId], references: [id])
+  adminId Int?  @unique @map("admin_id")
+
+  campaigns Campaign[]
+
+}
+
+
+model Skill {
+  id              Int      @id @default(autoincrement())
+  name            String   @unique
+  category        SkillCategory
+  imageUrl        String?  @map("image_url") @db.Text
+  workExperiences WorkExperienceSkill[]
+  skillType       SkillType @default(ROLE)
+  endorsements    Int      @default(0)      // <-- NEW: Add endorsement count
+  isVerified      Boolean  @default(false) @map("is_verified") // <-- NEW: Add verification status
+
+}
+
+model User {
+  id              Int              @id @default(autoincrement())
+  username        String           @unique
+  fullName        String?          @map("full_name")
+  email           String           @unique
+  password        String
+  mobile          String?          @unique
+  dob             DateTime?
+  gender          Gender?
+  role            Role             @default(EMPLOYEE)
+  position        String?
+  verifier_email  String?
+  is_verified     Boolean?         @default(false)
+  // Relation: A user belongs to ONE company.
+  company   Company @relation("CompanyUsers", fields: [companyId], references: [id])
+  companyId Int     @map("company_id")
+  administeredCompany Company? @relation("CompanyAdmin")
+
+  // This will give a list of all campaigns this user is a part of.
+  campaigns           CampaignUser[]
+
+
+  // User's own details
+  educations      Education[]
+  workExperiences WorkExperience[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Education {
+  id          Int       @id @default(autoincrement())
+  degree      String
+  institution String
+  branch      String?
+  rollNumber  String?   @map("roll_number")
+  startDate   DateTime  @map("start_date")
+  endDate     DateTime? @map("end_date")
+  gradeInCgpa Float?    @map("grade_in_cgpa")
+  description String?   @db.Text
+
+  // Relation to User
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @map("user_id")
+}
+
+model WorkExperience {
+  id               Int       @id @default(autoincrement())
+  role             String
+  companyName      String    @map("company_name")
+  employeeId       String?   @map("employee_id")
+  workType         WorkType  @map("work_type")
+  location         String
+  startDate        DateTime  @map("start_date")
+  endDate          DateTime? @map("end_date")
+  currentlyWorking Boolean   @default(false) @map("currently_working")
+  description      String?   @db.Text
+  verifier_email   String?   @default("")
+  is_verified      Boolean   @default(false)
+  // Relation to User
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @map("user_id")
+
+  // Many-to-many relation to Skill through the join table
+  skills WorkExperienceSkill[]
+}
+
+// This is the "join table" for the many-to-many relationship
+// between WorkExperience and Skill.
+model WorkExperienceSkill {
+  // Relation to WorkExperience
+  workExperience   WorkExperience @relation(fields: [workExperienceId], references: [id], onDelete: Cascade)
+  workExperienceId Int            @map("work_experience_id")
+
+  // Relation to Skill
+  skill   Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  skillId Int   @map("skill_id")
+
+  // Extra field on the relation
+  verificationStatus VerificationStatus @default(UNVERIFIED) @map("verification_status")
+
+  // Define a composite primary key to ensure a skill is only added once per experience
+  @@id([workExperienceId, skillId])
+}

@@ -8,10 +8,20 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "dependencies": {
+    "@lottiefiles/dotlottie-react": "^0.14.4",
+    "bcryptjs": "^3.0.2",
+    "chart.js": "^4.5.0",
+    "jose": "^6.0.12",
+    "jsonwebtoken": "^9.0.2",
+    "next": "15.4.5",
     "react": "19.1.0",
+    "react-chartjs-2": "^5.3.0",
     "react-dom": "19.1.0",
-    "next": "15.4.5"
+    "react-icons": "^5.5.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
