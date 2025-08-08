@@ -77,7 +77,7 @@ export const getVerificationHtml = (Id,company,name,position) => {
             <strong>${name}</strong> has added their experience as a <strong>${position}</strong> in <strong>${company}</strong>. Please verify the details using the following link.
           </p>
           <div class="button-wrapper">
-            <a href="http://localhost:3000/review/${Id}" class="button">
+            <a href="https://verifier-phi.vercel.app/review/${Id}" class="button">
               Verify Now
             </a>
           </div>

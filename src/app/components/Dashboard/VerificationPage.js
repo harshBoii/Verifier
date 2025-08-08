@@ -26,7 +26,7 @@ const ActionMenu = ({ onVerifyClick, onGetHrEmail, user }) => (
         <button onClick={onVerifyClick}>Send Verification</button>
         {/* The new link/button */}
         <Link href={`/admin/verify-experience/${user.id}`} className={styles.actionButton}>
-            View Exp
+            <buttonView>View Exp</buttonView> 
         </Link>
         <button onClick={onGetHrEmail}>Get HR Email</button>
         <button className={styles.delete}>Delete</button>
