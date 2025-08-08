@@ -9,6 +9,7 @@ import { FiCheck, FiX, FiClock } from 'react-icons/fi';
 // 1. Import your layout components
 import Sidebar from '@/app/components/Dashboard/Sidebar';
 import Header from '@/app/components/Dashboard/Header';
+import LoadingGlass from '@/app/components/LoadingGlass';
 
 const VerifyExperiencePage = () => {
     const [user, setUser] = useState(null);
@@ -56,7 +57,7 @@ const VerifyExperiencePage = () => {
 
     // The main content of the page is now a separate block of JSX
     const pageContent = () => {
-        if (loading) return <div className={styles.container}><p>Loading experiences...</p></div>;
+        if (loading) return <LoadingGlass/>;
         if (error) return <div className={styles.container}><p style={{color: 'red'}}>Error: {error}</p></div>;
         if (!user) return null;
 
@@ -80,7 +81,7 @@ const VerifyExperiencePage = () => {
                             </div>
                             <div className={styles.actions}>
                                 {exp.is_verified === true && <span className={`${styles.status} ${styles.verified}`}><FiCheck /> Verified</span>}
-                                {exp.is_verified === false && <span className={`${styles.status} ${styles.declined}`}><FiX /> Declined</span>}
+                                {exp.is_verified === false && <span className={`${styles.status} ${styles.declined}`}><FiClock /> Pending</span>}
                                 {exp.is_verified === null && <span className={`${styles.status} ${styles.pending}`}><FiClock /> Pending</span>}
                                 <div className={styles.buttonGroup}>
                                     <button className={styles.acceptButton} onClick={() => handleVerification(exp.id, true)}>Accept</button>

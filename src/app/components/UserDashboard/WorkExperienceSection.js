@@ -4,7 +4,8 @@ import Image from 'next/image';
 import styles from './UserProfile.module.css';
 import { FiEdit2, FiPlus, FiCheckCircle } from 'react-icons/fi';
 import AddExperienceModal from './AddExperienceModal';
-import UserGetVerifiedModal from './UserGetVerifiedModal'; // Import the verification modal
+import UserGetVerifiedModal from './UserGetVerifiedModal'; // The modal to be opened
+
 
 const formatDateRange = (startDateISO, endDateISO, isCurrentlyWorking) => {
   const options = { year: 'numeric', month: 'short' };
@@ -36,7 +37,6 @@ const formatDateRange = (startDateISO, endDateISO, isCurrentlyWorking) => {
  */
 const ExperienceCard = ({ experience, onVerifyClick }) => {
   const logoUrl = `https://placehold.co/40x40/3F51B5/FFFFFF?text=${experience.companyName.charAt(0)}`;
-  const isRoleVerified = experience.skills.some(s => s.verificationStatus === 'VERIFIED');
   
   return (
     <div className={styles.card}>
@@ -45,7 +45,8 @@ const ExperienceCard = ({ experience, onVerifyClick }) => {
         <div className={styles.cardHeaderText}>
           <h4 className={styles.cardRole}>
             {experience.role}
-            {isRoleVerified && <FiCheckCircle className={styles.verifiedIcon} />}
+            {/* The green check on the role now uses the specific is_verified flag */}
+            {experience.is_verified && <FiCheckCircle className={styles.verifiedIcon} />}
           </h4>
           <p className={styles.cardCompany}>{experience.companyName} | {experience.location}</p>
           <p className={styles.cardDuration}>
@@ -68,10 +69,20 @@ const ExperienceCard = ({ experience, onVerifyClick }) => {
                 ))}
             </div>
         </div>
-        {/* New Verify Button */}
-        <button className={styles.verifyButton} onClick={() => onVerifyClick(experience)}>
+        
+        {/* --- THIS IS THE NEW LOGIC --- */}
+        {/* Conditionally render the button or the verified status */}
+        {experience.is_verified ? (
+          <span className={`${styles.status} ${styles.verified}`}>
+            <FiCheckCircle /> Verified
+          </span>
+        ) : (
+          <button className={styles.verifyButton} onClick={() => onVerifyClick(experience)}>
             Verify
-        </button>
+          </button>
+        )}
+        {/* --- END OF NEW LOGIC --- */}
+
       </div>
     </div>
   );
@@ -79,9 +90,8 @@ const ExperienceCard = ({ experience, onVerifyClick }) => {
 
 const WorkExperienceSection = ({ experiences = [], refetchData, user }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  // State for the verification modal
-  const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
   const [selectedExperience, setSelectedExperience] = useState(null);
+
   const handleVerifyClick = (experience) => {
     setSelectedExperience(experience);
   };
@@ -96,7 +106,11 @@ const WorkExperienceSection = ({ experiences = [], refetchData, user }) => {
       </div>
       <div className={styles.cardContainer}>
         {experiences.map(exp => (
-          <ExperienceCard key={exp.id} experience={exp} onVerifyClick={handleVerifyClick} />
+          <ExperienceCard 
+            key={exp.id} 
+            experience={exp} 
+            onVerifyClick={handleVerifyClick}
+          />
         ))}
       </div>
 
@@ -106,11 +120,10 @@ const WorkExperienceSection = ({ experiences = [], refetchData, user }) => {
         onSuccess={refetchData}
       />
 
-      {/* Render the UserGetVerifiedModal */}
       <UserGetVerifiedModal
         isOpen={!!selectedExperience}
         onClose={() => setSelectedExperience(null)}
-        user={user} // Pass the main user object to the modal
+        user={user}
         experience={selectedExperience}
       />
     </div>

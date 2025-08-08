@@ -64,7 +64,7 @@
     font-size: 0.8rem;
 }
 .verified { background-color: #dcfce7; color: #166534; }
-.declined { background-color: #fee2e2; color: #991b1b; }
+.declined { background-color: #b4b2b2; color: #000000; }
 .pending { background-color: #fef3c7; color: #92400e; }
 .buttonGroup { display: flex; gap: 10px; }
 .acceptButton, .declineButton {

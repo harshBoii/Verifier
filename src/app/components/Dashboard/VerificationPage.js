@@ -25,13 +25,17 @@ const ActionMenu = ({ onVerifyClick, onGetHrEmail, user }) => (
         <button>Edit</button>
         <button onClick={onVerifyClick}>Send Verification</button>
         {/* The new link/button */}
-        <Link href={`/admin/verify-experience/${user.id}`} className={styles.actionButton}>
-            <buttonView>View Exp</buttonView> 
-        </Link>
+        {/* <Link href={`/admin/verify-experience/${user.id}`} className={styles.actionButton}> */}
+            <button onClick={()=>GoVerify(user.id)}>View Exp</button> 
+        {/* </Link> */}
         <button onClick={onGetHrEmail}>Get HR Email</button>
         <button className={styles.delete}>Delete</button>
     </div>
 );
+
+const GoVerify=(id)=>{
+    window.location.href=`/admin/verify-experience/${id}`
+}
 
 const VerificationPage = () => {
     // --- STATE MANAGEMENT ---
