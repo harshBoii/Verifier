@@ -18,7 +18,6 @@ const GetVerifiedModal = ({ isOpen, onClose,user }) => {
         e.preventDefault();
         setIsSending(true);
         setError('');
-        console.log(user)
         try {
             // STEP 1: Send the user's data to our backend API route
             const response = await fetch('/api/send-verification', {

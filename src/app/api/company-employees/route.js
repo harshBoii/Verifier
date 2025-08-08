@@ -64,6 +64,7 @@ export async function GET(request) {
         position:emp.position
     }));
 
+    console.log(processedEmployees)
     return NextResponse.json(processedEmployees);
 
   } catch (error) {

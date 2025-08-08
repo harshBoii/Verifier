@@ -1,7 +1,7 @@
 // app/lib/email-templates.js
 
 // FUNCTION 1: Your original template for the initial verification request.
-export const getVerificationHtml = (Id,company,name,position) => {
+export const getVerificationHtml = (Id,company,name,position,exp_id) => {
   // Use template literals (`) to create an HTML string
   return `
     <!DOCTYPE html>
@@ -77,7 +77,7 @@ export const getVerificationHtml = (Id,company,name,position) => {
             <strong>${name}</strong> has added their experience as a <strong>${position}</strong> in <strong>${company}</strong>. Please verify the details using the following link.
           </p>
           <div class="button-wrapper">
-            <a href="https://verifier-phi.vercel.app/review/${Id}" class="button">
+            <a href="https://verifier-phi.vercel.app/review/experience/${exp_id}" class="button">
               Verify Now
             </a>
           </div>

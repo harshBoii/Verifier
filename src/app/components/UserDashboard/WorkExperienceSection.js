@@ -69,7 +69,7 @@ const ExperienceCard = ({ experience, onVerifyClick }) => {
             </div>
         </div>
         {/* New Verify Button */}
-        <button className={styles.verifyButton} onClick={onVerifyClick}>
+        <button className={styles.verifyButton} onClick={() => onVerifyClick(experience)}>
             Verify
         </button>
       </div>
@@ -81,9 +81,9 @@ const WorkExperienceSection = ({ experiences = [], refetchData, user }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   // State for the verification modal
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
-
-  const handleVerifyClick = () => {
-    setIsVerifyModalOpen(true);
+  const [selectedExperience, setSelectedExperience] = useState(null);
+  const handleVerifyClick = (experience) => {
+    setSelectedExperience(experience);
   };
 
   return (
@@ -108,9 +108,10 @@ const WorkExperienceSection = ({ experiences = [], refetchData, user }) => {
 
       {/* Render the UserGetVerifiedModal */}
       <UserGetVerifiedModal
-        isOpen={isVerifyModalOpen}
-        onClose={() => setIsVerifyModalOpen(false)}
+        isOpen={!!selectedExperience}
+        onClose={() => setSelectedExperience(null)}
         user={user} // Pass the main user object to the modal
+        experience={selectedExperience}
       />
     </div>
   );

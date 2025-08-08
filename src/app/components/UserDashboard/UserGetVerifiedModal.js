@@ -4,7 +4,7 @@ import styles from './UserGetVerifiedModal.module.css';
 import { FiX, FiMail } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 
-const UserGetVerifiedModal = ({ isOpen, onClose, user }) => {
+const UserGetVerifiedModal = ({ isOpen, onClose, user,experience }) => {
     const [email, setEmail] = useState('');
     const [isSending, setIsSending] = useState(false);
     const [error, setError] = useState('');
@@ -35,7 +35,8 @@ const UserGetVerifiedModal = ({ isOpen, onClose, user }) => {
                     employeeId: user.id,
                     company: user.company?.name, // Safely access company name
                     name: user.fullName,
-                    position: user.position
+                    position: user.position,
+                    exp_id:experience.id
                 }),
             });
 
