@@ -84,7 +84,7 @@ const UserProfilePage = ({ id }) => {
       case 'Education':
         return <EducationSection educations={profileData.educations} refetchData={fetchProfileData} user={profileData} />;
       case 'Skill Repository':
-        return <SkillRepositorySection skills={profileData.skills} />;
+        return <SkillRepositorySection skills={profileData.skills} workExperiences={profileData.workExperiences} refetchData={fetchProfileData}  />;
       default:
         return null;
     }
