@@ -134,6 +134,9 @@ model User {
   position        String?
   verifier_email  String?
   is_verified     Boolean?         @default(false)
+  summary         String?          @default("")
+
+
   // Relation: A user belongs to ONE company.
   company   Company @relation("CompanyUsers", fields: [companyId], references: [id])
   companyId Int     @map("company_id")
@@ -182,6 +185,11 @@ model WorkExperience {
   // Relation to User
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @map("user_id")
+
+  hr_comment       String?   @db.Text // To store the text response ("Good", "Bad", etc.)
+  verified_by      String?   // To store the email of the HR who responded
+  verified_at      DateTime? // To store when the verification happened
+
 
   // Many-to-many relation to Skill through the join table
   skills WorkExperienceSkill[]

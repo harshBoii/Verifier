@@ -5,18 +5,20 @@ import { ArrowRight, Globe } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { FiPlus } from "react-icons/fi"
 
+// The component now accepts a 'type' prop for the button element.
 const WrapButton = ({
   className,
   children,
   href,
-  onClick
+  onClick,
+  type = 'button' // Default type is 'button' to prevent accidental form submissions.
 }) => {
   return (
     <div className="flex items-center justify-center">
       {href ? (
         <Link href={href}>
           <div
-          onClick={onClick}
+            onClick={onClick}
             className={cn(
               "group cursor-pointer border group border-[#fff4f4] bg-[#ffffff] gap-2  h-[64px] flex items-center p-[11px] rounded-full",
               className
@@ -35,8 +37,11 @@ const WrapButton = ({
           </div>
         </Link>
       ) : (
-        <div
-        onClick={onClick}
+        // --- FIX: Changed from <div> to <button> ---
+        // This allows the component to accept `type="submit"` and function correctly within a form.
+        <button
+          type={type} // The 'type' prop is now passed to the button element.
+          onClick={onClick}
           className={cn(
             "group cursor-pointer border group border-[#fff2f2] bg-[#1980ff] gap-2  h-[64px] flex items-center p-[11px] rounded-full",
             className
@@ -52,7 +57,7 @@ const WrapButton = ({
             className="text-[#3b3a3a] group-hover:ml-2  ease-in-out transition-all size-[26px] flex items-center justify-center rounded-full border-2 border-[#3b3a3a]  ">
             <FiPlus size={18} className="group-hover:rotate-45 ease-in-out transition-all bg-zinc-600 text-white rounded-4xl " />
           </div>
-        </div>
+        </button>
       )}
     </div>
   );
