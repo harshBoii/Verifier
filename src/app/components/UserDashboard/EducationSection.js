@@ -5,6 +5,7 @@ import styles from './UserProfile.module.css';
 import { FiEdit2, FiPlus, FiCheckCircle } from 'react-icons/fi';
 import AddEducationModal from './AddEducationModal';
 import UserGetVerifiedModal from './UserGetVerifiedModal';
+import WrapButton from '@/components/ui/wrap-button';
 
 const EducationCard = ({ education, onVerifyClick }) => {
   const logoUrl = `https://placehold.co/40x40/7E57C2/FFFFFF?text=${education.institution.charAt(0)}`;
@@ -60,9 +61,9 @@ const EducationSection = ({ educations = [], refetchData, user }) => {
     <div>
       <div className={styles.contentHeader}>
         <h3>Educational Details</h3>
-        <button className={styles.addButton} onClick={() => setIsAddModalOpen(true)}>
-          <FiPlus /> Add Education
-        </button>
+        <WrapButton onClick={() => setIsAddModalOpen(true)}>
+           Add Education
+        </WrapButton>
       </div>
       <div className={styles.cardContainer}>
         {educations.map(edu => (

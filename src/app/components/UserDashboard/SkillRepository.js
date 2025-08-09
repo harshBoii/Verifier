@@ -13,6 +13,8 @@ import {
   Tooltip,
 } from 'chart.js';
 import AddSkillModal from './AddSkillModal'; // Import the new modal
+import SlideButton from '@/components/ui/slide-button';
+import WrapButton from '@/components/ui/wrap-button';
 
 // Register the necessary components for the radar chart
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip);
@@ -118,7 +120,12 @@ const SkillRepositorySection = ({ skills = [], workExperiences = [], refetchData
           <section>
             <div className={styles.contentHeader}>
               <h3>Role Based Skills</h3>
-              <a href="#" className={styles.seeAllLink}>See all &gt;</a>
+              {/* <a href="#" className={styles.seeAllLink}>See all &gt;</a> */}
+              {/* <button className='h-10 w-20 text-l text-black bg-emerald-200 rounded-2xl hover:bg-red-200 ' onClick={() => setIsModalOpen(true)}>
+                <FiPlus/> Add Skill
+              </button> */}
+              <WrapButton onClick={()=>setIsModalOpen(true)}/>
+
             </div>
             <p className={styles.sectionDescription}>Skills that you earn for your career.</p>
             <div className={styles.skillsGrid}>
@@ -133,9 +140,6 @@ const SkillRepositorySection = ({ skills = [], workExperiences = [], refetchData
             <div className={styles.contentHeader}>
               <h3>Interest Based Skills</h3>
               {/* This button will now open the modal */}
-              <button className={styles.addButtonSmall} onClick={() => setIsModalOpen(true)}>
-                <FiPlus /> Add Skill
-              </button>
             </div>
             <p className={styles.sectionDescription}>Skills that you earn for your will.</p>
             <div className={styles.skillsGrid}>

@@ -2,6 +2,7 @@
 import React from 'react';
 import styles from './UserProfile.module.css';
 import { FiSave, FiLinkedin, FiGithub, FiGlobe } from 'react-icons/fi';
+import WrapButton from '@/components/ui/wrap-button';
 
 // Updated FormInput to accept and render an icon
 const FormInput = ({ label, name, value, placeholder, type = 'text', disabled = false, icon }) => (
@@ -34,9 +35,9 @@ const BasicProfileForm = ({ profileData }) => {
     <div>
       <div className={styles.contentHeader}>
         <h3>Basic Details</h3>
-        <button className={styles.saveButton} onClick={handleFormSubmit}>
-            <FiSave /> Save Changes
-        </button>
+        <WrapButton onClick={handleFormSubmit}>
+              Save Changes
+        </WrapButton>
       </div>
       <form className={styles.formGrid}>
         {/* --- Basic Info --- */}

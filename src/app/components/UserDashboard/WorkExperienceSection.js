@@ -5,6 +5,7 @@ import styles from './UserProfile.module.css';
 import { FiEdit2, FiPlus, FiCheckCircle } from 'react-icons/fi';
 import AddExperienceModal from './AddExperienceModal';
 import UserGetVerifiedModal from './UserGetVerifiedModal'; // The modal to be opened
+import WrapButton from '@/components/ui/wrap-button';
 
 
 const formatDateRange = (startDateISO, endDateISO, isCurrentlyWorking) => {
@@ -100,9 +101,9 @@ const WorkExperienceSection = ({ experiences = [], refetchData, user }) => {
     <div>
       <div className={styles.contentHeader}>
         <h3>Work Experiences & Internships</h3>
-        <button className={styles.addButton} onClick={() => setIsAddModalOpen(true)}>
-          <FiPlus /> Add Experience
-        </button>
+        <WrapButton onClick={() => setIsAddModalOpen(true)}>
+          Add Experience
+        </WrapButton>
       </div>
       <div className={styles.cardContainer}>
         {experiences.map(exp => (
