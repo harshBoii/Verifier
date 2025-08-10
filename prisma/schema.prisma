@@ -61,6 +61,45 @@ enum SkillType {
 // -- MODELS (Tables) --
 
 
+model Plan {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique // "Secondary", "Primary", "Tertiary"
+  
+  // Price fields
+  priceMonthly Decimal
+  priceAnnually Decimal
+
+  // Feature flags based on your design
+  verificationLimit   Int     @default(5)
+  hasCustomSmtp       Boolean @default(false)
+  canSetRates         Boolean @default(false)
+  hasAgentConnect     Boolean @default(false)
+  hasAdvancedStats    Boolean @default(false)
+
+  // Relation: Many subscriptions can be based on this one plan
+  subscriptions Subscription[]
+}
+
+// This model tracks the active subscription for each company
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  isActive  Boolean  @default(true)
+  
+  // Tracks the billing cycle
+  currentPeriodEnds DateTime
+
+  // Relation to a Company
+  // This is a one-to-one relation, meaning one company has one subscription
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int     @unique @map("company_id")
+
+  // Relation to a Plan
+  plan   Plan @relation(fields: [planId], references: [id])
+  planId Int  @map("plan_id")
+}
+
+
+
 model Campaign {
   id          Int      @id @default(autoincrement())
   name        String
@@ -105,6 +144,8 @@ model Company {
   adminId Int?  @unique @map("admin_id")
 
   campaigns Campaign[]
+
+  subscription Subscription?
 
 }
 

@@ -1,0 +1,128 @@
+.container {
+    padding: 20px;
+    font-family: 'DM Sans', sans-serif;
+    min-height: 95vh;
+}
+
+.headerGrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.welcomeBanner {
+    background: linear-gradient(180deg, #2B66F6 -0.55%, #677AFF 121.03%);
+    color: #FFFFFF;
+    padding: 25px;
+    border-radius: 12px;
+}
+
+.welcomeBanner h2 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 0 0 8px 0;
+}
+
+.welcomeBanner p {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.statsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.statCard {
+    background: #FFFFFF;
+    border: 1px solid #EAEAEA;
+    border-radius: 7px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.statIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    background: linear-gradient(180deg, #2B66F6 -0.55%, #677AFF 121.03%);
+}
+
+.statInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.statValue {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #121212;
+}
+
+.statLabel {
+    font-size: 0.8rem;
+    color: #717171;
+}
+
+.tableWrapper {
+    background-color: #FFFFFF;
+    border: 1px solid #EAEAEA;
+    border-radius: 9px;
+    padding: 20px;
+}
+
+.tableWrapper h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #626262;
+    margin: 0 0 20px 0;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th, .table td {
+    padding: 15px 10px;
+    text-align: left;
+    border-bottom: 1px solid #F0F0F0;
+}
+
+.table th {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #000000;
+}
+
+.table td {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #626262;
+}
+
+.cellWrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    border-radius: 50%;
+}
+
+.remainingUrgent {
+    color: #F04F52;
+    font-weight: 700;
+}

@@ -1,0 +1,246 @@
+.container {
+    padding: 40px 20px;
+    background-color: #F8F4FF;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+}
+
+.header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 30px auto;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #181059;
+    margin-bottom: 15px;
+}
+
+.header p {
+    font-size: 1rem;
+    color: #181059;
+    opacity: 0.7;
+    line-height: 1.6;
+}
+
+.toggleContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 40px;
+    font-weight: 500;
+    color: #181059;
+}
+
+.toggleContainer .activeText {
+    font-weight: 700;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #181059;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: #EDBB01;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.cardsContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.card {
+    background-color: #FFFFFF;
+    border: 1.5px solid #E5E1FF;
+    border-radius: 28px;
+    padding: 30px;
+    width: 25vw;
+    text-align: center;
+    transition: transform 0.4s ease, box-shadow 0.4s ease, opacity 0.4s ease;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.08);
+    background-color: #c6e0ef
+}
+
+.card.primary {
+    background-color: #181059;
+    color: #FFFFFF;
+    transform: scale(1.05);
+    box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.card.active {
+    transform: scale(1.1);
+    border-color: #8645FF;
+    box-shadow: 0px 20px 40px rgba(134, 69, 255, 0.2);
+    background-color: #181059;
+    color: white;
+}
+
+.card.primary.active {
+    transform: scale(1.15);
+}
+
+.hasActiveCard .card:not(.active) {
+    transform: scale(0.95);
+    opacity: 0.7;
+}
+
+.cardHeader {
+    margin-bottom: 30px;
+    min-height: 60px;
+}
+
+.cardHeader h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #181059;
+}
+
+.card.primary .cardHeader h3 {
+    color: #FFFFFF;
+}
+
+.saveBadge {
+    background-color: #FFFFFF;
+    color: #8645FF;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    display: inline-block;
+    margin-top: -10px;
+}
+
+.featuresList {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+    text-align: left;
+}
+
+.featureItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    font-size: 1rem;
+    color: #181059;
+}
+
+.card.primary .featureItem {
+    color: #FFFFFF;
+}
+
+.featureItem.excluded {
+    color: #BAB8CE;
+}
+
+.checkIcon, .xIcon {
+    font-size: 1.2rem;
+}
+
+.checkIcon { color:#BAB8CE ; }
+.card.primary .checkIcon { color: #FFFFFF; }
+.xIcon { color: #8645FF; }
+
+.checkButton { color: #333146 ; }
+.card.primary .checkIcon { color: #FFFFFF; }
+.xButton{ color:#8645FF; }
+
+.checkButton.active { color: #ffffff ; }
+.card.primary .checkIcon { color: #FFFFFF; }
+.xButton.active{ color:#8645FF; }
+
+
+.priceSection {
+    margin-bottom: 30px;
+}
+
+.price {
+    font-size: 2.5rem;
+    font-weight: 500;
+    color: #181059;
+}
+
+.perMonth {
+    font-size: 1.2rem;
+    color: #181059;
+    opacity: 0.7;
+}
+
+.card.primary .price, .card.primary .perMonth {
+    color: #FFFFFF;
+}
+
+.ctaButton {
+    width: 100%;
+    padding: 15px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.card:not(.primary) .ctaButton {
+    background-color: #F8F4FF;
+    color: #8645FF;
+}
+
+.card:not(.primary) .ctaButton:hover {
+    background-color: #E5E1FF;
+}
+
+.card.primary .ctaButton {
+    background-color: #8645FF;
+    color: #FFFFFF;
+}
+
+.card.primary .ctaButton:hover {
+    background-color: #7a6df5;
+}
