@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import styles from './CompaniesPage.module.css';
 import { FiUsers, FiBriefcase } from 'react-icons/fi';
+import SuperAdminCharts from './SuperChart';
 
 const StatCard = ({ icon, value, label }) => (
     <div className={styles.statCard}>
@@ -44,11 +45,13 @@ const CompaniesPage = () => {
                     <p>You can now turn your Verification Process Faster than a Cheetah.</p>
                 </div>
                 <div className={styles.statsContainer}>
-                    <StatCard icon={<FiUsers />} value="2830" label="Total Company applied for Verification" />
+                    <StatCard icon={<FiUsers />} value="2" label="Total Company applied for Verification" />
                     <StatCard icon={<FiBriefcase />} value={companies.length} label="Total Companys" />
                 </div>
             </div>
-
+                <div className="my-8">
+                    <SuperAdminCharts />
+                </div>
             <div className={styles.tableWrapper}>
                 <h3>Newly Joined Company</h3>
                 {loading ? (

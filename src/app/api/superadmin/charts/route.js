@@ -1,0 +1,70 @@
+import { NextResponse } from 'next/server';
+import prisma from '@/app/lib/prisma';
+
+/**
+ * Handles GET requests to fetch chart data for the Super Admin dashboard.
+ * This route is open and does not require authentication.
+ */
+export async function GET() {
+  try {
+    // --- Query 1: Overall Verification Stats Across All Companies ---
+    const verifiedCount = await prisma.user.count({
+      where: { role: 'EMPLOYEE', is_verified: true },
+    });
+    const unverifiedCount = await prisma.user.count({
+      where: { role: 'EMPLOYEE', is_verified: false },
+    });
+
+    // --- Query 2: Top 5 Campaigns by Member Count Across All Companies ---
+    const campaigns = await prisma.campaign.findMany({
+      include: {
+        _count: {
+          select: { members: true },
+        },
+      },
+      orderBy: {
+        members: {
+          _count: 'desc',
+        },
+      },
+      take: 5,
+    });
+
+    // --- Query 3: Top 7 Companies by Employee Size ---
+    const companies = await prisma.company.findMany({
+      include: {
+        _count: {
+          select: { users: true },
+        },
+      },
+       orderBy: {
+        users: {
+          _count: 'desc',
+        },
+      },
+      take: 7,
+    });
+
+    // --- Assemble the final data object ---
+    const chartData = {
+      verificationStats: {
+        verified: verifiedCount,
+        unverified: unverifiedCount,
+      },
+      campaignMembers: campaigns.map(c => ({
+        name: c.name,
+        members: c._count.members,
+      })),
+      companySizes: companies.map(c => ({
+        name: c.name,
+        employees: c._count.users,
+      })),
+    };
+
+    return NextResponse.json(chartData);
+
+  } catch (error) {
+    console.error("API Super Admin Charts Error:", error);
+    return NextResponse.json({ error: 'Failed to fetch super admin chart data.' }, { status: 500 });
+  }
+}

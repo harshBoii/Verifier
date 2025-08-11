@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { FiCheckCircle } from 'react-icons/fi';
 
 // An SVG icon component for the password visibility toggle
 const EyeIcon = ({ closed }) => (
@@ -61,8 +62,10 @@ const SignInPage = () => {
       const id = result.user.id
       switch (userRole) {
         case 'ADMIN':
+          router.push('/admin')
+          break
         case 'SUPER_ADMIN':
-          router.push('/admin'); // Redirect admins
+          router.push('/superadmin'); // Redirect admins
           break;
         case 'EMPLOYEE':
           router.push(`/employee/${id}/profile`); // Redirect employees
@@ -91,12 +94,9 @@ const SignInPage = () => {
         {/* Left decorative panel */}
         <div className="w-1/2 hidden md:flex flex-col rounded-2xl justify-between h-180 mt-2 mb-2 ml-2 p-12 text-white bg-gradient-to-br from-blue-300 to-blue-800">
           <div>
-            <img 
-              src="Svg/logo.svg" 
-              alt="Company Logo" 
-              className="w-24"
-              onError={(e) => e.target.src='https://placehold.co/100x40?text=Logo'}
-            />
+            <div className='font-extrabold text-[30px] align-middle text-center'>
+              <FiCheckCircle className='absolute ml-13 mt-2'/>DEMO CRM
+            </div>
             <h1 className="text-4xl font-bold mt-8">Welcome Back</h1>
             <p className="mt-4 text-orange-100">
               Login to see your performance and keep your learning curve like no one else.

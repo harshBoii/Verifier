@@ -6,7 +6,7 @@ import styles from './SuperSide.module.css';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { FiGrid, FiUploadCloud, FiCheckSquare, FiBarChart2, FiHelpCircle, FiSettings,FiPlus,FiClipboard } from 'react-icons/fi';
+import { FiGrid, FiUploadCloud, FiCheckSquare, FiBarChart2, FiHelpCircle, FiSettings,FiPlus,FiClipboard,FiCodesandbox } from 'react-icons/fi';
 
 // 2. Modify NavItem to handle links and dynamic active state
 const NavItem = ({ icon, label, href }) => {
@@ -46,6 +46,7 @@ const SuperSide = () => {
         <NavItem icon={<FiClipboard />} href="/superadmin/subscription" label="Subscription" />
         <NavItem icon={<FiPlus />} href="/superadmin/role" label="Create Role" />
         <NavItem icon={<FiBarChart2 />} href="/reports" label="Reports" />
+        <NavItem icon={<FiCodesandbox />} href="/superadmin/agents" label="Agents" />
       </nav>
       <div className={styles.footer}>
         <NavItem icon={<FiHelpCircle />} label="Help" /> {/* No href = not a link */}

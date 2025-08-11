@@ -4,7 +4,8 @@ import styles from './Dashboard.module.css';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import CampaignsTable from './CampaignsTable';
-import { FiUsers, FiUserCheck, FiUserX, FiClock } from 'react-icons/fi';
+import { FiUsers, FiUserCheck, FiX, FiClock } from 'react-icons/fi';
+import DashboardCharts from './Chart';
 
 const StatCard = ({ icon, value, label }) => (
     <div className={styles.statCard}>
@@ -19,49 +20,99 @@ const StatCard = ({ icon, value, label }) => (
 );
 
 const Dashboard = () => {
-    // 1. ADD STATE FOR USER, STATS, LOADING, AND ERRORS
     const [user, setUser] = useState(null);
     const [stats, setStats] = useState(null);
+    
+    // State for filters, table data, and loading
+    const [filters, setFilters] = useState({
+        campaignId: '',
+        role: '',
+        name: '', // Added name to the filter state
+    });
+    const [tableData, setTableData] = useState([]);
+    const [allCampaigns, setAllCampaigns] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [loginTime, setLoginTime] = useState(null);
 
-    // 2. FETCH DATA WHEN THE COMPONENT LOADS
+    // --- DATA FETCHING ---
     useEffect(() => {
-        const fetchData = async () => {
+        const initialFetch = async () => {
             try {
                 setLoading(true);
-                // Fetch both user data and stats concurrently for speed
-                const [userResponse, statsResponse] = await Promise.all([
-                    fetch('/api/auth/me'), // An API to get the current user
-                    fetch('/api/dashboard-stats') // The API for company stats
+                const [userRes, statsRes, campaignsRes] = await Promise.all([
+                    fetch('/api/auth/me'),
+                    fetch('/api/dashboard-stats'),
+                    fetch('/api/campaigns')
                 ]);
 
-                if (!userResponse.ok) throw new Error('Failed to fetch user data. Please log in again.');
-                if (!statsResponse.ok) throw new Error('Failed to fetch dashboard stats.');
+                if (!userRes.ok) throw new Error('Failed to fetch user data.');
+                if (!statsRes.ok) throw new Error('Failed to fetch dashboard stats.');
+                if (!campaignsRes.ok) throw new Error('Failed to fetch campaign list.');
 
-                const userData = await userResponse.json();
-                const statsData = await statsResponse.json();
+                const userData = await userRes.json();
+                const statsData = await statsRes.json();
+                const campaignsData = await campaignsRes.json();
 
                 setUser(userData);
                 setStats(statsData);
+                setAllCampaigns(campaignsData);
+                setTableData(campaignsData);
+                // Set the login time from the API response
+                if (userData.loginTime) {
+                    setLoginTime(new Date(userData.loginTime));
+                }
+
             } catch (err) {
                 setError(err.message);
             } finally {
                 setLoading(false);
             }
         };
+        initialFetch();
+    }, []);
 
-        fetchData();
-    }, []); // Empty array ensures this runs only once on mount
+    // --- EFFECT TO HANDLE SEARCHING ---
+    useEffect(() => {
+        // Don't run the search on the initial page load
+        if (loading) return;
+
+        // Debounce: Wait 300ms after the user stops typing before making an API call
+        const handler = setTimeout(() => {
+            const searchCampaigns = async () => {
+                const params = new URLSearchParams();
+                if (filters.campaignId) params.append('campaignId', filters.campaignId);
+                if (filters.role) params.append('role', filters.role);
+                if (filters.name) params.append('name', filters.name);
+                
+                try {
+                    const response = await fetch(`/api/campaigns/search?${params.toString()}`);
+                    if (!response.ok) throw new Error('Search failed.');
+                    const data = await response.json();
+                    setTableData(data); // Update the table with filtered results
+                } catch (err) {
+                    setError(err.message);
+                }
+            };
+            searchCampaigns();
+        }, 300); // 300ms delay
+
+        // Cleanup function: If the user types again, cancel the previous timeout
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [filters, loading]); // This effect re-runs whenever the filters change
+
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilters(prev => ({ ...prev, [name]: value }));
+    };
 
     return (
         <div className={styles.dashboardContainer}>
-            <Sidebar />
+            <Sidebar className="w-20" />
             <main className={styles.mainContent}>
-                {/* The Header now receives the dynamic user data */}
                 <Header user={user} />
-
-                {/* Welcome Banner now uses the dynamic user name */}
                 <div className={styles.welcomeBanner}>
                     <div>
                         <h2>Welcome back, {user ? user.fullName : 'Admin'}!</h2>
@@ -69,37 +120,51 @@ const Dashboard = () => {
                         <button className={styles.exploreButton}>Explore Now &rarr;</button>
                     </div>
                 </div>
-
-                {/* Logged In Time & Stats */}
                 <div className={styles.statsGrid}>
-                    {/* 3. DISPLAY FETCHED DATA OR LOADING/ERROR STATES */}
-                    {loading ? (
-                        <p>Loading statistics...</p>
-                    ) : error ? (
-                        <p style={{ color: 'red' }}>Error: {error}</p>
-                    ) : stats ? (
+                    {loading ? <p>Loading statistics...</p> : error ? <p style={{ color: 'red' }}>Error: {error}</p> : stats ? (
                         <>
                             <StatCard icon={<FiUsers />} value={stats.totalEmployees} label="Total Employees in Your Company" />
                             <StatCard icon={<FiUserCheck />} value={stats.verifiedEmployees} label="Verified Employees" />
-                            <StatCard icon={<FiUserX />} value={stats.pendingEmployees} label="Pending Verification" />
+                            <StatCard icon={<FiX />} value={stats.pendingEmployees} label="Pending Verification" />
                         </>
                     ) : null}
                     <div className={styles.loginTimeCard}>
-                         <div className={styles.statIcon}><FiClock /></div>
-                         <div className={styles.statInfo}>
-                            <span className={styles.statValue}>09:00 am</span>
+                        <div className={styles.statIcon}><FiClock /></div>
+                        <div className={styles.statInfo}>
+                            <span className={styles.statValue}>
+                                {loginTime ? loginTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) : '--:--'}
+                            </span>
                             <span className={styles.statLabel}>Logged In Time</span>
                         </div>
                     </div>
                 </div>
 
-                {/* Search & Filters */}
+                <DashboardCharts className="mb-5"/>
+
+                {/* --- UPDATED SEARCH & FILTERS SECTION --- */}
                 <div className={styles.searchSection}>
-                    <h3>Search Campaign</h3>
+                    <h3 className='mt-10'>Search Campaign</h3>
                     <div className={styles.filters}>
-                        <select className={styles.filterInput}><option>Select Campaign</option></select>
-                        <select className={styles.filterInput}><option>Role</option></select>
-                        <select className={styles.filterInput}><option>Level</option></select>
+                        <select name="campaignId" value={filters.campaignId} onChange={handleFilterChange} className={styles.filterInput}>
+                            <option value="">All Campaigns</option>
+                            {allCampaigns.map(campaign => (
+                                <option key={campaign.id} value={campaign.id}>{campaign.name}</option>
+                            ))}
+                        </select>
+                        <select name="role" value={filters.role} onChange={handleFilterChange} className={styles.filterInput}>
+                            <option value="">All Roles</option>
+                            <option value="EMPLOYEE">Employee</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                        {/* The "Level" select is replaced with this text input */}
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Search by name..."
+                            value={filters.name}
+                            onChange={handleFilterChange}
+                            className={styles.filterInput}
+                        />
                     </div>
                      <div className={styles.dateFilters}>
                         <input type="text" placeholder="Select date" className={styles.filterInput} onFocus={(e) => e.target.type = 'date'} onBlur={(e) => e.target.type = 'text'}/>
@@ -108,9 +173,8 @@ const Dashboard = () => {
                     </div>
                 </div>
                 
-                {/* Campaigns List */}
-                <CampaignsTable />
-
+                {/* CampaignsTable now receives the dynamic and filtered tableData */}
+                <CampaignsTable data={tableData} />
             </main>
         </div>
     );

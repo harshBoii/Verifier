@@ -1,4 +1,4 @@
-import VerificationPage from "../components/Dashboard/VerificationPage";
+import VerificationPage from "@/app/components/Dashboard/VerificationPage";
 
 export default function Home() {
   return (

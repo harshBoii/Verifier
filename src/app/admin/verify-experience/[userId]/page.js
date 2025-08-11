@@ -134,7 +134,7 @@ const VerifyExperiencePage = () => {
     return (
         <div className="flex min-h-screen bg-gray-50">
             <Sidebar />
-            <div className="flex flex-1 flex-col">
+            <div className="flex flex-1 flex-col ml-[13vw]">
                 <div className="px-4 py-6 sm:px-8">
                     <Header user={user} />
                 </div>

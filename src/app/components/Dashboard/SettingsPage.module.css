@@ -53,13 +53,14 @@
 .mainContent {
     flex-grow: 1;
     padding: 30px;
-    background-color: #FFFFFF;
+    background-color: #f6f8de;
     border-radius: 13px;
     margin: 20px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    width: 817px; /* From your CSS */
+    width: 50vw; /* From your CSS */
     height: 60vh; /* From your CSS */
-    margin-top: 10vh;
+    margin-top: 17vh;
+
 
 }
 
