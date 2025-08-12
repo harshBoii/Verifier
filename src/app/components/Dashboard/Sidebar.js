@@ -44,7 +44,7 @@ const Sidebar = () => {
         {/* 3. Use the corrected NavItem with href props for each link */}
         <NavItem icon={<FiGrid />} href="/admin" label="Dashboard" />
         <NavItem icon={<FiUploadCloud />} href="/admin/import" label="Import Employee" />
-        <NavItem icon={<FiCheckSquare />} href="admin/verification" label="Verification" />
+        <NavItem icon={<FiCheckSquare />} href="/admin/verification" label="Verification" />
         <NavItem icon={<FiBarChart2 />} href="/reports" label="Reports" />
       </nav>
       <div className={styles.footer}>
