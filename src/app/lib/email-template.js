@@ -46,8 +46,7 @@ export const getVerificationHtml = (Id,company,name,position,exp_id) => {
           }
           /* The button itself */
           .button {
-            background-color: #2979FF;
-            color: white; /* Corrected from black to white */
+            background-color: silver;
             padding: 14px 24px;
             border-radius: 6px;
             text-decoration: none;

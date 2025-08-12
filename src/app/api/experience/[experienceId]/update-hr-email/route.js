@@ -1,0 +1,36 @@
+import { NextResponse } from 'next/server';
+import prisma from '@/app/lib/prisma';
+
+export async function POST(request, { params }) { // <-- This line is fixed
+  try {
+    const { experienceId } = params; // This now works correctly
+    const { hrEmail } = await request.json();
+
+    if (!hrEmail) {
+      return NextResponse.json({ error: 'HR Email is required.' }, { status: 400 });
+    }
+    
+    const numericId = parseInt(experienceId, 10);
+    if (isNaN(numericId)) {
+        return NextResponse.json({ error: 'Invalid Experience ID format.' }, { status: 400 });
+    }
+
+    const updatedExperience = await prisma.workExperience.update({
+      where: {
+        id: numericId,
+      },
+      data: {
+        verifier_email: hrEmail,
+      },
+    });
+
+    return NextResponse.json({ message: 'HR Email updated successfully!', data: updatedExperience });
+  } catch (error) {
+    console.error("API Update HR Email Error:", error);
+    // This will now correctly handle cases where the ID is not found in the DB
+    if (error.code === 'P2025') {
+        return NextResponse.json({ error: 'Work experience not found.' }, { status: 404 });
+    }
+    return NextResponse.json({ error: 'Failed to update HR email.' }, { status: 500 });
+  }
+}

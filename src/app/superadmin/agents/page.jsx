@@ -9,7 +9,7 @@ export default function Agents() {
       <SuperSide />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Header user={{ name: 'Super Admin' }} />
-        <div className='text-[120px] text-center align-center'>
+        <div className='text-[90px] text-center align-center'>
             <LoadingGlass className='-mt-100'/>
             <div>Agents Coming Soon .......</div>
         </div>

@@ -145,10 +145,10 @@ const VerificationReviewPage = ({ id }) => {
           </div>
         </div>
         <div className={styles.fieldGroup}>
-          <label>Employee/Staff ID</label>
+          <label>Employee/Staff ID of your company</label>
           <div className={styles.inputDisplay}>
             {/* Display the first work experience's employeeId as an example */}
-            <span>{reviewData.workExperiences[0]?.employeeId || 'N/A'}</span>
+            <span>1</span>
           </div>
         </div>
       </div>

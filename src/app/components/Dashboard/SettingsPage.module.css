@@ -1,7 +1,7 @@
 /* SettingsPage.module.css */
 .settingsContainer {
     display: flex;
-    background-color: #F4F6F8; /* Light grey background */
+    background-color: #ffffff; /* Light grey background */
     min-height: 100vh;
     font-family: 'DM Sans', sans-serif;
     width: 100vw;
@@ -53,7 +53,7 @@
 .mainContent {
     flex-grow: 1;
     padding: 30px;
-    background-color: #f6f8de;
+    background-color: #f4f3f3;
     border-radius: 13px;
     margin: 20px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
@@ -123,6 +123,8 @@
     border-radius: 6px;
     font-size: 1rem;
     color: #333;
+    background-color: #ffffff
+
 }
 
 .inputGroup input:disabled {

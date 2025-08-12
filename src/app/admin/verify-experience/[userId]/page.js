@@ -3,12 +3,15 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Swal from 'sweetalert2';
-import { FiCheck, FiX, FiClock } from 'react-icons/fi';
+import styles from './VerifyExperiencePage.module.css';
+import { FiCheck, FiX, FiClock, FiMail } from 'react-icons/fi';
+import LoadingGlass from '@/app/components/LoadingGlass';
 
-// 1. Import your layout components
+// 1. Import all necessary components
 import Sidebar from '@/app/components/Dashboard/Sidebar';
 import Header from '@/app/components/Dashboard/Header';
-import LoadingGlass from '@/app/components/LoadingGlass';
+import GetVerifiedModal from '@/app/components/Dashboard/GetVerifiedModal';
+import GetHrEmailModal from '@/app/components/GetHrEmailModal';
 
 const VerifyExperiencePage = () => {
     const [user, setUser] = useState(null);
@@ -16,6 +19,11 @@ const VerifyExperiencePage = () => {
     const [error, setError] = useState('');
     const params = useParams();
     const { userId } = params;
+
+    // State for modals
+    const [selectedExperience, setSelectedExperience] = useState(null);
+    const [isHrChoiceModalOpen, setIsHrChoiceModalOpen] = useState(false);
+    const [isDirectSendModalOpen, setIsDirectSendModalOpen] = useState(false);
 
     const fetchUserData = async () => {
         try {
@@ -47,11 +55,36 @@ const VerifyExperiencePage = () => {
             if (!response.ok) throw new Error('Failed to update status.');
             
             Swal.fire('Success!', 'Verification status updated.', 'success');
-            // Refetch data to show the change
             fetchUserData(); 
         } catch (err) {
             Swal.fire('Error!', err.message, 'error');
         }
+    };
+
+    // Event handlers for the HR email flow
+    const handleGetHrEmailClick = (experience) => {
+        setSelectedExperience(experience);
+        setIsHrChoiceModalOpen(true);
+    };
+
+    const handleRequestFromEmployee = async () => {
+        if (!selectedExperience) return;
+        setIsHrChoiceModalOpen(false);
+        try {
+            const response = await fetch(`/api/experience/${selectedExperience.id}/request-hr-email`, {
+                method: 'POST',
+            });
+            if (!response.ok) throw new Error('Failed to send request.');
+            Swal.fire('Sent!', 'An email has been sent to the user.', 'success');
+        } catch (err) {
+            Swal.fire('Error!', err.message, 'error');
+        }
+        setSelectedExperience(null);
+    };
+
+    const handleSendDirectly = () => {
+        setIsHrChoiceModalOpen(false);
+        setIsDirectSendModalOpen(true);
     };
 
     const StatusBadge = ({ status }) => {
@@ -65,84 +98,73 @@ const VerifyExperiencePage = () => {
         return <span className={`${baseClasses} bg-yellow-100 text-yellow-800`}><FiClock /> Pending</span>;
     };
 
-    const ActionButton = ({ isVerified, onClick }) => {
-        const baseClasses = "flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2";
-        if (isVerified === true) {
-            return (
-                <button onClick={onClick} className={`${baseClasses} bg-red-600 hover:bg-red-700 focus:ring-red-500`}>
-                    <FiX /> Decline
-                </button>
-            );
-        }
-        return (
-            <button onClick={onClick} className={`${baseClasses} bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500`}>
-                <FiCheck /> Accept
-            </button>
-        );
-    };
-
     const pageContent = () => {
-        if (loading) return <LoadingGlass className="h-40 w-50"/>;
+        if (loading) return <LoadingGlass className='ml-[13vw]'/>;
         if (error) return <div className="p-8 text-center text-red-500">Error: {error}</div>;
         if (!user) return null;
 
         return (
-            <div className="mx-auto max-w-4xl rounded-lg bg-white p-6 shadow-sm sm:p-8">
-                {/* Page Header */}
-                <div className="mb-8 flex items-center gap-4 border-b border-gray-200 pb-6">
-                    <Image 
-                        src={`https://ui-avatars.com/api/?name=${user.fullName.replace(' ', '+')}&background=random&color=fff&bold=true`} 
-                        alt={user.fullName} 
-                        width={64} 
-                        height={64} 
-                        className="rounded-full" 
-                        unoptimized={true} 
-                    />
+            <div className={styles.container}>
+                <div className={styles.header}>
+                    <Image src={`https://ui-avatars.com/api/?name=${user.fullName.replace(' ', '+')}&background=random`} alt={user.fullName} width={50} height={50} className={styles.avatar} unoptimized={true} />
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Work Experience Verification</h1>
-                        <h2 className="text-md text-gray-600">For: {user.fullName}</h2>
+                        <h1>Work Experience Verification</h1>
+                        <h2>For: {user.fullName}</h2>
                     </div>
                 </div>
 
-                {/* Experience List */}
-                <div className="flex flex-col gap-6 mt-20">
-                    {user.workExperiences.length > 0 ? (
-                        user.workExperiences.map(exp => (
-                            <div key={exp.id} className="flex flex-col gap-4 rounded-md border border-gray-200 p-4 transition-shadow hover:shadow-md sm:flex-row sm:items-center sm:justify-between">
-                                <div className="flex-grow">
-                                    <h3 className="text-lg font-semibold text-gray-800">{exp.role} at {exp.companyName}</h3>
-                                    <p className="text-sm text-gray-500">{new Date(exp.startDate).getFullYear()} - {exp.currentlyWorking ? 'Present' : new Date(exp.endDate).getFullYear()}</p>
-                                    <p className="mt-2 text-gray-700">{exp.description}</p>
-                                </div>
-                                <div className="flex flex-col items-start gap-3 sm:items-end">
-                                    <StatusBadge status={exp.is_verified} />
-                                    <ActionButton 
-                                        isVerified={exp.is_verified}
-                                        onClick={() => handleVerification(exp.id, exp.is_verified !== true)}
-                                    />
+                <div className={styles.experienceList}>
+                    {user.workExperiences.map(exp => (
+                        <div key={exp.id} className={styles.card}>
+                            <div>
+                                <h3 className={styles.role}>{exp.role} at {exp.companyName}</h3>
+                                <p className={styles.duration}>{new Date(exp.startDate).getFullYear()} - {exp.currentlyWorking ? 'Present' : new Date(exp.endDate).getFullYear()}</p>
+                                <p className={styles.description}>{exp.description}</p>
+                            </div>
+                            <div className={styles.actions}>
+                                <StatusBadge status={exp.is_verified} />
+                                <div className={styles.buttonGroup}>
+                                    <button className={styles.greenButton} onClick={() => handleGetHrEmailClick(exp)}>
+                                        <FiMail /> 
+                                    </button>
+                                    <button className={styles.acceptButton} onClick={() => handleVerification(exp.id, true)}>Accept</button>
+                                    <button className={styles.declineButton} onClick={() => handleVerification(exp.id, false)}>Decline</button>
                                 </div>
                             </div>
-                        ))
-                    ) : (
-                        <p className="text-center text-gray-500">No work experiences to verify.</p>
-                    )}
+                        </div>
+                    ))}
                 </div>
             </div>
         );
     };
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
-            <Sidebar />
-            <div className="flex flex-1 flex-col ml-[13vw]">
-                <div className="px-4 py-6 sm:px-8">
-                    <Header user={user} />
+        <>
+            <div className="flex min-h-screen bg-gray-50">
+                <Sidebar />
+                <div className="flex flex-1 flex-col">
+                    <div className="px-4 py-6 sm:px-8 ml-[13vw]">
+                        <Header user={user} />
+                    </div>
+                    <main className="flex-1 px-4 pb-8 sm:px-8 ml-[13vw]">
+                        {pageContent()}
+                    </main>
                 </div>
-                <main className="flex-1 px-4 pb-8 sm:px-8">
-                    {pageContent()}
-                </main>
             </div>
-        </div>
+            {/* Render the new modals */}
+            <GetHrEmailModal
+                isOpen={isHrChoiceModalOpen}
+                onClose={() => setIsHrChoiceModalOpen(false)}
+                onRequestFromEmployee={handleRequestFromEmployee}
+                onSendDirectly={handleSendDirectly}
+            />
+            <GetVerifiedModal
+                isOpen={isDirectSendModalOpen}
+                onClose={() => setIsDirectSendModalOpen(false)}
+                user={user}
+                experience={selectedExperience}
+            />
+        </>
     );
 };
 

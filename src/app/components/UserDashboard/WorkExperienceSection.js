@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import styles from './UserProfile.module.css';
-import { FiEdit2, FiPlus, FiCheckCircle } from 'react-icons/fi';
+import { FiEdit2, FiClock, FiCheckCircle  } from 'react-icons/fi';
 import AddExperienceModal from './AddExperienceModal';
 import UserGetVerifiedModal from './UserGetVerifiedModal'; // The modal to be opened
 import WrapButton from '@/components/ui/wrap-button';
@@ -60,7 +60,7 @@ const ExperienceCard = ({ experience, onVerifyClick }) => {
         <div>
             <p className={styles.cardDescription}>
                 {experience.description}
-                <a href="#"> ...read more</a>
+                {/* <a href="#"> ...read more</a> */}
             </p>
             <div className={styles.cardSkills}>
                 {experience.skills.map(({ skill, verificationStatus }) => (
@@ -73,14 +73,20 @@ const ExperienceCard = ({ experience, onVerifyClick }) => {
         
         {/* --- THIS IS THE NEW LOGIC --- */}
         {/* Conditionally render the button or the verified status */}
+        
         {experience.is_verified ? (
           <span className={`${styles.status} ${styles.verified}`}>
             <FiCheckCircle /> Verified
           </span>
         ) : (
+          experience.mail_sent ? (          
+          <button className={styles.verifyButton} onClick={() => onVerifyClick(experience)}>
+            Resend
+          </button>          
+          ) :(
           <button className={styles.verifyButton} onClick={() => onVerifyClick(experience)}>
             Verify
-          </button>
+          </button>) 
         )}
         {/* --- END OF NEW LOGIC --- */}
 

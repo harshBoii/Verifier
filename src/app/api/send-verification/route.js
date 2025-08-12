@@ -1,39 +1,49 @@
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
-import { getVerificationHtml } from '@/app/lib/email-template'; // Corrected path
-
+import prisma from '@/app/lib/prisma';
+import { getVerificationHtml } from '@/app/lib/email-template';
+import { sendMailWithCompanySmtp } from '@/app/lib/mailer'; // 1. Import the new mailer helper
 
 export async function POST(request) {
   try {
-    // 2. The API now expects the verifier's email and the employee's ID
-    const { verifierEmail, employeeId,company,name,position,exp_id } = await request.json();
-    console.log(employeeId)
-    console.log(verifierEmail)
-    if (!verifierEmail || !employeeId) {
-      return NextResponse.json({ error: 'Missing verifierEmail or employeeId' }, { status: 401 });
+    // The API still accepts all the original arguments
+    const { verifierEmail, employeeId, company, name, position, exp_id } = await request.json();
+    console.log(verifierEmail,exp_id,employeeId)
+
+
+    if (!verifierEmail || !exp_id) {
+      // console.log(verifierEmail,exp_id,employeeId)
+      return NextResponse.json({ error: 'Missing verifierEmail or experience ID' }, { status: 400 });
     }
 
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT, 10),
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD, // Corrected variable name
-      },
+    // 2. Find the work experience to get the user and their companyId
+    const experience = await prisma.workExperience.findUnique({
+      where: { id: parseInt(exp_id, 10) },
+      include: { user: true },
     });
 
-    // 4. Use the fetched data to generate the email content
-    const emailHtml = getVerificationHtml(employeeId,company,name,position,exp_id);
+    if (!experience) {
+      throw new Error('Work experience not found.');
+    }
 
-    const mailOptions = {
-      from: `"Demo CRM" <${process.env.SMTP_USER}>`,
-      to: verifierEmail,
-      subject: `Employee Verification Request for ${name}`,
-      html: emailHtml,
-    };
+    const { user } = experience;
 
-    await transporter.sendMail(mailOptions);
+    // 3. Call the mailer helper with the required details
+    // It will automatically handle fetching and using the company's SMTP settings
+    await sendMailWithCompanySmtp({
+        companyId: user.companyId,
+        to: verifierEmail,
+        subject: `Employee Verification Request for ${user.fullName}`,
+        html: getVerificationHtml(employeeId, company, name, position, exp_id),
+    });
+
+    // 4. Update the database to record that the email was sent
+    await prisma.workExperience.update({
+        where: { id: parseInt(exp_id, 10) },
+        data: { 
+            verifier_email: verifierEmail,
+            mail_sent: true 
+        },
+    });
 
     return NextResponse.json({ message: 'Email sent successfully!' });
 

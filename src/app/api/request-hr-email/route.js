@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
-import { getRequestHrEmailHtml } from '@/app/lib/email-template'; // Corrected path
-import prisma from '@/app/lib/prisma'; // 1. Import your Prisma client
+import prisma from '@/app/lib/prisma';
+import { getRequestHrEmailHtml } from '@/app/lib/email-template';
+import { sendMailWithCompanySmtp } from '@/app/lib/mailer'; // 1. Import the new mailer helper
 
 export async function POST(request) {
   try {
     const { userId } = await request.json();
-    
-    // Convert the incoming string ID to a number for Prisma
+
     const numericUserId = parseInt(userId, 10);
     if (isNaN(numericUserId)) {
         return NextResponse.json({ error: 'Invalid User ID format.' }, { status: 400 });
@@ -24,25 +23,18 @@ export async function POST(request) {
       return NextResponse.json({ error: `User with ID ${userId} not found.` }, { status: 404 });
     }
 
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS, // This MUST be your 16-character App Password
-      },
+    // 3. Create the unique submission link for the email
+    const submissionLink = `https://verifier-phi.vercel.app/submit-hr-email/user/${userId}`;
+
+    // 4. Call the mailer helper with the required details
+    // It will automatically handle fetching and using the company's SMTP settings
+    await sendMailWithCompanySmtp({
+        companyId: user.companyId,
+        to: user.email,
+        subject: 'Action Required: Submit Your HR Manager\'s Email',
+        html: getRequestHrEmailHtml({ employeeName: user.fullName, submissionLink }),
     });
 
-    const submissionLink = `http://localhost:3000/submit-hr-email/${userId}`;
-
-    const mailOptions = {
-      from: `"Demo CRM" <${process.env.SMTP_USER}>`,
-      to: user.email,
-      subject: 'Action Required: Submit Your HR Manager\'s Email',
-      // Use fullName from the database record
-      html: getRequestHrEmailHtml({ employeeName: user.fullName, submissionLink }),
-    };
-
-    await transporter.sendMail(mailOptions);
     return NextResponse.json({ message: 'Request email sent successfully!' });
 
   } catch (error) {

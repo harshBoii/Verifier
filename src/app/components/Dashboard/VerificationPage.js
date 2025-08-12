@@ -127,7 +127,7 @@ const VerificationPage = () => {
                             <table className={styles.table}>
                                 <thead>
                                     <tr>
-                                        <th>Name</th><th>Email</th><th>Role</th><th>HR Email</th><th>Status</th><th>Action</th>
+                                        <th>Name</th><th>Email</th><th>Role</th><th>last HR Email</th><th>Status</th><th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>

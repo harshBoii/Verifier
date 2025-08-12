@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import styles from  './Verification.module.css' ;
-import { FiCheckCircle, FiFacebook, FiPlus } from 'react-icons/fi';
+import { FiCheckCircle, FiFacebook, FiPlus ,FiPhoneIncoming,FiMail } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 import Image from 'next/image';
 import LoadingGlass from '@/app/components/LoadingGlass';
@@ -93,16 +93,18 @@ const SingleExperienceReviewPage = () => {
           </div>
         </div>
         <div className={styles.fieldGroup}>
-          <label>Employee/Staff ID</label>
+          <label>Employee/Staff ID In Your Company</label>
           <div className={styles.inputDisplay}>
-            <span>{experienceData.employeeId || 'N/A'}</span>
+            <span>{experienceData.expId || '1'}</span>
+            {/* <span>1</span> */}
+
           </div>
         </div>
       </div>
 
       <div className={styles.experienceCard}>
         <div className={styles.cardHeader}>
-          <FiFacebook size={28} className={styles.companyLogo} />
+          <FiMail size={28} className={styles.companyLogo} />
           <div>
             <h3 className={styles.jobTitle}>{experienceData.role}</h3>
             <p className={styles.companyInfo}>{experienceData.companyName} | {experienceData.location}</p>
@@ -122,7 +124,7 @@ const SingleExperienceReviewPage = () => {
                     {workSkill.skill.name}
                   </SkillTag>
                 ))}
-                <button className={styles.addSkillButton}><FiPlus size={12}/> Add Skills</button>
+                {/* <button className={styles.addSkillButton}><FiPlus size={12}/> Add Skills</button> */}
             </div>
         </div>
         <div className={styles.cardActions}>

@@ -1,0 +1,48 @@
+.modalOverlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6); display: flex;
+    justify-content: center; align-items: center; z-index: 1000;
+    font-family: 'DM Sans', sans-serif;
+}
+.modalContent {
+    background: #FFFFFF; border-radius: 12px; padding: 24px;
+    width: 100%; max-width: 600px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+.modalHeader {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;
+}
+.modalHeader h2 { font-size: 1.4rem; font-weight: 700; color: #333; margin: 0; }
+.closeButton { background: none; border: none; cursor: pointer; color: #888; font-size: 1.5rem; }
+.modalBody { max-height: 60vh; overflow-y: auto; }
+.errorText { color: #ef4444; }
+.memberList { list-style: none; padding: 0; margin: 0; }
+.memberItem {
+    display: flex;
+    align-items: center;
+    padding: 12px 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.memberItem:last-child { border-bottom: none; }
+.avatar { border-radius: 50%; }
+.memberInfo {
+    flex-grow: 1;
+    margin-left: 15px;
+}
+.memberName {
+    display: block;
+    font-weight: 600;
+    color: #333;
+}
+.memberEmail {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+.memberRole {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #3b82f6;
+    background-color: #dbeafe;
+    padding: 4px 10px;
+    border-radius: 12px;
+}

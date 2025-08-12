@@ -99,7 +99,8 @@ const SignInPage = () => {
             </div>
             <h1 className="text-4xl font-bold mt-8">Welcome Back</h1>
             <p className="mt-4 text-orange-100">
-              Login to see your performance and keep your learning curve like no one else.
+                Login to track your progress, stay ahead, and keep your growth curve soaring.
+                Whether you're leading the way or making it happen, your journey starts here.
             </p>
           </div>
           <img 
@@ -114,7 +115,7 @@ const SignInPage = () => {
         <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-8 sm:p-12">
           <div className="w-full max-w-sm text-center">
             <h1 className="text-3xl font-bold text-gray-800">Sign In</h1>
-            <p className="mt-2 text-gray-500">Let’s open your skill repository.</p>
+            <p className="mt-2 text-gray-500">Log in to  track, manage, and grow like never before.</p>
           </div>
 
           <form onSubmit={handleLogin} className="w-full max-w-sm mt-8 space-y-4">

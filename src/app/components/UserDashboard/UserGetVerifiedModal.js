@@ -1,22 +1,34 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './UserGetVerifiedModal.module.css';
 import { FiX, FiMail } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 
-const UserGetVerifiedModal = ({ isOpen, onClose, user,experience }) => {
+const UserGetVerifiedModal = ({ isOpen, onClose, user, experience }) => {
     const [email, setEmail] = useState('');
     const [isSending, setIsSending] = useState(false);
     const [error, setError] = useState('');
 
-    // When the modal opens, pre-fill the email state with the user's verifier email
-    React.useEffect(() => {
-        if (user?.verifier_email) {
-            setEmail(user.verifier_email);
+    // --- THIS IS THE UPDATED LOGIC ---
+    // This effect now correctly prioritizes the experience-specific verifier email.
+    useEffect(() => {
+        if (isOpen) {
+            // If the specific experience has a verifier email, use it.
+            if (experience?.verifier_email) {
+                setEmail(experience.verifier_email);
+            } 
+            // Otherwise, fall back to the user's default verifier email.
+            else if (user?.verifier_email) {
+                setEmail(user.verifier_email);
+            }
+            // If neither exists, start with an empty field.
+            else {
+                setEmail('');
+            }
         }
-    }, [user]);
+    }, [isOpen, user, experience]); // Re-run when the modal opens or data changes
 
-    if (!isOpen || !user) {
+    if (!isOpen || !user || !experience) {
         return null;
     }
 
@@ -31,22 +43,22 @@ const UserGetVerifiedModal = ({ isOpen, onClose, user,experience }) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    verifierEmail: email, // Send the email from the input field
+                    verifierEmail: email, // Use the email from the component's state
                     employeeId: user.id,
-                    company: user.company?.name, // Safely access company name
-                    name: user.fullName,
-                    position: user.position,
-                    exp_id:experience.id
+                    company:experience.companyName,
+                    name:user.fullName,
+                    position:experience.role,
+                    exp_id: experience.id // Send the specific experience ID
                 }),
             });
-
+// verifierEmail, employeeId, company, name, position, exp_id
             const result = await response.json();
 
             if (!response.ok) {
                 throw new Error(result.error || 'Something went wrong');
             }
 
-            Swal.fire('Success!', `Verification email sent successfully to ${email}!`, 'success');
+            Swal.fire('Success!', `Verification email for "${experience.role}" sent successfully to ${email}!`, 'success');
             handleClose();
 
         } catch (err) {
@@ -58,7 +70,6 @@ const UserGetVerifiedModal = ({ isOpen, onClose, user,experience }) => {
     };
 
     const handleClose = () => {
-        // Don't clear the email state on close, just the error/sending state
         setError('');
         setIsSending(false);
         onClose();
@@ -68,7 +79,7 @@ const UserGetVerifiedModal = ({ isOpen, onClose, user,experience }) => {
         <div className={styles.modalOverlay} id="modal-backdrop" onClick={handleClose}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
-                    <h2>Send Verification for {user.fullName}</h2>
+                    <h2>Send Verification for: {experience.role}</h2>
                     <button onClick={handleClose} className={styles.closeButton}>
                         <FiX size={24} />
                     </button>

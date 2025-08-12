@@ -143,7 +143,7 @@ export async function GET(request, { params }) {
     };
     
     // Return the complete and correctly structured profile data.
-    // console.log(finalProfileData)
+    console.log(finalProfileData)
     return NextResponse.json(finalProfileData, { status: 200 });
 
   } catch (error) {

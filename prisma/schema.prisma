@@ -143,6 +143,14 @@ model Company {
   admin   User? @relation("CompanyAdmin", fields: [adminId], references: [id])
   adminId Int?  @unique @map("admin_id")
 
+  smtpHost      String?
+  smtpPort      Int?
+  smtpUser      String?
+  smtpPassword  String? // IMPORTANT: This will be stored encrypted
+  senderEmail   String?
+
+
+
   campaigns Campaign[]
 
   subscription Subscription?
@@ -223,6 +231,7 @@ model WorkExperience {
   description      String?   @db.Text
   verifier_email   String?   @default("")
   is_verified      Boolean   @default(false)
+  mail_sent        Boolean   @default(false)
   // Relation to User
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @map("user_id")

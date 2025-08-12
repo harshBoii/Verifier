@@ -191,7 +191,7 @@ const PackagesPage = () => {
 
 return (
     <>
-      <div className="p-5 md:p-10 bg-[#F8F4FF] font-['Inter'] min-h-screen">
+      <div className="p-5 md:p-10 bg-[#F8F4FF]  min-h-screen">
         <div className="text-center max-w-2xl mx-auto mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-[#181059] mb-4">The Right Plan for Your Business</h1>
           <p className="text-base text-[#181059] opacity-70 leading-relaxed">We have several powerful plans to showcase your business and get discovered as a creative entrepreneur. Everything you need.</p>

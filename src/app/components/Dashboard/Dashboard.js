@@ -35,6 +35,7 @@ const Dashboard = () => {
     const [error, setError] = useState('');
     const [loginTime, setLoginTime] = useState(null);
 
+
     // --- DATA FETCHING ---
     useEffect(() => {
         const initialFetch = async () => {
@@ -174,7 +175,7 @@ const Dashboard = () => {
                 </div>
                 
                 {/* CampaignsTable now receives the dynamic and filtered tableData */}
-                <CampaignsTable data={tableData} />
+            <CampaignsTable data={tableData} setData={setTableData} />
             </main>
         </div>
     );
