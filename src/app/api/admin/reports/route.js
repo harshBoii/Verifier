@@ -1,14 +1,19 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
 
-export async function GET() {
+export async function GET(request) {
   try {
-    // In a real app, you might scope these queries by a companyId from a user session.
-    // For a super admin view, fetching all data is appropriate.
+    const { searchParams } = new URL(request.url);
+    const companyId = searchParams.get('companyId');
+
+    // Create a dynamic where clause for filtering by company
+    const whereClause = companyId ? { companyId: parseInt(companyId, 10) } : {};
+    const userWhereClause = companyId ? { user: { companyId: parseInt(companyId, 10) } } : {};
+
 
     const now = new Date();
 
-    // Run all database queries concurrently for maximum performance
+    // Run all database queries concurrently
     const [
       byRole,
       mix,
@@ -20,21 +25,24 @@ export async function GET() {
     ] = await prisma.$transaction([
       // Query #1: Org Role Pyramid
       prisma.role.findMany({
-        include: {
-          _count: {
-            select: { users: true },
-          },
+        where: {
+            users: { some: whereClause.companyId ? { user: { companyId: whereClause.companyId } } : {} }
         },
+        include: { _count: { select: { users: true } } },
       }),
 
       // Query #2: Staff by Work Type
       prisma.workExperience.groupBy({
         by: ['workType'],
+        where: userWhereClause,
         _count: { _all: true },
       }),
       
-      // Query #3: Top 5 Skills Footprint by endorsements
+      // Query #3: Top 5 Skills Footprint
       prisma.skill.findMany({
+        where: {
+            workExperiences: { some: userWhereClause.user ? { workExperience: { user: { companyId: userWhereClause.user.companyId } } } : {} }
+        },
         orderBy: { endorsements: 'desc' },
         take: 5,
         select: { name: true, endorsements: true },
@@ -43,11 +51,13 @@ export async function GET() {
       // Query #4: Verification Health
       prisma.workExperienceSkill.groupBy({
         by: ['verificationStatus'],
+        where: userWhereClause.user ? { workExperience: { user: { companyId: userWhereClause.user.companyId } } } : {},
         _count: { _all: true },
       }),
 
-      // Query #5: Top 5 Campaign Funnel by member count
+      // Query #5: Top 5 Campaign Funnel
       prisma.campaign.findMany({
+        where: whereClause,
         include: { _count: { select: { members: true } } },
         orderBy: { members: { _count: 'desc' } },
         take: 5,
@@ -55,39 +65,31 @@ export async function GET() {
 
       // Query #6: Campaign Lifecycle
       prisma.campaign.groupBy({
-        by: ['companyId'], // This is just to satisfy groupBy, we care about the counts
-        _count: {
-          _all: true,
-        },
+        by: ['companyId'],
         where: {
-          OR: [
-            { startDate: { gt: now } }, // Upcoming
-            { startDate: { lte: now }, endDate: { gte: now } }, // Active
-            { endDate: { lt: now } }, // Completed
-          ],
+            ...whereClause,
+            OR: [
+                { startDate: { gt: now } },
+                { startDate: { lte: now }, endDate: { gte: now } },
+                { endDate: { lt: now } },
+            ],
         },
+        _count: { _all: true },
       }),
       
-      // Query #7: Permission Audit (fetches all permissions)
+      // Query #7: Permission Audit (Global)
       prisma.rolePermission.findMany(),
     ]);
 
     // --- Process Data for Frontend ---
+    const upcoming = await prisma.campaign.count({ where: { ...whereClause, startDate: { gt: now } } });
+    const active = await prisma.campaign.count({ where: { ...whereClause, startDate: { lte: now }, endDate: { gte: now } } });
+    const completed = await prisma.campaign.count({ where: { ...whereClause, endDate: { lt: now } } });
 
-    // Process Campaign Lifecycle
-    const upcoming = await prisma.campaign.count({ where: { startDate: { gt: now } } });
-    const active = await prisma.campaign.count({ where: { startDate: { lte: now }, endDate: { gte: now } } });
-    const completed = await prisma.campaign.count({ where: { endDate: { lt: now } } });
-
-
-    // Mocked Data (as in the original request)
-    const hires = {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-        data: [12, 19, 3, 5, 2, 3],
-    };
+    // Mocked Data
+    const hires = { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], data: [12, 19, 3, 5, 2, 3] };
     const current = { '0-1 years': 15, '1-2 years': 8, '3-5 years': 5, '5+ years': 2 };
     const subscriptionUtilization = { usedThisCycle: 120, limit: 500 };
-
 
     const datasets = {
       orgRolePyramid: byRole.map(r => ({ role: r.name, count: r._count.users })),
