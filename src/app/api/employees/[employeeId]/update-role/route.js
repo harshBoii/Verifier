@@ -19,18 +19,29 @@ export async function PUT(request, { params }) {
       
       const { companyId } = employee;
 
-      // 2. If making this user an admin, handle the switch
+      // 2. Get the IDs for the ADMIN and EMPLOYEE roles
+      const adminRole = await tx.role.findUnique({ where: { name: 'ADMIN' } });
+      const employeeRole = await tx.role.findUnique({ where: { name: 'EMPLOYEE' } });
+      if (!adminRole || !employeeRole) throw new Error('Default roles not found in database.');
+
+      // 3. If making this user an admin, handle the switch
       if (makeAdmin) {
-        // Find the current admin of the company, if one exists
-        const currentAdmin = await tx.user.findFirst({
-          where: { companyId: companyId, role: 'ADMIN' },
+        // Find the current admin of the company
+        const companyWithAdmin = await tx.company.findUnique({
+            where: { id: companyId },
+            include: { admin: { include: { roles: true } } }
         });
+        const currentAdmin = companyWithAdmin?.admin;
 
         // If there's a current admin who is not this employee, demote them
         if (currentAdmin && currentAdmin.id !== numericId) {
-          await tx.user.update({
-            where: { id: currentAdmin.id },
-            data: { role: 'EMPLOYEE' },
+          // Remove their ADMIN role
+          await tx.userRole.deleteMany({
+            where: { userId: currentAdmin.id, roleId: adminRole.id, companyId: companyId }
+          });
+          // Add the EMPLOYEE role
+          await tx.userRole.create({
+            data: { userId: currentAdmin.id, roleId: employeeRole.id, companyId: companyId }
           });
         }
 
@@ -41,13 +52,26 @@ export async function PUT(request, { params }) {
         });
       }
 
-      // 3. Update the target employee's position and role
+      // 4. Update the target employee's position and role
+      // First, remove their existing roles for this company
+      await tx.userRole.deleteMany({
+          where: { userId: numericId, companyId: companyId }
+      });
+      
+      // Then, create the new role assignment
+      await tx.userRole.create({
+          data: {
+              userId: numericId,
+              roleId: makeAdmin ? adminRole.id : employeeRole.id,
+              companyId: companyId
+          }
+      });
+      
+      // Finally, update the position on the user model
       const userToUpdate = await tx.user.update({
         where: { id: numericId },
         data: {
           position: position,
-          // If makeAdmin is true, promote them; otherwise, ensure they are an employee
-          role: makeAdmin ? 'ADMIN' : 'EMPLOYEE',
         },
       });
       

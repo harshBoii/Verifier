@@ -21,7 +21,15 @@ export async function GET(request) {
       // Select only the fields needed for the form
       select: {
         fullName: true,
-        role: true,
+        roles: {
+                select: {
+                  role: {
+                    select: {
+                      name: true,
+                    },
+                  },
+                },
+              },
         position: true,
         mobile: true,
         email: true,

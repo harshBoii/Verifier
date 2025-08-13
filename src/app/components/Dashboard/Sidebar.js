@@ -45,7 +45,7 @@ const Sidebar = () => {
         <NavItem icon={<FiGrid />} href="/admin" label="Dashboard" />
         <NavItem icon={<FiUploadCloud />} href="/admin/import" label="Import Employee" />
         <NavItem icon={<FiCheckSquare />} href="/admin/verification" label="Verification" />
-        <NavItem icon={<FiBarChart2 />} href="/reports" label="Reports" />
+        <NavItem icon={<FiBarChart2 />} href="/admin/reports" label="Reports" />
       </nav>
       <div className={styles.footer}>
         <NavItem icon={<FiHelpCircle />} label="Help" /> {/* No href = not a link */}

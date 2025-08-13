@@ -1,13 +1,32 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import styles from './RolesPermissionsPage.module.css';
-import { FiCheck } from 'react-icons/fi';
+import { FiCheck, FiSave } from 'react-icons/fi';
+import Swal from 'sweetalert2';
+import LoadingGlass from '../LoadingGlass';
 
-const permissionKeys = ['accessCompanies', 'packages', 'supportTeam', 'searchLogin'];
+// This object now maps all database fields to user-friendly table headers.
+// This is the new single source of truth for your table columns.
+const permissionsMap = {
+    accessCompanies: 'Access Companies',
+    packages: 'Packages',
+    supportTeam: 'Support Team',
+    searchLogin: 'Search Login',
+    manageSystemSettings: 'Manage System',
+    manageAgentStaff: 'Manage Agents',
+    assignManageCompanyStaff: 'Manage Company Staff',
+    initiateVerifications: 'Initiate Verifications',
+    viewVerificationResults: 'View Results',
+    viewReportsStatistics: 'View Reports',
+};
+
+// We get the keys from the map to ensure the order is correct and dynamic.
+const permissionKeys = Object.keys(permissionsMap);
 
 const RolesPermissionsPage = () => {
     const [roles, setRoles] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState('');
 
     useEffect(() => {
@@ -34,6 +53,7 @@ const RolesPermissionsPage = () => {
     };
 
     const handleSaveChanges = async () => {
+        setIsSaving(true);
         try {
             const response = await fetch('/api/roles', {
                 method: 'POST',
@@ -41,30 +61,47 @@ const RolesPermissionsPage = () => {
                 body: JSON.stringify(roles),
             });
             if (!response.ok) throw new Error('Failed to save changes.');
-            alert('Permissions saved successfully!');
+            Swal.fire({
+                title: 'Success!',
+                text: 'Permissions have been updated successfully.',
+                icon: 'success',
+                confirmButtonColor: '#242565',
+            });
         } catch (err) {
-            alert(`Error: ${err.message}`);
+            Swal.fire({
+                title: 'Error!',
+                text: err.message,
+                icon: 'error',
+            });
+        } finally {
+            setIsSaving(false);
         }
     };
 
-    if (loading) return <div className={styles.container}><p>Loading roles...</p></div>;
+    if (loading) return <LoadingGlass/>;
     if (error) return <div className={styles.container}><p style={{ color: 'red' }}>Error: {error}</p></div>;
 
     return (
         <div className={styles.container}>
             <div className={styles.header}>
                 <h1>Roles and Permissions</h1>
-                <button className={styles.createButton} onClick={handleSaveChanges}>Save Changes</button>
+                <button 
+                    className={styles.createButton} 
+                    onClick={handleSaveChanges} 
+                    disabled={isSaving}
+                >
+                    <FiSave /> {isSaving ? 'Saving...' : 'Save Changes'}
+                </button>
             </div>
             <div className={styles.tableWrapper}>
                 <table className={styles.table}>
                     <thead>
                         <tr>
                             <th>Role name</th>
-                            <th>Access Companies</th>
-                            <th>Packages</th>
-                            <th>Support Team</th>
-                            <th>Search Login</th>
+                            {/* Dynamically create headers from our map */}
+                            {permissionKeys.map(key => (
+                                <th key={key}>{permissionsMap[key]}</th>
+                            ))}
                         </tr>
                     </thead>
                     <tbody>
@@ -76,7 +113,7 @@ const RolesPermissionsPage = () => {
                                         <label className={styles.checkboxContainer}>
                                             <input 
                                                 type="checkbox" 
-                                                checked={role.permissions[key]} 
+                                                checked={role.permissions[key] || false} 
                                                 onChange={() => handlePermissionChange(roleIndex, key)}
                                             />
                                             <span className={styles.checkmark}>

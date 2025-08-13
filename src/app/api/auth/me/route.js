@@ -20,7 +20,15 @@ export async function GET(request) {
         id: true,
         fullName: true,
         email: true,
-        role: true,
+        roles: {
+                select: {
+                  role: {
+                    select: {
+                      name: true,
+                    },
+                  },
+                },
+              },
         companyId: true
       }
     });

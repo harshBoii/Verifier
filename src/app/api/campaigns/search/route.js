@@ -40,8 +40,21 @@ export async function GET(request) {
       whereClause.id = parseInt(campaignId, 10);
     }
     if (role) {
+      // --- THIS IS THE CORRECTED LOGIC ---
+      // This now filters for campaigns that have at least one member
+      // whose role name matches the filter.
       whereClause.members = {
-        some: { user: { role: role } },
+        some: { 
+          user: { 
+            roles: {
+              some: {
+                role: {
+                  name: role
+                }
+              }
+            }
+          } 
+        },
       };
     }
     if (name) {
@@ -66,7 +79,7 @@ export async function GET(request) {
         const verifiedCount = await prisma.user.count({
           where: {
             is_verified: true,
-            companyId: adminCompanyId, // Also scope this count to the company
+            companyId: adminCompanyId,
             campaigns: { some: { campaignId: campaign.id } },
           },
         });

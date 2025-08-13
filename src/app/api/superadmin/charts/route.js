@@ -8,11 +8,30 @@ import prisma from '@/app/lib/prisma';
 export async function GET() {
   try {
     // --- Query 1: Overall Verification Stats Across All Companies ---
+    // This query is now corrected to check the role through the UserRole relation.
     const verifiedCount = await prisma.user.count({
-      where: { role: 'EMPLOYEE', is_verified: true },
+      where: { 
+        is_verified: true,
+        roles: {
+            some: {
+                role: {
+                    name: 'EMPLOYEE'
+                }
+            }
+        }
+      },
     });
     const unverifiedCount = await prisma.user.count({
-      where: { role: 'EMPLOYEE', is_verified: false },
+      where: { 
+        is_verified: false,
+        roles: {
+            some: {
+                role: {
+                    name: 'EMPLOYEE'
+                }
+            }
+        }
+      },
     });
 
     // --- Query 2: Top 5 Campaigns by Member Count Across All Companies ---
@@ -64,6 +83,8 @@ export async function GET() {
     return NextResponse.json(chartData);
 
   } catch (error) {
+    console.error("Error generating chart data:", err);
+
     console.error("API Super Admin Charts Error:", error);
     return NextResponse.json({ error: 'Failed to fetch super admin chart data.' }, { status: 500 });
   }

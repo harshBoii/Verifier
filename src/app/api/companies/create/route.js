@@ -10,28 +10,45 @@ export async function POST(request) {
       return NextResponse.json({ error: 'All fields are required.' }, { status: 400 });
     }
 
-    // Use a transaction to ensure both company and admin are created successfully
+    // Use a transaction to ensure all related records are created successfully
     const newCompany = await prisma.$transaction(async (tx) => {
-      // Step 1: Create the company first
+      
+      // 1. Find the ID for the 'ADMIN' role from the Role table.
+      const adminRole = await tx.role.findUnique({
+        where: { name: 'ADMIN' },
+      });
+
+      if (!adminRole) {
+        // This is a critical error if the roles haven't been seeded.
+        throw new Error("The 'ADMIN' role does not exist in the database.");
+      }
+
+      // 2. Create the company first.
       const company = await tx.company.create({
         data: { name: companyName },
       });
 
-      // Step 2: Create the Admin User for this company
+      // 3. Create the Admin User for this company.
       const hashedPassword = await bcrypt.hash(adminPassword, 10);
       const adminUser = await tx.user.create({
         data: {
-          username: adminEmail.split('@')[0], // Create a username from email
+          username: adminEmail.split('@')[0],
           fullName: adminFullName,
           email: adminEmail,
           password: hashedPassword,
-          role: 'ADMIN',
           position: adminPosition,
-          companyId: company.id,
+          companyId: company.id, // Link the user to the company
+          // Create the role assignment in the UserRole join table
+          roles: {
+            create: {
+              roleId: adminRole.id,
+              companyId: company.id,
+            },
+          },
         },
       });
 
-      // Step 3: Update the company to set its admin
+      // 4. Update the company to set its adminId to the user we just created.
       const updatedCompany = await tx.company.update({
         where: { id: company.id },
         data: { adminId: adminUser.id },

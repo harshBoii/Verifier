@@ -12,7 +12,8 @@ import prisma from '@/app/lib/prisma';
  * This function securely reads the session cookie and fetches user data.
  */
 async function getLoggedInUser() {
-  const token = cookies().get('token')?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
   if (!token) {
     return null; // No user is logged in
   }
@@ -27,7 +28,15 @@ async function getLoggedInUser() {
         id: true,
         fullName: true,
         email: true,
-        role: true,
+        roles: {
+          select: {
+            role: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
     return user;
@@ -42,7 +51,7 @@ async function getLoggedInUser() {
  */
 export default async function ProfilePage({ params }) {
   // The 'id' of the profile being viewed
-  const { id } = params;
+  const { id } = await params;
 
   // Fetch the data for the currently logged-in user for the header
   const loggedInUser = await getLoggedInUser();

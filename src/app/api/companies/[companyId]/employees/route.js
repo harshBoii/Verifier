@@ -17,8 +17,15 @@ export async function GET(request, { params }) {
     const employees = await prisma.user.findMany({
       where: {
         companyId: numericId,
-        role: 'EMPLOYEE',
-        // Add the search filter for the fullName
+        // This is the updated logic to filter by role using the new relationship
+        roles: {
+          some: {
+            role: {
+              name: 'EMPLOYEE',
+            },
+          },
+        },
+        // The search filter for fullName remains the same
         fullName: {
           contains: searchTerm,
           mode: 'insensitive',

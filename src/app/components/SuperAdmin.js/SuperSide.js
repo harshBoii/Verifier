@@ -45,7 +45,7 @@ const SuperSide = () => {
         <NavItem icon={<FiGrid />} href="/superadmin" label="Dashboard" />
         <NavItem icon={<FiClipboard />} href="/superadmin/subscription" label="Subscription" />
         <NavItem icon={<FiPlus />} href="/superadmin/role" label="Create Role" />
-        <NavItem icon={<FiBarChart2 />} href="/reports" label="Reports" />
+        <NavItem icon={<FiBarChart2 />} href="/superadmin/reports" label="Reports" />
         <NavItem icon={<FiCodesandbox />} href="/superadmin/agents" label="Agents" />
       </nav>
       <div className={styles.footer}>

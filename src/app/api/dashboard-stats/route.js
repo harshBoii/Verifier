@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
-import * as jose from 'jose'; // Import the jose library for JWT verification
+import * as jose from 'jose';
 
 export async function GET(request) {
   try {
-    // --- 1. Get the Admin's Company ID from their session ---
+    // 1. Get the Admin's Company ID from their session
     const token = request.cookies.get('token')?.value;
 
     if (!token) {
@@ -14,10 +14,8 @@ export async function GET(request) {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const { payload } = await jose.jwtVerify(token, secret);
 
-    // The payload contains the user's details we stored during login
     const adminId = payload.userId;
 
-    // Find the admin to get their companyId
     const admin = await prisma.user.findUnique({
       where: { id: adminId },
     });
@@ -28,22 +26,31 @@ export async function GET(request) {
 
     const adminCompanyId = admin.companyId;
 
-    // --- 2. Fetch Stats Scoped to the Admin's Company ---
+    // --- 2. Fetch Stats Scoped to the Admin's Company (with Corrected Logic) ---
+
+    // Define the common filter for employees of the admin's company
+    const employeeFilter = {
+      companyId: adminCompanyId,
+      // This is the updated logic to filter by role using the new relationship
+      roles: {
+        some: {
+          role: {
+            name: 'EMPLOYEE',
+          },
+        },
+      },
+    };
 
     // Get the total count of all employees in that company
     const totalEmployees = await prisma.user.count({
-      where: {
-        companyId: adminCompanyId,
-        role: 'EMPLOYEE',
-      },
+      where: employeeFilter,
     });
 
-    // Get the count of verified employees in that company using the new 'is_verified' field
+    // Get the count of verified employees in that company
     const verifiedEmployees = await prisma.user.count({
       where: {
-        companyId: adminCompanyId,
-        role: 'EMPLOYEE',
-        is_verified: true, // Use the new boolean field
+        ...employeeFilter,
+        is_verified: true,
       },
     });
 
@@ -58,7 +65,6 @@ export async function GET(request) {
     });
 
   } catch (error) {
-    // Handle potential JWT errors (e.g., expired token)
     if (error.code === 'ERR_JWT_EXPIRED') {
         return NextResponse.json({ error: 'Session expired. Please log in again.' }, { status: 401 });
     }

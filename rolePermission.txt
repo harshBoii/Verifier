@@ -1,0 +1,28 @@
+ROLE PERMISSSION IS  {
+  SUPER_ADMIN: [ '*' ],
+  AGENT: [
+    'onboard_manage_companies',
+    'manage_agent_staff',
+    'view_assign_requests',
+    'initiate_verifications',
+    'view_verification_results',
+    'view_reports_statistics'
+  ],
+  AGENT_STAFF: [
+    'view_assign_requests',
+    'initiate_verifications',
+    'view_verification_results'
+  ],
+  ADMIN: [
+    'assign_manage_company_staff',
+    'view_assign_requests',
+    'initiate_verifications',
+    'view_verification_results',
+    'subscription_management',
+    'view_reports_statistics'
+  ],
+  EMPLOYEE: [
+    'view_assign_requests',
+    'initiate_verifications',
+    'view_verification_results'
+  ]}

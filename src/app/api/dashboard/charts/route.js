@@ -1,52 +1,41 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
-import * as jose from 'jose';
-import { cookies } from 'next/headers';
 
 /**
- * Handles GET requests to fetch chart data for a specific Admin's dashboard.
- * This route is secure and scopes all data to the logged-in admin's company.
+ * Handles GET requests to fetch chart data for the Super Admin dashboard.
+ * This route is open and does not require authentication.
  */
-export async function GET(request) {
+export async function GET() {
   try {
-    // --- 1. Authenticate the admin and get their user ID ---
-    const token = cookies().get('token')?.value;
-    if (!token) {
-      return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
-    }
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    const { payload } = await jose.jwtVerify(token, secret);
-    
-    // Ensure the user is an admin
-    if (payload.role !== 'ADMIN') {
-        return NextResponse.json({ error: 'Access denied.' }, { status: 403 });
-    }
-    const adminId = payload.userId;
-
-    // --- 2. Fetch the admin's user record to find their companyId ---
-    const admin = await prisma.user.findUnique({
-        where: { id: adminId },
-        select: { companyId: true }
-    });
-
-    if (!admin || !admin.companyId) {
-        return NextResponse.json({ error: 'Admin is not associated with a company.' }, { status: 404 });
-    }
-    const adminCompanyId = admin.companyId;
-
-    // --- 3. Fetch data scoped to the admin's company ---
-
-    // Query 3.1: Verification Stats for the Admin's Company
+    // --- Query 1: Overall Verification Stats Across All Companies ---
+    // This query is now corrected to check the role through the UserRole relation.
     const verifiedCount = await prisma.user.count({
-      where: { companyId: adminCompanyId, role: 'EMPLOYEE', is_verified: true },
+      where: { 
+        is_verified: true,
+        roles: {
+            some: {
+                role: {
+                    name: 'EMPLOYEE'
+                }
+            }
+        }
+      },
     });
     const unverifiedCount = await prisma.user.count({
-      where: { companyId: adminCompanyId, role: 'EMPLOYEE', is_verified: false },
+      where: { 
+        is_verified: false,
+        roles: {
+            some: {
+                role: {
+                    name: 'EMPLOYEE'
+                }
+            }
+        }
+      },
     });
 
-    // Query 3.2: Top 5 Campaigns by Member Count for the Admin's Company
+    // --- Query 2: Top 5 Campaigns by Member Count Across All Companies ---
     const campaigns = await prisma.campaign.findMany({
-      where: { companyId: adminCompanyId },
       include: {
         _count: {
           select: { members: true },
@@ -59,9 +48,32 @@ export async function GET(request) {
       },
       take: 5,
     });
-    // --- NEW: Query 3 to find employees with the most skills ---
+
+    // --- Query 3: Top 7 Companies by Employee Size ---
+    const companies = await prisma.company.findMany({
+      include: {
+        _count: {
+          select: { users: true },
+        },
+      },
+       orderBy: {
+        users: {
+          _count: 'desc',
+        },
+      },
+      take: 7,
+    });
+
     const usersWithSkillCounts = await prisma.user.findMany({
-        where: { role: 'EMPLOYEE' },
+        where: {         
+          roles: {
+            some: {
+                role: {
+                    name: 'EMPLOYEE'
+                                }
+                            }
+                        }
+                },
         include: {
             workExperiences: {
                 include: {
@@ -72,24 +84,30 @@ export async function GET(request) {
             }
         }
     });
-
-    // Process the data in memory to get a final count
     const topEmployeesBySkills = usersWithSkillCounts.map(user => {
-        const totalSkills = user.workExperiences.reduce((acc, exp) => acc + exp._count.skills, 0);
-        return {
-            name: user.fullName,
-            skillCount: totalSkills
+    const totalSkills = user.workExperiences.reduce((acc, exp) => acc + exp._count.skills, 0);
+    return {
+        name: user.fullName,
+        skillCount: totalSkills
         }
     })
-    .sort((a, b) => b.skillCount - a.skillCount) // Sort by skill count
-    .slice(0, 7); // Get the top 7
+
+
 
     // --- Assemble the final data object ---
     const chartData = {
-      verificationStats: { verified: verifiedCount, unverified: unverifiedCount },
-      campaignMembers: campaigns.map(c => ({ name: c.name, members: c._count.members })),
-      topEmployeesBySkills: topEmployeesBySkills, // Add the new data
+      verificationStats: {
+        verified: verifiedCount,
+        unverified: unverifiedCount,
+      },
+      campaignMembers: campaigns.map(c => ({
+        name: c.name,
+        members: c._count.members,
+      })),
+      topEmployeesBySkills: topEmployeesBySkills    
     };
+
+
 
     return NextResponse.json(chartData);
 

@@ -23,6 +23,8 @@ const ActionMenu = ({ onViewDetails, onEdit, onDelete }) => (
 );
 
 const CampaignsTable = ({ data = [], setData }) => {
+    console.log("Data changed", data);
+
     const [activeMenu, setActiveMenu] = useState(null);
     const [viewingCampaign, setViewingCampaign] = useState(null);
     const [editingId, setEditingId] = useState(null);
