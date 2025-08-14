@@ -32,8 +32,8 @@ export const routePermissions = [
   
   // Verification Flow
   { prefix: "/api/experience/verify", permission: Permissions.VIEW_ASSIGN_REQUESTS },
-  { prefix: "/api/review", permission: Permissions.VIEW_ASSIGN_REQUESTS },
-  { prefix: "/api/experience/add", permission: Permissions.INITIATE_VERIFICATIONS },
+  // { prefix: "/api/review", permission: Permissions.VIEW_ASSIGN_REQUESTS },
+  // { prefix: "/api/experience/add", permission: Permissions.INITIATE_VERIFICATIONS },
   { prefix: "/api/submit-verification", permission: Permissions.INITIATE_VERIFICATIONS },
   { prefix: "/api/send-verification", permission: Permissions.INITIATE_VERIFICATIONS },
   { prefix: "/api/request-hr-email", permission: Permissions.INITIATE_VERIFICATIONS },

@@ -62,17 +62,30 @@ src/app/employee/[id]/profile/page.js
 
 mac@Macs-MacBook-Air saas % grep -r -l '\brole\b:' src/app
 
-src/app/lib/RWCmiddleware.js
+src/app/lib/RWCmiddleware.js 
+
 src/app/api/settings/profile/route.js
+
 src/app/api/auth/me/route.js
+
 src/app/api/auth/login/route.js
+
 src/app/api/superadmin/charts/route.js
+
 src/app/api/dashboard/charts/route.js
+
 src/app/api/company-employees/route.js
+
 src/app/api/dashboard-stats/route.js
+
 src/app/api/campaigns/search/route.js
+
 src/app/api/companies/[companyId]/employees/route.js
+
 src/app/api/companies/create/route.js
+
 src/app/api/import-employees/route.js
+
 src/app/api/employees/[employeeId]/update-role/route.js
+
 src/app/employee/[id]/profile/page.js

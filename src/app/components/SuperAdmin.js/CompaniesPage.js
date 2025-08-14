@@ -1,24 +1,26 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import styles from './CompaniesPage.module.css';
 import { FiUsers, FiBriefcase, FiPlus, FiSearch } from 'react-icons/fi';
 import SuperAdminCharts from './SuperChart';
 import AddCompanyModal from './AddCompanyModal';
 import CompanyEmployeesModal from './CompanyEmployeesModal';
 
 const StatCard = ({ icon, value, label }) => (
-    <div className={styles.statCard}>
-        <div className={styles.statIcon}>{icon}</div>
-        <div className={styles.statInfo}>
-            <span className={styles.statValue}>{value}</span>
-            <span className={styles.statLabel}>{label}</span>
+    <div className="bg-white border border-gray-200 rounded-lg p-4 flex items-center gap-4">
+        <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0">
+            {icon}
+        </div>
+        <div>
+            <span className="text-2xl font-bold text-gray-800">{value}</span>
+            <span className="block text-sm text-gray-500">{label}</span>
         </div>
     </div>
 );
 
 const CompaniesPage = () => {
     const [companies, setCompanies] = useState([]);
+    const [stats, setStats] = useState({ totalCompanies: 0, totalEmployees: 0 });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     
@@ -28,21 +30,41 @@ const CompaniesPage = () => {
 
     const fetchCompanies = async (name = '') => {
         try {
-            setLoading(true);
+            // No need to set loading here as the main fetch handles it
             const response = await fetch(`/api/companies/search?name=${name}`);
             if (!response.ok) throw new Error('Failed to fetch companies.');
             const data = await response.json();
             setCompanies(data);
         } catch (err) {
             setError(err.message);
-        } finally {
-            setLoading(false);
         }
     };
 
-    // Initial fetch for all companies
+    // Initial fetch for stats and all companies
     useEffect(() => {
-        fetchCompanies();
+        const initialFetch = async () => {
+             try {
+                setLoading(true);
+                const [statsRes, companiesRes] = await Promise.all([
+                    fetch('/api/superadmin/stats'),
+                    fetch('/api/companies/search')
+                ]);
+
+                if (!statsRes.ok) throw new Error('Failed to fetch dashboard stats.');
+                if (!companiesRes.ok) throw new Error('Failed to fetch company list.');
+
+                const statsData = await statsRes.json();
+                const companiesData = await companiesRes.json();
+
+                setStats(statsData);
+                setCompanies(companiesData);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        initialFetch();
     }, []);
 
     // Debounced search effect
@@ -58,15 +80,15 @@ const CompaniesPage = () => {
 
     return (
         <>
-            <div className={styles.container}>
-                <div className={styles.headerGrid}>
-                    <div className={styles.welcomeBanner}>
-                        <h2>Welcome back, Super Admin!</h2>
-                        <p>You can now turn your Verification Process Faster than a Cheetah.</p>
+            <div className="p-6 font-sans">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <div className="lg:col-span-2 bg-gradient-to-br from-blue-500 to-blue-700 text-white p-8 rounded-xl">
+                        <h2 className="text-3xl font-bold">Welcome back, Super Admin!</h2>
+                        <p className="mt-2 opacity-90">You can now turn your Verification Process Faster than a Cheetah.</p>
                     </div>
-                    <div className={styles.statsContainer}>
-                        <StatCard icon={<FiUsers />} value="2830" label="Total Company applied for Verification" />
-                        <StatCard icon={<FiBriefcase />} value={companies.length} label="Total Companies" />
+                    <div className="flex flex-col gap-4 justify-center">
+                        <StatCard icon={<FiUsers size={20} />} value={stats.totalEmployees} label="Total Employees Verified" />
+                        <StatCard icon={<FiBriefcase size={20} />} value={stats.totalCompanies} label="Total Companies" />
                     </div>
                 </div>
 
@@ -74,10 +96,9 @@ const CompaniesPage = () => {
                     <SuperAdminCharts />
                 </div>
 
-                <div className={styles.tableWrapper}>
-                    <div className={styles.tableHeader}>
-                        <h3>Newly Joined Company</h3>
-                        {/* --- UPDATED SEARCH AND ADD BUTTONS --- */}
+                <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-xl font-bold text-gray-800">Newly Joined Company</h3>
                         <div className="flex items-center gap-4">
                             <div className="relative">
                                 <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -98,52 +119,49 @@ const CompaniesPage = () => {
                         </div>
                     </div>
 
-                    {loading ? (
-                        <p className="text-center p-8">Loading companies...</p>
-                    ) : error ? (
-                        <p className="text-center p-8 text-red-500">Error: {error}</p>
-                    ) : (
-                        <table className={styles.table}>
-                            <thead>
-                                <tr>
-                                    <th>Company Name</th>
-                                    <th>Admin Email</th>
-                                    <th>Admin Role</th>
-                                    <th>Package</th>
-                                    <th>Remaining</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {companies.map(company => (
-                                    <tr key={company.id} onClick={() => setViewingCompany(company)} className="cursor-pointer hover:bg-gray-50">
-                                        <td>
-                                            <div className={styles.cellWrapper}>
+                    <div className="overflow-x-auto">
+                        {loading ? (
+                            <p className="text-center p-8">Loading companies...</p>
+                        ) : error ? (
+                            <p className="text-center p-8 text-red-500">Error: {error}</p>
+                        ) : (
+                            <table className="w-full text-sm text-left text-gray-500">
+                                <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                                    <tr>
+                                        <th scope="col" className="px-6 py-3">Company Name</th>
+                                        <th scope="col" className="px-6 py-3">Admin Email</th>
+                                        <th scope="col" className="px-6 py-3">Package</th>
+                                        <th scope="col" className="px-6 py-3">Remaining</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {companies.map(company => (
+                                        <tr key={company.id} onClick={() => setViewingCompany(company)} className="bg-white border-b hover:bg-gray-50 cursor-pointer">
+                                            <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-3">
                                                 <Image 
                                                     src={`https://ui-avatars.com/api/?name=${company.adminName.replace(' ', '+')}&background=random`} 
                                                     alt={company.adminName} 
-                                                    width={30} 
-                                                    height={30} 
-                                                    className={styles.avatar}
+                                                    width={32} 
+                                                    height={32} 
+                                                    className="rounded-full"
                                                     unoptimized={true}
                                                 />
                                                 {company.companyName}
-                                            </div>
-                                        </td>
-                                        <td>{company.adminEmail}</td>
-                                        <td>Administrator</td>
-                                        <td>{company.package}</td>
-                                        <td className={company.remaining === '4 days' ? styles.remainingUrgent : ''}>
-                                            {company.remaining}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    )}
+                                            </th>
+                                            <td className="px-6 py-4">{company.adminEmail}</td>
+                                            <td className="px-6 py-4">{company.package}</td>
+                                            <td className={`px-6 py-4 ${company.remaining.includes('Expired') || company.remaining.includes('4 days') ? 'text-red-500 font-semibold' : ''}`}>
+                                                {company.remaining}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
                 </div>
             </div>
             
-            {/* Modals */}
             <AddCompanyModal 
                 isOpen={isAddModalOpen}
                 onClose={() => setIsAddModalOpen(false)}
@@ -154,7 +172,6 @@ const CompaniesPage = () => {
                 onClose={() => setViewingCompany(null)}
                 company={viewingCompany}
                 onSuccess={() => fetchCompanies()}
-
             />
         </>
     );

@@ -10,6 +10,7 @@ export async function middleware(request) {
     console.log(result.status)
     return new NextResponse(
       JSON.stringify({ error: "Permission Denied , Contact Us if You Think There Is Something Wrong" }),
+      // JSON.stringify({ error: result.error }),
       { status: 403, headers: { "Content-Type": "application/json" } }
     );
   }

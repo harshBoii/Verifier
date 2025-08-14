@@ -14,6 +14,7 @@ import {
   ArcElement,
   RadialLinearScale,
 } from 'chart.js';
+import LoadingGlass from '../LoadingGlass';
 
 // Register the necessary components for Chart.js
 ChartJS.register(
@@ -103,7 +104,7 @@ const ComprehensiveDashboard = () => {
     fetchData();
   }, []); // Empty dependency array ensures this runs only once
 
-  if (loading) return <div className="p-8 text-center">Loading dashboard...</div>;
+  if (loading) return <LoadingGlass/>;
   if (error) return <div className="p-8 text-center text-red-500">Error: {error}</div>;
   if (!datasets) return null;
 

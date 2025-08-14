@@ -6,7 +6,7 @@ import styles from './Sidebar.module.css';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { FiGrid, FiUploadCloud, FiCheckSquare, FiBarChart2, FiHelpCircle, FiSettings } from 'react-icons/fi';
+import { FiGrid, FiUploadCloud, FiCheckSquare, FiBarChart2, FiHelpCircle, FiSettings,FiShoppingCart,FiCreditCard } from 'react-icons/fi';
 
 // 2. Modify NavItem to handle links and dynamic active state
 const NavItem = ({ icon, label, href }) => {
@@ -46,6 +46,7 @@ const Sidebar = () => {
         <NavItem icon={<FiUploadCloud />} href="/admin/import" label="Import Employee" />
         <NavItem icon={<FiCheckSquare />} href="/admin/verification" label="Verification" />
         <NavItem icon={<FiBarChart2 />} href="/admin/reports" label="Reports" />
+        <NavItem icon={<FiCreditCard />} href="/admin/subscription" label="Subscription" />
       </nav>
       <div className={styles.footer}>
         <NavItem icon={<FiHelpCircle />} label="Help" /> {/* No href = not a link */}

@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import styles from './VerifyExperiencePage.module.css';
 import { FiCheck, FiX, FiClock, FiMail } from 'react-icons/fi';
 import LoadingGlass from '@/app/components/LoadingGlass';
+import SubAlert from '@/app/components/Dashboard/SubAlert';
 
 // 1. Import all necessary components
 import Sidebar from '@/app/components/Dashboard/Sidebar';
@@ -145,6 +146,7 @@ const VerifyExperiencePage = () => {
                 <div className="flex flex-1 flex-col">
                     <div className="px-4 py-6 sm:px-8 ml-[13vw]">
                         <Header user={user} />
+                        <SubAlert/>
                     </div>
                     <main className="flex-1 px-4 pb-8 sm:px-8 ml-[13vw]">
                         {pageContent()}
