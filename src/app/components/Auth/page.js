@@ -99,7 +99,7 @@ const SignInPage = () => {
             </div>
             <h1 className="text-4xl font-bold mt-8">Welcome Back</h1>
             <p className="mt-4 text-orange-100">
-                Login to track your progress, stay ahead, and keep your growth curve soaring.
+                Login to track your progress, stay ahead, and keep your growth curve soaring,
                 Whether you're leading the way or making it happen, your journey starts here.
             </p>
           </div>
