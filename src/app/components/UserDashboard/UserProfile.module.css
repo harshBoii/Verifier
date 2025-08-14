@@ -103,6 +103,44 @@
     cursor: pointer;
 }
 
+/* .verifyButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #2bf639a0;
+    color: #FFFFFF;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+} */
+
+.GetverifierButton{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #c0dffaa0;
+    color: #4f58ff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-right: 5px;
+    border: 0.3px solid grey;
+    width: 170px;
+    text-align: center;
+    justify-content: center;
+
+}
+.GetverifierButton:hover{
+  background-color: #7a7aff27;
+  color: #000000;
+
+}
 .cardContainer {
     display: flex;
     flex-direction: column;

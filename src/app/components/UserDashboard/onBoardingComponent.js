@@ -50,7 +50,7 @@ const OnboardingComponent = () => {
 
         {/* Main Content Section */}
         {/* Corresponds to .main-content */}
-        <div className="absolute top-80 left-1/2 -translate-x-1/2 w-[70vw] text-center">
+        <div className="absolute top-50 bottom-60 left-1/2 -translate-x-1/2 w-[70vw] text-center">
           {/* Main Heading */}
           <h1 className="text-[40px]  font-bold leading-9 text-gray-900 uppercase">
             DEMO CRM IS YOUR ONLINE VERIFICATION

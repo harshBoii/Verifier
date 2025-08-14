@@ -2,11 +2,11 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import styles from './UserProfile.module.css';
-import { FiEdit2, FiClock, FiCheckCircle  } from 'react-icons/fi';
+import { FiEdit2, FiPlus, FiCheckCircle, FiUserPlus } from 'react-icons/fi';
 import AddExperienceModal from './AddExperienceModal';
-import UserGetVerifiedModal from './UserGetVerifiedModal'; // The modal to be opened
-import WrapButton from '@/components/ui/wrap-button';
-
+import UserGetVerifiedModal from './UserGetVerifiedModal';
+import VerifierModal from './VerifierModal'; // 1. Import the VerifierModal
+import Swal from 'sweetalert2';
 
 const formatDateRange = (startDateISO, endDateISO, isCurrentlyWorking) => {
   const options = { year: 'numeric', month: 'short' };
@@ -36,8 +36,9 @@ const formatDateRange = (startDateISO, endDateISO, isCurrentlyWorking) => {
 /**
  * A sub-component for rendering a single work experience card.
  */
-const ExperienceCard = ({ experience, onVerifyClick }) => {
+const ExperienceCard = ({ experience, onVerifyClick, onAddVerifierClick }) => {
   const logoUrl = `https://placehold.co/40x40/3F51B5/FFFFFF?text=${experience.companyName.charAt(0)}`;
+  const isRoleVerified = experience.skills.some(s => s.verificationStatus === 'VERIFIED');
   
   return (
     <div className={styles.card}>
@@ -46,8 +47,7 @@ const ExperienceCard = ({ experience, onVerifyClick }) => {
         <div className={styles.cardHeaderText}>
           <h4 className={styles.cardRole}>
             {experience.role}
-            {/* The green check on the role now uses the specific is_verified flag */}
-            {experience.is_verified && <FiCheckCircle className={styles.verifiedIcon} />}
+            {isRoleVerified && <FiCheckCircle className={styles.verifiedIcon} />}
           </h4>
           <p className={styles.cardCompany}>{experience.companyName} | {experience.location}</p>
           <p className={styles.cardDuration}>
@@ -71,26 +71,38 @@ const ExperienceCard = ({ experience, onVerifyClick }) => {
             </div>
         </div>
         
-        {/* --- THIS IS THE NEW LOGIC --- */}
-        {/* Conditionally render the button or the verified status */}
-        
-        {experience.is_verified ? (
-          <span className={`${styles.status} ${styles.verified}`}>
-            <FiCheckCircle /> Verified
-          </span>
-        ) : (
-          experience.mail_sent ? (          
-          <button className={styles.verifyButton} onClick={() => onVerifyClick(experience)}>
-            Resend
-          </button>          
-          ) :(
-          <button className={styles.verifyButton} onClick={() => onVerifyClick(experience)}>
-            Verify
-          </button>) 
-        )}
-        {/* --- END OF NEW LOGIC --- */}
+        {/* Button container */}
 
-      </div>
+          <div className='flex  flex-row'>
+            {/* --- THIS IS THE UPDATED LOGIC --- */}
+            {/* The "Add Verifier" button is now only shown if the experience is not verified and no mail has been sent. */}
+            {!experience.is_verified && !experience.mail_sent && (
+                <button className={styles.GetverifierButton} onClick={() => onAddVerifierClick(experience)}>
+                    <FiUserPlus size={14} /> Add Verifier
+                </button>
+            )}
+
+            {/* && !experience.mail_sent */}
+
+            {!experience.is_verified && experience.mail_sent && (
+                <button className={styles.GetverifierButton} onClick={() => onAddVerifierClick(experience)}>
+                    <FiUserPlus size={14} /> Change Verifier
+                </button>
+            )}
+
+
+            {experience.is_verified ? (
+              <span className={`${styles.status} ${styles.verified}`}>
+                <FiCheckCircle /> Verified
+              </span>
+            ) : (
+              <button className={styles.verifyButton} onClick={() => onVerifyClick(experience)}>
+                {experience.mail_sent ? 'Resend' : 'Verify'}
+              </button>
+            )}
+            </div>
+        </div>
+
     </div>
   );
 };
@@ -98,18 +110,43 @@ const ExperienceCard = ({ experience, onVerifyClick }) => {
 const WorkExperienceSection = ({ experiences = [], refetchData, user }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedExperience, setSelectedExperience] = useState(null);
+  const [isVerifierModalOpen, setIsVerifierModalOpen] = useState(false); // State for the Verifier modal
 
   const handleVerifyClick = (experience) => {
+    // Logic to open the GetVerifiedModal
+    // This needs to be distinct from the VerifierModal logic
     setSelectedExperience(experience);
+    setIsVerifierModalOpen(false); // Ensure verifier modal is closed
+  };
+  
+  const handleAddVerifierClick = (experience) => {
+    setSelectedExperience(experience);
+    setIsVerifierModalOpen(true);
+  };
+
+  const handleVerifierSelect = async (email) => {
+    if (!selectedExperience) return;
+    try {
+        const response = await fetch(`/api/experience/${selectedExperience.id}/update-hr-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ hrEmail: email }),
+        });
+        if (!response.ok) throw new Error('Failed to update verifier email.');
+        Swal.fire('Success!', 'Verifier email has been updated.', 'success');
+        refetchData(); // Refetch all data to show the update
+    } catch (error) {
+        Swal.fire('Error!', error.message, 'error');
+    }
   };
 
   return (
     <div>
       <div className={styles.contentHeader}>
         <h3>Work Experiences & Internships</h3>
-        <WrapButton onClick={() => setIsAddModalOpen(true)}>
-          Add Experience
-        </WrapButton>
+        <button className={styles.addButton} onClick={() => setIsAddModalOpen(true)}>
+          <FiPlus /> Add Experience
+        </button>
       </div>
       <div className={styles.cardContainer}>
         {experiences.map(exp => (
@@ -117,6 +154,7 @@ const WorkExperienceSection = ({ experiences = [], refetchData, user }) => {
             key={exp.id} 
             experience={exp} 
             onVerifyClick={handleVerifyClick}
+            onAddVerifierClick={handleAddVerifierClick} // Pass the new handler
           />
         ))}
       </div>
@@ -128,10 +166,17 @@ const WorkExperienceSection = ({ experiences = [], refetchData, user }) => {
       />
 
       <UserGetVerifiedModal
-        isOpen={!!selectedExperience}
+        isOpen={!!selectedExperience && !isVerifierModalOpen} // Only open if verifier modal is not
         onClose={() => setSelectedExperience(null)}
         user={user}
         experience={selectedExperience}
+      />
+
+      {/* Render the new VerifierModal */}
+      <VerifierModal
+        isOpen={isVerifierModalOpen}
+        onClose={() => setIsVerifierModalOpen(false)}
+        onVerifierSelect={handleVerifierSelect}
       />
     </div>
   );

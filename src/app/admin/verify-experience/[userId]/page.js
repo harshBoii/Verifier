@@ -144,11 +144,11 @@ const VerifyExperiencePage = () => {
             <div className="flex min-h-screen bg-gray-50">
                 <Sidebar />
                 <div className="flex flex-1 flex-col">
-                    <div className="px-4 py-6 sm:px-8 ml-[13vw]">
+                    <div className="px-4 py-6 sm:px-8 ">
                         <Header user={user} />
                         <SubAlert/>
                     </div>
-                    <main className="flex-1 px-4 pb-8 sm:px-8 ml-[13vw]">
+                    <main className="flex-1 px-4 pb-8 sm:px-8 ">
                         {pageContent()}
                     </main>
                 </div>

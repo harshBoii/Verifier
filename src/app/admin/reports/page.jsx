@@ -13,13 +13,12 @@ export default function ImportEmployee() {
       {/* Main content area that takes up the remaining space */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         {/* Header is placed inside the main content area */}
-        <div style={{ padding: '20px 30px 0 30px' }} className='ml-[13vw]'>
+        <div style={{ padding: '20px 30px 0 30px' }} >
           <Header user={{ name: 'Admin' }} />
           <SubAlert/>
-
         </div>
         {/* The import page component is also inside the main content area */}
-        <div style={{ padding: '0 30px 30px 30px' }} className='ml-[13vw]'>
+        <div style={{ padding: '0 30px 30px 30px' }} >
           <Report />
         </div>
       </div>
