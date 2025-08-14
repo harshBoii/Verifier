@@ -6,6 +6,7 @@ import Header from './Header';
 import CampaignsTable from './CampaignsTable';
 import { FiUsers, FiUserCheck, FiX, FiClock } from 'react-icons/fi';
 import DashboardCharts from './Chart';
+import SubAlert from './SubAlert';
 
 const StatCard = ({ icon, value, label }) => (
     <div className={styles.statCard}>
@@ -114,6 +115,7 @@ const Dashboard = () => {
             <Sidebar className="w-20" />
             <main className={styles.mainContent}>
                 <Header user={user} />
+                <SubAlert/>
                 <div className={styles.welcomeBanner}>
                     <div>
                         <h2>Welcome back, {user ? user.fullName : 'Admin'}!</h2>

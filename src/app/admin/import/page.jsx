@@ -16,8 +16,9 @@ export default function ImportEmployee() {
         {/* Header is placed inside the main content area */}
         <div style={{ padding: '20px 30px 0 30px' }} className='ml-[13vw]'>
           <Header user={{ name: 'Admin' }} />
-          <SubAlert/>
         </div>
+          <SubAlert/>
+
         {/* The import page component is also inside the main content area */}
         <div style={{ padding: '0 30px 30px 30px' }} className='ml-[13vw]'>
           <ImportEmployeePage />

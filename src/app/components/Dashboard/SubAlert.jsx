@@ -43,8 +43,8 @@ const SubAlert = () => {
   }
 
   return (
-    <div className="sticky top-0 z-40">
-      <div className="bg-red-600 text-white p-3">
+    <div className="sticky top-0 z-40 rounded-4xl">
+      <div className="bg-red-500 mb-3 text-white p-3 rounded-2xl">
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <FiAlertTriangle className="h-6 w-6" />
