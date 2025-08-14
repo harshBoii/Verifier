@@ -90,9 +90,9 @@ const SignInPage = () => {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-300 to-blue-800 font-sans">
-      <div className="relative flex w-full max-w-4xl min-h-[70vh] m-4 sm:m-8 bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div className="relative flex w-full max-w-4xl h-[65vh] m-4 sm:m-8 bg-white rounded-2xl shadow-2xl overflow-hidden">
         {/* Left decorative panel */}
-        <div className="w-1/2 hidden md:flex flex-col rounded-2xl justify-between h-180 mt-2 mb-2 ml-2 p-12 text-white bg-gradient-to-br from-blue-300 to-blue-800">
+        <div className="w-1/2 hidden md:flex flex-col rounded-2xl justify-between h-160 mt-4 mb-2 ml-4 p-12 text-white bg-gradient-to-br from-blue-300 to-blue-800">
           <div>
             <div className='font-extrabold text-[30px] align-middle text-center'>
               <FiCheckCircle className='absolute ml-13 mt-2'/>DEMO CRM
@@ -106,7 +106,7 @@ const SignInPage = () => {
           <img 
             src="Svg/signin.svg" 
             alt="Sign In Illustration" 
-            className="w-full max-w-xs mx-auto"
+            className="w-full max-w-xs mx-auto -mt-25]"
             onError={(e) => e.target.src='https://placehold.co/400x300?text=Illustration'}
           />
         </div>
