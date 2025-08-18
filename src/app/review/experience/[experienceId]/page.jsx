@@ -1,164 +1,227 @@
-'use client';
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import styles from  './Verification.module.css' ;
-import { FiCheckCircle, FiFacebook, FiPlus ,FiPhoneIncoming,FiMail } from 'react-icons/fi';
-import Swal from 'sweetalert2';
-import Image from 'next/image';
-import LoadingGlass from '@/app/components/LoadingGlass';
+// app/feedback/[experienceId]/page.js 
+// Important: This component should be in the `app` directory for this code to work.
+'use client'
+import { useState, useEffect, useRef } from 'react';
+import { useParams, useRouter } from 'next/navigation'; 
 
-const SkillTag = ({ children, highlighted }) => (
-  <div className={`${styles.skillTag} ${highlighted ? styles.highlighted : ''}`}>
-    {children}
+// --- Helper Components ---
+
+// Loading spinner component
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center space-x-2">
+    <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
+    <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse [animation-delay:0.2s]"></div>
+    <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse [animation-delay:0.4s]"></div>
   </div>
 );
 
-const SingleExperienceReviewPage = () => {
-  const [experienceData, setExperienceData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [isRevisionMode, setIsRevisionMode] = useState(false);
-  const [revisionComment, setRevisionComment] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const params = useParams();
-  const { experienceId } = params;
+// Message bubble component
+const MessageBubble = ({ message, isUser }) => (
+  <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
+    <div
+      className={`max-w-md px-4 py-3 rounded-2xl shadow ${
+        isUser
+          ? 'bg-blue-600 text-white rounded-br-none'
+          : 'bg-white text-gray-800 rounded-bl-none'
+      }`}
+    >
+      {/* Using dangerouslySetInnerHTML to render markdown for bolding, etc. in summary */}
+      <p className="text-sm" dangerouslySetInnerHTML={{ __html: message.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br />') }}></p>
+    </div>
+  </div>
+);
 
+// --- Main Chat Component ---
+export default function ChatPage() {
+  // --- State Management ---
+  const [session, setSession] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [userInput, setUserInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const chatEndRef = useRef(null);
+  
+  const router = useRouter(); 
+  const params = useParams(); 
+  const experienceId = params.experienceId;
+
+  // --- Effects ---
+
+  // Automatically scroll to the latest message
   useEffect(() => {
-    if (!experienceId) return;
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
-    const fetchExperienceData = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/experience/${experienceId}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch experience data.');
-        }
-        const data = await response.json();
-        setExperienceData(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Start the conversation on component mount when experienceId is available
+  useEffect(() => {
+    if (experienceId) {
+      startConversation(experienceId);
+    } else {
+      setMessages([{ text: "Waiting for a work experience ID in the URL...", isUser: false }]);
+    }
+  }, [experienceId]); 
 
-    fetchExperienceData();
-  }, [experienceId]);
+  // --- API Interaction ---
+  const startConversation = async (id) => {
+    setIsLoading(true);
+    setMessages([]);
+    setSession(null);
 
-  const handleRevisionClick = () => setIsRevisionMode(!isRevisionMode);
-
-  const handleVerifyNow = async () => {
-    setIsSubmitting(true);
     try {
-      const response = await fetch('/api/submit-verification', {
+      // Step 1: Fetch the dynamic experience data from your Next.js API
+      const experienceResponse = await fetch(`/api/experience/${id}`);
+      if (!experienceResponse.ok) {
+        throw new Error(`Failed to fetch experience data. Status: ${experienceResponse.status}`);
+      }
+      const experienceData = await experienceResponse.json();
+
+      // Extract skill names and concatenate them into a single string.
+      const skillsString = experienceData.skills?.map(s => s.skill.name).join(', ') || '';
+      
+      // Combine the original description with the new skills string.
+      const combinedExperience = `${experienceData.description}\n\nSkills: ${skillsString}`;
+      
+      // Step 2: Use the fetched data to start the feedback session.
+      const feedbackResponse = await fetch('http://127.0.0.1:8000/start-feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          employeeId: experienceData.userId,
-          revisionComment: revisionComment,
+          profession: experienceData.user?.position || experienceData.jobTitle, // Use user's position if available
+          work_experience: combinedExperience, // Send the combined description and skills
+          name: experienceData.user?.fullName || "User"
         }),
       });
-      if (!response.ok) throw new Error('Failed to submit verification.');
+
+      if (!feedbackResponse.ok) throw new Error('Failed to start conversation');
+
+      const data = await feedbackResponse.json();
       
-      Swal.fire({
-        title: 'Request Sent!',
-        icon: 'success',
-        html: `The request to update the experience has been successfully sent to <strong>${experienceData.user.fullName}</strong>.`,
-        confirmButtonText: 'Got it!',
-        confirmButtonColor: '#2979FF',
+      // The session state is set up to hold both the session_id and the crucial checkpoint_id
+      // that the API returns.
+      setSession({
+        sessionId: data.session_id,
+        checkpointId: data.checkpoint_id,
       });
-      setIsRevisionMode(false);
-      setRevisionComment('');
-    } catch (err) {
-      Swal.fire('Error!', err.message, 'error');
+
+      setMessages([{ text: data.question, isUser: false }]);
+    } catch (error) {
+      console.error("Start conversation error:", error);
+      setMessages([{ text: "Sorry, I couldn't start the conversation. Please try again later.", isUser: false }]);
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
-  if (loading) return <LoadingGlass className='mt-250'/>;
-  if (error) return <div className={styles.pageContainer}><p style={{ color: 'red' }}>Error: {error}</p></div>;
-  if (!experienceData) return null;
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (!userInput.trim() || isLoading || !session) return;
 
+    const userMessage = { text: userInput, isUser: true };
+    setMessages(prev => [...prev, userMessage]);
+    setUserInput('');
+    setIsLoading(true);
+
+    try {
+      // The body of this request perfectly matches the `ContinueBody` Pydantic model in main.py,
+      // sending back the session_id, the new answer, and the specific checkpoint_id from the last turn.
+      const response = await fetch('http://127.0.0.1:8000/continue-feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: session.sessionId,
+          answer: userInput,
+          checkpoint_id: session.checkpointId,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to send message');
+
+      const data = await response.json();
+
+      // This logic correctly handles both possible API responses:
+      if (data.question) {
+        // 1. If the conversation continues, we get a new question and a NEW checkpoint_id for the next turn.
+        setSession({
+          sessionId: data.session_id,
+          checkpointId: data.checkpoint_id,
+        });
+        setMessages(prev => [...prev, { text: data.question, isUser: false }]);
+      } else if (data.summary) {
+        // 2. If the conversation is over, we get the summary and end the session.
+        setMessages(prev => [...prev, { text: `**Feedback Summary:**\n\n${data.summary}`, isUser: false }]);
+        setSession(null);
+      }
+    } catch (error) {
+      console.error("Send message error:", error);
+      setMessages(prev => [...prev, { text: "Sorry, an error occurred. Please try again.", isUser: false }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // --- Render ---
   return (
-    <div className={styles.pageContainer}>
-      <h2 className={styles.title}>{experienceData.user.fullName} is mentioned the following details,</h2>
-      
-      <div className={styles.infoFields}>
-        <div className={styles.fieldGroup}>
-          <label>Full Name</label>
-          <div className={styles.inputDisplay}>
-            <span>{experienceData.user.fullName}</span>
-            <FiCheckCircle className={styles.checkIcon} />
-          </div>
-        </div>
-        <div className={styles.fieldGroup}>
-          <label>Employee/Staff ID In Your Company</label>
-          <div className={styles.inputDisplay}>
-            <span>{experienceData.expId || '1'}</span>
-            {/* <span>1</span> */}
-
-          </div>
-        </div>
-      </div>
-
-      <div className={styles.experienceCard}>
-        <div className={styles.cardHeader}>
-          <FiMail size={28} className={styles.companyLogo} />
+    <div className="flex flex-col h-screen bg-gray-100 font-sans">
+      {/* Header */}
+      <header className="bg-white shadow-sm p-4 border-b border-gray-200">
+        <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div>
-            <h3 className={styles.jobTitle}>{experienceData.role}</h3>
-            <p className={styles.companyInfo}>{experienceData.companyName} | {experienceData.location}</p>
-            <p className={styles.durationInfo}>{new Date(experienceData.startDate).toLocaleDateString()} - {experienceData.endDate ? new Date(experienceData.endDate).toLocaleDateString() : 'Present'}</p>
+            <h1 className="text-xl font-bold text-gray-800">Feedback Agent</h1>
+            <p className="text-sm text-gray-500">AI-powered feedback collection</p>
           </div>
+          <button
+            onClick={() => experienceId && startConversation(experienceId)}
+            disabled={isLoading || !experienceId}
+            className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-100 rounded-lg hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            New Session
+          </button>
         </div>
-        <p className={styles.description}>{experienceData.description}</p>
-        
-        <div className={styles.skillsSection}>
-            <div className={styles.skillsHeader}>
-                <h4>Skills Earned</h4>
-                <p>Select the Skills to Endorse</p>
-            </div>
-            <div className={styles.skillsList}>
-                {experienceData.skills.map(workSkill => (
-                  <SkillTag key={workSkill.skill.id} highlighted={workSkill.verificationStatus === 'VERIFIED'}>
-                    {workSkill.skill.name}
-                  </SkillTag>
-                ))}
-                {/* <button className={styles.addSkillButton}><FiPlus size={12}/> Add Skills</button> */}
-            </div>
-        </div>
-        <div className={styles.cardActions}>
-            <button
-              className={`${styles.revisionButton} ${isRevisionMode ? styles.revisionActive : ''}`}
-              onClick={handleRevisionClick}
-              disabled={isSubmitting}
-            >
-              Send for Revision
-            </button>
-        </div>
-        {isRevisionMode && (
-          <textarea
-            className={styles.revisionTextarea}
-            placeholder="Enter your revision comments here..."
-            value={revisionComment}
-            onChange={(e) => setRevisionComment(e.target.value)}
-            disabled={isSubmitting}
-          />
-        )}
-      </div>
+      </header>
 
-      <div className={styles.footerActions}>
-        <p>I find all the information true to my knowledge.</p>
-        <button 
-          className={styles.verifyButton} 
-          onClick={handleVerifyNow}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Submitting...' : 'Verify Now'}
-        </button>
-      </div>
+      {/* Chat Area */}
+      <main className="flex-1 overflow-y-auto p-4 md:p-6">
+        <div className="max-w-3xl mx-auto">
+          {messages.map((msg, index) => (
+            <MessageBubble key={index} message={msg.text} isUser={msg.isUser} />
+          ))}
+          {isLoading && messages.length > 0 && (
+            <div className="flex justify-start mb-4">
+              <div className="max-w-md px-4 py-3 rounded-2xl shadow bg-white text-gray-800 rounded-bl-none">
+                <LoadingSpinner />
+              </div>
+            </div>
+          )}
+           {isLoading && messages.length === 0 && (
+             <div className="text-sm text-gray-500 text-center p-4">Fetching experience data and starting session...</div>
+           )}
+          <div ref={chatEndRef} />
+        </div>
+      </main>
+
+      {/* Input Form */}
+      <footer className="bg-white border-t border-gray-200 p-4">
+        <div className="max-w-3xl mx-auto">
+          <form onSubmit={handleSendMessage} className="flex items-center space-x-4">
+            <input
+              type="text"
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              placeholder={session ? "Type your answer..." : "Session ended. Start a new one."}
+              disabled={isLoading || !session}
+              className="flex-1 w-full px-4 py-2 text-sm text-gray-800 bg-gray-100 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            />
+            <button
+              type="submit"
+              disabled={isLoading || !userInput.trim() || !session}
+              className="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 text-white bg-blue-600 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            >
+              <svg className="w-5 h-5 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+              </svg>
+            </button>
+          </form>
+        </div>
+      </footer>
     </div>
   );
-};
-
-export default SingleExperienceReviewPage;
+}
