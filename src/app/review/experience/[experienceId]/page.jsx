@@ -38,6 +38,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [QADone, setQADone] = useState(false); // State to track if the summary has been received
   const chatEndRef = useRef(null);
   
   const router = useRouter(); 
@@ -65,6 +66,7 @@ export default function ChatPage() {
     setIsLoading(true);
     setMessages([]);
     setSession(null);
+    setQADone(false); // Reset the QA status on new session
 
     try {
       // Step 1: Fetch the dynamic experience data from your Next.js API
@@ -95,15 +97,14 @@ export default function ChatPage() {
 
       const data = await feedbackResponse.json();
       
-      // The session state is set up to hold both the session_id and the crucial checkpoint_id
-      // that the API returns.
       setSession({
         sessionId: data.session_id,
         checkpointId: data.checkpoint_id,
       });
 
       setMessages([{ text: data.question, isUser: false }]);
-    } catch (error) {
+    } catch (error)
+ {
       console.error("Start conversation error:", error);
       setMessages([{ text: "Sorry, I couldn't start the conversation. Please try again later.", isUser: false }]);
     } finally {
@@ -121,8 +122,6 @@ export default function ChatPage() {
     setIsLoading(true);
 
     try {
-      // The body of this request perfectly matches the `ContinueBody` Pydantic model in main.py,
-      // sending back the session_id, the new answer, and the specific checkpoint_id from the last turn.
       const response = await fetch('http://127.0.0.1:8000/continue-feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -134,21 +133,19 @@ export default function ChatPage() {
       });
 
       if (!response.ok) throw new Error('Failed to send message');
-
+      
       const data = await response.json();
 
-      // This logic correctly handles both possible API responses:
       if (data.question) {
-        // 1. If the conversation continues, we get a new question and a NEW checkpoint_id for the next turn.
         setSession({
           sessionId: data.session_id,
           checkpointId: data.checkpoint_id,
         });
         setMessages(prev => [...prev, { text: data.question, isUser: false }]);
       } else if (data.summary) {
-        // 2. If the conversation is over, we get the summary and end the session.
         setMessages(prev => [...prev, { text: `**Feedback Summary:**\n\n${data.summary}`, isUser: false }]);
         setSession(null);
+        setQADone(true); // Set QA to done to show the final buttons
       }
     } catch (error) {
       console.error("Send message error:", error);
@@ -156,6 +153,20 @@ export default function ChatPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // --- Button Handlers for Final Step ---
+  const handleFinalSubmit = () => {
+    // Here you would typically post the final summary to your database
+    console.log("Submitting final feedback...");
+    setIsLoading(true);
+    // For demonstration, we'll just show a success message and redirect
+    setTimeout(() => {
+        setMessages(prev => [...prev, { text: "Thank you for your feedback!", isUser: false }]);
+        setIsLoading(false);
+        // Optionally redirect after a delay
+        // router.push('/dashboard');
+    }, 1500);
   };
 
   // --- Render ---
@@ -184,42 +195,58 @@ export default function ChatPage() {
           {messages.map((msg, index) => (
             <MessageBubble key={index} message={msg.text} isUser={msg.isUser} />
           ))}
-          {isLoading && messages.length > 0 && (
+          {isLoading && (
             <div className="flex justify-start mb-4">
               <div className="max-w-md px-4 py-3 rounded-2xl shadow bg-white text-gray-800 rounded-bl-none">
                 <LoadingSpinner />
               </div>
             </div>
           )}
-           {isLoading && messages.length === 0 && (
-             <div className="text-sm text-gray-500 text-center p-4">Fetching experience data and starting session...</div>
-           )}
           <div ref={chatEndRef} />
         </div>
       </main>
 
-      {/* Input Form */}
+      {/* Input Form or Final Action Buttons */}
       <footer className="bg-white border-t border-gray-200 p-4">
         <div className="max-w-3xl mx-auto">
-          <form onSubmit={handleSendMessage} className="flex items-center space-x-4">
-            <input
-              type="text"
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              placeholder={session ? "Type your answer..." : "Session ended. Start a new one."}
-              disabled={isLoading || !session}
-              className="flex-1 w-full px-4 py-2 text-sm text-gray-800 bg-gray-100 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-            />
-            <button
-              type="submit"
-              disabled={isLoading || !userInput.trim() || !session}
-              className="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 text-white bg-blue-600 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-            >
-              <svg className="w-5 h-5 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-              </svg>
-            </button>
-          </form>
+          {QADone ? (
+            <div className="flex items-center justify-center space-x-4">
+              <button
+                onClick={() => experienceId && startConversation(experienceId)}
+                disabled={isLoading}
+                className="flex-1 px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 transition-colors"
+              >
+                Regenerate
+              </button>
+              <button
+                onClick={handleFinalSubmit}
+                disabled={isLoading}
+                className="flex-1 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
+              >
+                Submit
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSendMessage} className="flex items-center space-x-4">
+              <input
+                type="text"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                placeholder={session ? "Type your answer..." : "Session ended. Start a new one."}
+                disabled={isLoading || !session}
+                className="flex-1 w-full px-4 py-2 text-sm text-gray-800 bg-gray-100 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              />
+              <button
+                type="submit"
+                disabled={isLoading || !userInput.trim() || !session}
+                className="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 text-white bg-blue-600 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg className="w-5 h-5 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                </svg>
+              </button>
+            </form>
+          )}
         </div>
       </footer>
     </div>
