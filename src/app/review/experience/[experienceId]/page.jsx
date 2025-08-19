@@ -83,7 +83,7 @@ export default function ChatPage() {
       const combinedExperience = `${experienceData.description}\n\nSkills: ${skillsString}`;
       
       // Step 2: Use the fetched data to start the feedback session.
-      const feedbackResponse = await fetch('http://127.0.0.1:8000/start-feedback', {
+      const feedbackResponse = await fetch('https://questionbotverifier.onrender.com/start-feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -122,7 +122,7 @@ export default function ChatPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/continue-feedback', {
+      const response = await fetch('https://questionbotverifier.onrender.com/continue-feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
