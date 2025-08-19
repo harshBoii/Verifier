@@ -282,6 +282,7 @@ model WorkExperience {
   verifier_email   String?   @default("")
   is_verified      Boolean   @default(false)
   mail_sent        Boolean   @default(false)
+  job_title        String?   @default("")
   // Relation to User
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @map("user_id")

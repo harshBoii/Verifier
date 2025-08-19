@@ -7,12 +7,14 @@ import styles from './VerifyExperiencePage.module.css';
 import { FiCheck, FiX, FiClock, FiMail } from 'react-icons/fi';
 import LoadingGlass from '@/app/components/LoadingGlass';
 import SubAlert from '@/app/components/Dashboard/SubAlert';
+import Link from 'next/link';
 
 // 1. Import all necessary components
 import Sidebar from '@/app/components/Dashboard/Sidebar';
 import Header from '@/app/components/Dashboard/Header';
 import GetVerifiedModal from '@/app/components/Dashboard/GetVerifiedModal';
 import GetHrEmailModal from '@/app/components/GetHrEmailModal';
+import { Router } from 'next/router';
 
 const VerifyExperiencePage = () => {
     const [user, setUser] = useState(null);
@@ -117,11 +119,13 @@ const VerifyExperiencePage = () => {
                 <div className={styles.experienceList}>
                     {user.workExperiences.map(exp => (
                         <div key={exp.id} className={styles.card}>
+                            <Link href={`/admin/experience/${exp.id}`}>
                             <div>
                                 <h3 className={styles.role}>{exp.role} at {exp.companyName}</h3>
                                 <p className={styles.duration}>{new Date(exp.startDate).getFullYear()} - {exp.currentlyWorking ? 'Present' : new Date(exp.endDate).getFullYear()}</p>
                                 <p className={styles.description}>{exp.description}</p>
                             </div>
+                            </Link>
                             <div className={styles.actions}>
                                 <StatusBadge status={exp.is_verified} />
                                 <div className={styles.buttonGroup}>
@@ -160,6 +164,7 @@ const VerifyExperiencePage = () => {
                 onRequestFromEmployee={handleRequestFromEmployee}
                 onSendDirectly={handleSendDirectly}
             />
+
             <GetVerifiedModal
                 isOpen={isDirectSendModalOpen}
                 onClose={() => setIsDirectSendModalOpen(false)}

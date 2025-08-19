@@ -1,12 +1,7 @@
-// app/feedback/[experienceId]/page.js 
-// Important: This component should be in the `app` directory for this code to work.
 'use client'
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation'; 
 
-// --- Helper Components ---
-
-// Loading spinner component
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center space-x-2">
     <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
@@ -15,7 +10,7 @@ const LoadingSpinner = () => (
   </div>
 );
 
-// Message bubble component
+
 const MessageBubble = ({ message, isUser }) => (
   <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
     <div
@@ -39,7 +34,10 @@ export default function ChatPage() {
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [QADone, setQADone] = useState(false); // State to track if the summary has been received
+  const [empId,setEmpId] = useState(0)
+  const [summary,setSummmary]= useState("")
   const chatEndRef = useRef(null);
+
   
   const router = useRouter(); 
   const params = useParams(); 
@@ -68,6 +66,7 @@ export default function ChatPage() {
     setSession(null);
     setQADone(false); // Reset the QA status on new session
 
+
     try {
       // Step 1: Fetch the dynamic experience data from your Next.js API
       const experienceResponse = await fetch(`/api/experience/${id}`);
@@ -75,6 +74,7 @@ export default function ChatPage() {
         throw new Error(`Failed to fetch experience data. Status: ${experienceResponse.status}`);
       }
       const experienceData = await experienceResponse.json();
+      setEmpId(experienceData.user.id)
 
       // Extract skill names and concatenate them into a single string.
       const skillsString = experienceData.skills?.map(s => s.skill.name).join(', ') || '';
@@ -146,6 +146,7 @@ export default function ChatPage() {
         setMessages(prev => [...prev, { text: `**Feedback Summary:**\n\n${data.summary}`, isUser: false }]);
         setSession(null);
         setQADone(true); // Set QA to done to show the final buttons
+        setSummmary(data.summary)
       }
     } catch (error) {
       console.error("Send message error:", error);
@@ -156,16 +157,22 @@ export default function ChatPage() {
   };
 
   // --- Button Handlers for Final Step ---
-  const handleFinalSubmit = () => {
-    // Here you would typically post the final summary to your database
+  const handleFinalSubmit = async () => {
+    const updateDb = await fetch('/api/submit-verification',{
+      method:'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:JSON.stringify({
+        employeeId:parseInt(empId),
+        revisionComment:summary,
+        expId:parseInt(experienceId)      
+      })
+    })
+    // employeeId, revisionComment,expId
     console.log("Submitting final feedback...");
     setIsLoading(true);
-    // For demonstration, we'll just show a success message and redirect
     setTimeout(() => {
         setMessages(prev => [...prev, { text: "Thank you for your feedback!", isUser: false }]);
         setIsLoading(false);
-        // Optionally redirect after a delay
-        // router.push('/dashboard');
     }, 1500);
   };
 

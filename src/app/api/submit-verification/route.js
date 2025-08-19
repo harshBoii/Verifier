@@ -6,7 +6,7 @@ import prisma from '@/app/lib/prisma'; // 1. Import your Prisma client
 export async function POST(request) {
   try {
     // 2. The API now only needs the employee's ID and the comment
-    const { employeeId, revisionComment } = await request.json();
+    const { employeeId, revisionComment,expId  } = await request.json();
 
     if (!employeeId) {
       return NextResponse.json({ error: 'Missing employeeId' }, { status: 400 });
@@ -18,7 +18,6 @@ export async function POST(request) {
         id: parseInt(employeeId, 10),
       },
       include: {
-        // Include the company relation to find the admin
         company: {
           include: {
             admin: true, // Include the full admin user object
@@ -34,6 +33,7 @@ export async function POST(request) {
     const adminEmail = employee.company.admin.email;
     const employeeName = employee.fullName;
     const employeeEmail = employee.email;
+    const companyName = employee.company.name
 
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
@@ -55,7 +55,7 @@ export async function POST(request) {
     const adminMailOptions = {
       from: `"Demo CRM" <${process.env.SMTP_USER}>`,
       to: adminEmail,
-      subject: `Verification Submitted for ${employeeName}`,
+      subject: `Verification Submitted for ${employeeName} by ${companyName} `,
       html: emailHtml,
     };
 
@@ -63,21 +63,28 @@ export async function POST(request) {
     const employeeMailOptions = {
       from: `"Demo CRM" <${process.env.SMTP_USER}>`,
       to: employeeEmail,
-      subject: `Your Verification Has Been Processed`,
+      subject: `Your Verification Has Been Processed for Exp in ${companyName}`,
       html: emailHtml,
     };
     
     // 5. Update the employee's status to verified in the database
-    const updateEmployeeStatus = prisma.user.update({
-        where: { id: employee.id },
-        data: { is_verified: true },
-    });
 
     // 6. Send both emails and update the database concurrently
     await Promise.all([
         transporter.sendMail(adminMailOptions),
         transporter.sendMail(employeeMailOptions),
-        updateEmployeeStatus
+
+        await prisma.$transaction([
+        prisma.user.update({
+            where: { id: employee.id },
+            data: { is_verified: true},
+        }),
+        prisma.workExperience.update({
+          where:{id:expId},
+          data:{hr_comment:revisionComment}
+        })
+        ])
+
     ]);
 
     return NextResponse.json({ message: 'Verification submitted and emails sent successfully!' });

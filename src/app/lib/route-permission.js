@@ -9,6 +9,7 @@ export const Permissions = {
   VIEW_VERIFICATION_RESULTS: "view_verification_results",
   SUBSCRIPTION_MANAGEMENT: "subscription_management",
   VIEW_REPORTS_STATISTICS: "view_reports_statistics",
+  // FINISH_VERIFICATION:"finish_verification",
   NONE: "none", // For public routes
 };
 
@@ -35,8 +36,11 @@ export const routePermissions = [
   // { prefix: "/api/review", permission: Permissions.VIEW_ASSIGN_REQUESTS },
   // { prefix: "/api/experience/add", permission: Permissions.INITIATE_VERIFICATIONS },
   { prefix: "/api/submit-verification", permission: Permissions.INITIATE_VERIFICATIONS },
-  { prefix: "/api/send-verification", permission: Permissions.INITIATE_VERIFICATIONS },
   { prefix: "/api/request-hr-email", permission: Permissions.INITIATE_VERIFICATIONS },
+
+  // Finish Verification
+  // { prefix: "/api/send-verification", permission: Permissions.FINISH_VERIFICATION },
+
 
   // Viewing Data
   { prefix: "/api/profile", permission: Permissions.VIEW_VERIFICATION_RESULTS },
