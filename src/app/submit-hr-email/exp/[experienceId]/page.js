@@ -38,7 +38,7 @@ const SubmitHrEmailPage = () => {
                 icon: 'success',
                 confirmButtonColor: '#2563eb',
             });
-            
+
             setHrEmail('');
             // You can optionally close the window after success
             // window.close();

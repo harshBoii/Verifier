@@ -53,7 +53,7 @@ const OnboardingComponent = () => {
         <div className="absolute top-50 bottom-60 left-1/2 -translate-x-1/2 w-[70vw] text-center">
           {/* Main Heading */}
           <h1 className="text-[40px] mr-7 font-bold leading-9 text-gray-900 uppercase">
-            DEMO CRM IS YOUR ONLINE VERIFICATION
+            VETTIFY IS YOUR ONLINE VERIFICATION
           </h1>
           
           {/* Subheading */}

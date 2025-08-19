@@ -96,7 +96,7 @@ const SignInPage = () => {
         <div className="w-1/2 hidden md:flex flex-col rounded-2xl justify-between  mt-3 mb-3 ml-4 p-12 text-white bg-gradient-to-br from-blue-300 to-blue-800">
           <div>
             <div className='font-extrabold text-[30px] align-middle text-center'>
-              <FiCheckCircle className='absolute ml-13 mt-2'/>DEMO CRM
+              <FiCheckCircle className='absolute ml-13 mt-2'/>VETTIFY
             </div>
             <h1 className="text-4xl font-bold mt-8">Welcome Back</h1>
             <p className="mt-4 text-orange-100">

@@ -38,7 +38,7 @@ const Sidebar = () => {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logo}>
-        Demo CRM
+        VETTIFY
       </div>
       <nav className={styles.nav}>
         {/* 3. Use the corrected NavItem with href props for each link */}
