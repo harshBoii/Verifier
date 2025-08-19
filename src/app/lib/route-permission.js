@@ -37,6 +37,8 @@ export const routePermissions = [
   // { prefix: "/api/experience/add", permission: Permissions.INITIATE_VERIFICATIONS },
   { prefix: "/api/submit-verification", permission: Permissions.INITIATE_VERIFICATIONS },
   { prefix: "/api/request-hr-email", permission: Permissions.INITIATE_VERIFICATIONS },
+  { prefix: "/api/send-verification", permission: Permissions.INITIATE_VERIFICATIONS },
+
 
   // Finish Verification
   // { prefix: "/api/send-verification", permission: Permissions.FINISH_VERIFICATION },
