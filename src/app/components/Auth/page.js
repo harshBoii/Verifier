@@ -90,7 +90,7 @@ const SignInPage = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-300 to-blue-800 font-sans">
+    <div className="min-h-screen w-full flex items-center justify-center bg-[radial-gradient(circle_at_bottom,_#3b82f6_0%,_#bfdbfe_40%,_#ffffff_80%)] font-sans">
       <div className="relative flex w-full max-w-4xl h-[65vh] m-4 sm:m-8 bg-white rounded-2xl shadow-2xl overflow-hidden">
         {/* Left decorative panel */}
         <div className="w-1/2 hidden md:flex flex-col rounded-2xl justify-between  mt-3 mb-3 ml-4 p-12 text-white bg-gradient-to-br from-blue-300 to-blue-800">

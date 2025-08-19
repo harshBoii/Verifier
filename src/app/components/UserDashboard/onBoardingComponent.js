@@ -27,10 +27,10 @@ const HelpdeskIcon = () => (
 const OnboardingComponent = () => {
   return (
     // Main container to center the component on the page
-    <div className="flex items-center justify-center h-[100vh] w-[100vw] bg-gray-100 font-sans">
+    <div className="flex items-center justify-center h-[100vh] w-[100vw] bg-[radial-gradient(circle_at_bottom,_#3b82f6_0%,_#bfdbfe_40%,_#ffffff_80%)] font-sans">
       {/* Onboarding Page Container */}
       {/* Corresponds to .onboarding-page */}
-      <div className="relative w-[100vw] h-[100vh]  bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="relative w-[100vw] h-[100vh] rounded-xl shadow-lg overflow-hidden">
         
         {/* Go Back Button */}
         {/* Corresponds to .go-back-container */}

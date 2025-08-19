@@ -91,8 +91,8 @@ const DashboardChart = () => {
     labels: ['Verified Employees', 'Pending Employees'],
     datasets: [{
       data: [chartData.verificationStats.verified, chartData.verificationStats.unverified],
-      backgroundColor: ['#2dd4bf', '#f87171'],
-      borderColor: ['#14b8a6', '#ef4444'],
+      backgroundColor: ['#3b82f6', '#93c5fd'], 
+      borderColor: ['black', 'white'],
       borderWidth: 1,
     }],
   };
@@ -115,9 +115,9 @@ const DashboardChart = () => {
     datasets: [{
       label: 'Number of Skills',
       data: chartData.topEmployeesBySkills.map(s => s.skillCount),
-      backgroundColor: '#a78bfa',
-      borderColor: '#7c3aed',
-      borderWidth: 1,
+      backgroundColor: '#3b82f6',
+      borderColor: '#93c5fd',
+      borderWidth: 2,
     }],
   };
 
