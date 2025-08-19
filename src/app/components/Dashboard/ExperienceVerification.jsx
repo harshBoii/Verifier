@@ -4,6 +4,9 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Swal from 'sweetalert2';
 import { FiUser, FiBriefcase, FiCheck, FiX, FiAward, FiMessageSquare } from 'react-icons/fi';
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
 
 // Spinner component for loading states
 const Spinner = () => (
@@ -131,15 +134,17 @@ const ExperienceVerificationPage = () => {
 
                     {/* HR Comment Section */}
                     {experience.hr_comment && (
-                        <section>
-                            <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-3 mb-4">
-                                <FiMessageSquare className="text-blue-500" />
-                                Previous Verifier's Comment
-                            </h2>
-                            <blockquote className="border-l-4 border-blue-500 bg-blue-50 p-4 rounded-r-lg">
-                                <p className="text-gray-600 italic">"{experience.hr_comment}"</p>
-                            </blockquote>
-                        </section>
+                            <section>
+                                <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-3 mb-4">
+                                    <FiMessageSquare className="text-blue-500" />
+                                    Previous Verifier's Comment
+                                </h2>
+                                <blockquote className="border-l-4 border-blue-500 bg-blue-50 p-4 rounded-r-lg prose prose-blue max-w-none">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                        {experience.hr_comment}
+                                    </ReactMarkdown>
+                                </blockquote>
+                            </section>
                     )}
                 </main>
 

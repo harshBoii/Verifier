@@ -52,12 +52,12 @@ const OnboardingComponent = () => {
         {/* Corresponds to .main-content */}
         <div className="absolute top-50 bottom-60 left-1/2 -translate-x-1/2 w-[70vw] text-center">
           {/* Main Heading */}
-          <h1 className="text-[40px]  font-bold leading-9 text-gray-900 uppercase">
+          <h1 className="text-[40px] mr-7 font-bold leading-9 text-gray-900 uppercase">
             DEMO CRM IS YOUR ONLINE VERIFICATION
           </h1>
           
           {/* Subheading */}
-          <p className="mx-auto w-[40vw] mt-7 text-[25.5px] leading-[21px] text-gray-900">
+          <p className="mt-10 w-[40vw]  mx-auto text-[25.5px] leading-[21px] text-gray-500">
             You can manage and showcase all your courses from anywhere and everywhere in a single workspace.
           </p>
 

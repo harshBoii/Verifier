@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FiCheckCircle } from 'react-icons/fi';
+import Login from '../Login';
 
 // An SVG icon component for the password visibility toggle
 const EyeIcon = ({ closed }) => (
@@ -103,12 +104,13 @@ const SignInPage = () => {
                 Whether you're leading the way or making it happen, your journey starts here.
             </p>
           </div>
-          <img 
+          {/* <img 
             src="Svg/signin.svg" 
             alt="Sign In Illustration" 
             className="w-full max-w-xs mx-auto -mt-25]"
             onError={(e) => e.target.src='https://placehold.co/400x300?text=Illustration'}
-          />
+          /> */}
+          <Login/>
         </div>
 
         {/* Right Sign-in Form Panel */}
