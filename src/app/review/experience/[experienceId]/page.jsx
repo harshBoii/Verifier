@@ -87,7 +87,7 @@ export default function ChatPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          profession: experienceData.user?.position || experienceData.jobTitle, // Use user's position if available
+          profession: experienceData.jobTitle || experienceData.role, // Use user's position if available
           work_experience: combinedExperience, // Send the combined description and skills
           name: experienceData.user?.fullName || "User"
         }),
