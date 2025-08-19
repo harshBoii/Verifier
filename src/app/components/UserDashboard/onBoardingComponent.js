@@ -5,6 +5,7 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import Link from 'next/link';
 import DarkVeil from '@/Backgrounds/DarkVeil/DarkVeil'; // Your component path
 import LightRays from '@/Backgrounds/LightRays/LightRays';
+import Orb from '@/Backgrounds/Orb/Orb';
 
 // Your SVG Icons (GoBackIcon, HelpdeskIcon) remain the same...
 const GoBackIcon = () => (
@@ -29,11 +30,10 @@ const OnboardingComponent = () => {
       
       {/* 2. BACKGROUND CONTAINER */}
       {/* This div is positioned absolutely to fill the parent and sent to the back with z-0. */}
-      <div className="absolute inset-0 z-0 bg-zinc-800">
+      <div className="absolute inset-0 z-1 bg-[radial-gradient(circle_at_bottom,_#ffffff_0%,_#cccccc_40%,_#000000_90%)]">
         {/* DarkVeil is placed inside. It will automatically fill this container. */}
         {/* Notice we are NOT passing any className here anymore. */}
-        <LightRays 
-        />
+      <LightRays/>
       </div>
 
       {/* 3. FOREGROUND CONTAINER */}
