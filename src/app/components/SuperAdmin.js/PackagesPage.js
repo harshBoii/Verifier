@@ -13,246 +13,209 @@ const Spinner = () => (
 );
 
 
-const FeatureItem = ({ feature, editMode, onToggle, isPrimary, isActive }) => {
-    const included = feature.included;
-    const iconColor = isPrimary || isActive ? 'text-zinc-200 hover:text-red-400' : 'text-black';
-    const textColor = isPrimary || isActive ? 'text-white hover:text-red-400' : 'text-black';
-    const excludedColor = 'text-[#BAB8CE]';
+const PricingCard = ({ plan, isActive, onClick, billingCycle }) => {
+  const displayPrice = billingCycle === "annually" ? plan.priceAnnually : plan.priceMonthly;
+  const cardClasses = `
+    border-[1.5px] rounded-[28px] p-8 mt-10 w-full max-w-xs text-center transition-all duration-300 ease-in-out cursor-pointer
+    ${isActive ? 'scale-110 border-[#8645FF] shadow-2xl bg-[#181059] text-white' : 'bg-zinc-100 hover:bg-zinc-200 hover:-translate-y-2'}
+  `;
 
-    return (
-        <li className="flex items-center justify-between gap-2.5 mb-4 text-base">
-            <div className="flex items-center gap-2.5">
-                {included ? <FiCheck className={`flex-shrink-0 ${iconColor}`} /> : <FiX className={`flex-shrink-0 ${excludedColor}`} />}
-                <span className={included ? textColor : excludedColor}>{feature.text}</span>
-            </div>
-            {editMode && (
-                <button onClick={onToggle} className="text-xs font-semibold border rounded px-2 py-0.5 text-white hover:bg-gray-100">
-                    {included ? 'Exclude' : 'Include'}
-                </button>
-            )}
-        </li>
-    );
-};
-
-const PricingCard = ({ plan, editMode, onUpdate, isActive, onClick, onSubscribe }) => {
-    const cardClasses = `
-        border-[1.5px] rounded-[28px] p-8 ml-15 mt-10 w-full max-w-xs text-center transition-all duration-300 ease-in-out cursor-pointer  hover:text-black
-        ${isActive ? 'scale-120 !border-[#8645FF] shadow-2xl bg-[#181059] text-white hover:bg-black' : 'bg-zinc-100 hover:bg-zinc-400' }
-        hover:-translate-y-2.5 hover:shadow-lg 
-    `;
-    
-    return (
-        <div 
-            className={cardClasses}
-            onClick={!editMode ? onClick : undefined}
-        >
-            <div className="mb-8 min-h-[60px]">
-                {editMode ? (
-                    <input 
-                        type="text" 
-                        value={plan.name} 
-                        onChange={(e) => onUpdate('name', e.target.value)}
-                        className="bg-transparent border-b-2 border-dashed w-full text-center text-white text-2xl font-bold"
-                    />
-                ) : (
-                    <h3 className={`text-3xl font-bold ${plan.isPrimary || isActive ? 'text-white' : 'text-[#181059]'}`}>{plan.name}</h3>
-                )}
-                {plan.saveAmount && <span className="inline-block mt-2 bg-white text-[#8645FF] font-bold px-3 py-1 rounded-md text-sm">Save ${plan.saveAmount}</span>}
-            </div>
-            <ul className="text-left mb-8">
-                {plan.features.map((feature, index) => (
-                    <FeatureItem 
-                        key={index} 
-                        feature={feature} 
-                        editMode={editMode}
-                        isPrimary={plan.isPrimary}
-                        isActive={isActive}
-                        onToggle={() => {
-                            const updatedFeatures = [...plan.features];
-                            updatedFeatures[index].included = !updatedFeatures[index].included;
-                            onUpdate('features', updatedFeatures);
-                        }}
-                    />
-                ))}
-            </ul>
-            <div className="mb-8">
-                <span className={`text-5xl font-medium ${plan.isPrimary || isActive ? 'text-white' : 'text-[#181059]'}`}>
-                    ₹
-                    {editMode ? (
-                        <input 
-                            type="number" 
-                            value={plan.price} 
-                            onChange={(e) => onUpdate('price', parseInt(e.target.value, 10) || 0)}
-                            className="bg-transparent border-b-2 border-dashed w-24 text-white text-center"
-                        />
-                    ) : (
-                        plan.price
-                    )}
-                </span>
-                <span className={`text-lg opacity-70 ${plan.isPrimary || isActive ? 'text-white' : 'text-[#181059]'}`}>/mon</span>
-            </div>
-            <button 
-                className={`w-full p-4 rounded-xl border-none font-bold text-lg cursor-pointer transition
-                    ${plan.isPrimary ? 'bg-[#8645FF] text-white hover:bg-[#7a6df5]' : 'bg-[#F8F4FF] text-[#8645FF] hover:bg-[#E5E1FF]'}
-                    ${isActive && !plan.isPrimary ? '!bg-[#8645FF] !text-white hover:!bg-[#7a6df5]' : ''}
-                `}
-                onClick={!editMode ? onSubscribe : undefined}
-            >
-                {plan.isPrimary ? 'Try 1 month' : 'Choose'}
-            </button>
-        </div>
-    );
-};
-
-const PlaceholderCard = () => (
-    <div className="bg-white border-[1.5px] border-[#E5E1FF] rounded-[28px] p-8 w-full max-w-xs text-center animate-pulse">
-        <div className="mb-8 min-h-[60px]">
-            <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto"></div>
-        </div>
-        <ul className="text-left mb-8 space-y-4">
-            {[...Array(5)].map((_, i) => <li key={i}><div className="h-4 bg-gray-200 rounded w-full"></div></li>)}
-        </ul>
-        <div className="mb-8">
-            <div className="h-10 bg-gray-200 rounded w-1/2 mx-auto"></div>
-        </div>
-        <div className="h-14 bg-gray-200 rounded-xl w-full"></div>
-    </div>
-);
-
-const PackagesPage = () => {
-  const [plans, setPlans] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [billingCycle, setBillingCycle] = useState('monthly');
-  const [activePlan, setActivePlan] = useState('Primary');
-  const [editMode, setEditMode] = useState(false);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isSaving, setIsSaving] = useState(false); // 2. State for loading animation
-
-
-  const fetchPlans = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/packages');
-      if (!response.ok) throw new Error('Failed to fetch package data.');
-      const data = await response.json();
-      setPlans(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchPlans();
-  }, []);
-
-  const handlePlanUpdate = (planId, field, value) => {
-    const updatedPlans = { ...plans };
-    const planIndex = updatedPlans[billingCycle].findIndex(p => p.id === planId);
-    if (planIndex > -1) {
-      updatedPlans[billingCycle][planIndex][field] = value;
-      setPlans(updatedPlans);
-    }
-  };
-
-  const handleSaveChanges = async () => {
-    setIsSaving(true); // Start loading animation
-    try {
-      const response = await fetch('/api/packages', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(plans),
-      });
-      if (!response.ok) throw new Error('Failed to save changes.');
-      
-      // Use SweetAlert2 for success
-      Swal.fire({
-        title: 'Saved!',
-        text: 'Your changes have been saved successfully.',
-        icon: 'success',
-        confirmButtonColor: '#2979FF',
-      });
-
-      setEditMode(false);
-    } catch (err) {
-      // Use SweetAlert2 for error
-      Swal.fire({
-        title: 'Error!',
-        text: err.message,
-        icon: 'error',
-        confirmButtonColor: '#d33',
-      });
-    } finally {
-      setIsSaving(false); // Stop loading animation
-    }
-  };
-
-return (
-    <>
-      <div className="p-5 md:p-10 bg-[#F8F4FF]  min-h-screen">
-        <div className="text-center max-w-2xl mx-auto mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-[#181059] mb-4">The Right Plan for Your Business</h1>
-          <p className="text-base text-[#181059] opacity-70 leading-relaxed">We have several powerful plans to showcase your business and get discovered as a creative entrepreneur. Everything you need.</p>
-        </div>
-        <div className="flex justify-center items-center mb-10 relative">
-            <div className="flex items-center gap-4 font-medium text-[#181059]">
-                <span className={billingCycle === 'monthly' ? 'font-bold' : ''}>Bill Monthly</span>
-                <label className="relative inline-block w-[50px] h-[24px]">
-                    <input type="checkbox" className="opacity-0 w-0 h-0" onChange={() => setBillingCycle(prev => prev === 'monthly' ? 'annually' : 'monthly')} />
-                    <span className="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-[#181059] transition rounded-full">
-                        <span className={`absolute content-[''] h-4 w-4 left-1 bottom-1 bg-[#EDBB01] transition rounded-full ${billingCycle === 'annually' ? 'transform translate-x-[26px]' : ''}`}></span>
-                    </span>
-                </label>
-                <span className={billingCycle === 'annually' ? 'font-bold' : ''}>Bill Annually</span>
-            </div>
-            <div className="absolute right-0 md:right-5 flex gap-2">
-                <button className="flex items-center gap-2 px-4 py-2 bg-white text-[#181059] rounded-md font-semibold border hover:bg-gray-50" onClick={() => setIsAddModalOpen(true)}>
-                    <FiPlus /> Create New Plan
-                </button>
-                {editMode ? (
-                  <button 
-                    className="flex items-center justify-center gap-2 px-4 py-2 w-[160px] bg-green-500 text-white rounded-md font-semibold hover:bg-green-600 disabled:opacity-70 disabled:cursor-not-allowed" 
-                    onClick={handleSaveChanges}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? <Spinner /> : <><FiSave /> Save Changes</>}
-                  </button>
-                ) : (
-                  <button className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-md font-semibold border hover:bg-gray-50" onClick={() => setEditMode(true)}>
-                    <FiEdit /> Edit Packages
-                  </button>
-                )}
-            </div>
-        </div>
-        <div className={`flex justify-center items-center gap-8 flex-wrap ${activePlan && !editMode ? 'has-active' : ''}`}>
-          {loading ? (
-            [...Array(3)].map((_, index) => <PlaceholderCard key={index} />)
-          ) : error ? (
-            <p className="text-red-500">Error: {error}</p>
-          ) : (
-            plans && plans[billingCycle].map(plan => (
-              <PricingCard 
-                key={plan.id} 
-                plan={plan} 
-                isActive={activePlan === plan.name}
-                onClick={() => setActivePlan(plan.name)}
-                editMode={editMode}
-                onUpdate={(field, value) => handlePlanUpdate(plan.id, field, value)}
-                onSubscribe={() => alert(`Subscribing to ${plan.name}`)}
-              />
-            ))
-          )}
-        </div>
+  return (
+    <div className={cardClasses} onClick={onClick}>
+      <h3 className={`text-3xl font-bold mb-4 ${isActive ? 'text-white' : 'text-[#181059]'}`}>{plan.name}</h3>
+      <div className="mb-8">
+        <span className={`text-5xl font-medium ${isActive ? 'text-white' : 'text-[#181059]'}`}>
+          ${displayPrice}
+        </span>
+        <span className={`text-lg opacity-70 ${isActive ? 'text-white' : 'text-[#181059]'}`}>
+          /{billingCycle === "annually" ? "year" : "mon"}
+        </span>
       </div>
-      <AddPlanModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSuccess={fetchPlans}
-      />
-    </>
+       <ul className="text-left mb-8 min-h-[150px]">
+        <li className="flex items-center gap-2 mb-3">
+          <FiCheck className="text-green-500 flex-shrink-0" />
+          <span>Verifications({plan.verificationLimit})</span>
+        </li>
+
+        {plan.planFeatures?.map(({ feature }) => (
+          <li key={feature.id} className="flex items-center gap-2 mb-3">
+            <FiCheck className="text-green-500 flex-shrink-0" />
+            <span>{feature.name}</span>
+          </li>
+        ))}
+      </ul>
+      <button className={`w-full p-4 rounded-xl font-bold text-lg ${isActive ? 'bg-[#8645FF] text-white' : 'bg-[#F8F4FF] text-[#8645FF]'}`}>
+        {isActive ? "Current Plan" : "Choose Plan"}
+      </button>
+    </div>
   );
 };
 
-export default PackagesPage;
+// --- Main Page Component ---
+
+export default function PackagesPage() {
+  // Use the server-fetched data to initialize state
+
+// You can then use this data to set the state in your component
+// For example:
+// setPlans(initialPlans);
+// setFeatures(initialFeatures);
+
+  const [plans, setPlans] = useState([]);
+
+  const [loading, setLoading] = useState(true); // Only true if initial fetch fails
+  const [error, setError] = useState('');
+
+  const [billingCycle, setBillingCycle] = useState('monthly');
+  const [activePlanId, setActivePlanId] = useState(plans.length > 0 ? plans[0].id : null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [feature,setFeatures]= useState([])
+
+
+  useEffect(() => {
+    // Create an async function inside useEffect to fetch all data
+    const loadInitialData = async () => {
+      try {
+        setLoading(true);
+        // Use Promise.all to fetch both plans and features in parallel
+        const [plansResponse, featuresResponse] = await Promise.all([
+          fetch('/api/packages'),
+          fetch('/api/features')
+        ]);
+
+        if (!plansResponse.ok) throw new Error('Failed to fetch plans');
+        if (!featuresResponse.ok) throw new Error('Failed to fetch features');
+
+        const plansData = await plansResponse.json();
+        const featuresData = await featuresResponse.json();
+        console.log(featuresData)
+        // 3. Update the state with the fetched data
+        setPlans(plansData);
+        setFeatures(featuresData);
+        
+        // Set the default active plan after data has loaded
+        if (plansData.length > 0) {
+          setActivePlanId(plansData[0].id);
+        }
+
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false); // Stop loading, whether successful or not
+      }
+    };
+
+    loadInitialData();
+  }, []); // The empty dependency array [] ensures this runs only once.
+
+  // This function is passed to the modal to update the UI after a new plan is created
+  const handlePlanCreated = (newPlan) => {
+    setPlans(prevPlans => [...prevPlans, newPlan]);
+    Swal.fire({
+      title: 'Success!',
+      text: `Plan "${newPlan.name}" has been created successfully.`,
+      icon: 'success',
+      timer: 2000,
+      showConfirmButton: false
+    });
+  };
+
+  // This function is passed to the modal to update the UI after a new plan is creat
+  return (
+    <>
+      <div className="p-5 md:p-10 bg-[#F8F4FF] min-h-screen">
+        <div className="text-center max-w-2xl mx-auto mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold text-[#181059] mb-4">The Right Plan for Your Business</h1>
+          <p className="text-base text-[#181059] opacity-70 leading-relaxed">Choose a plan that fits your needs. All plans can be customized.</p>
+        </div>
+
+        {/* Controls: Billing Cycle Toggle and Create Button */}
+        <div className="flex justify-center items-center mb-10 relative">
+            <div className="flex items-center gap-4 font-medium text-[#181059]">
+                <span>Monthly</span>
+                <label className="relative inline-block w-[50px] h-[24px]">
+                    <input type="checkbox" className="opacity-0 w-0 h-0" onChange={() => setBillingCycle(prev => prev === 'monthly' ? 'annually' : 'monthly')} checked={billingCycle === 'annually'} />
+                    <span className="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-[#181059] transition rounded-full">
+                        <span className={`absolute content-[''] h-4 w-4 left-1 bottom-1 bg-white transition rounded-full ${billingCycle === 'annually' ? 'transform translate-x-[26px]' : ''}`}></span>
+                    </span>
+                </label>
+                <span>Annually</span>
+            </div>
+            <div className="absolute right-0 md:right-5">
+                <button 
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md font-semibold hover:bg-blue-700" 
+                  onClick={() => setIsModalOpen(true)}>
+                    <FiPlus /> Create New Plan
+                </button>
+            </div>
+        </div>
+
+        {/* Pricing Cards Display */}
+        <div className="flex justify-center items-start gap-8 flex-wrap">
+          {loading && <p>Loading plans...</p>}
+          {error && <p className="text-red-500">{error}</p>}
+          {!loading && !error && plans.map(plan => (
+            <PricingCard 
+              key={plan.id} 
+              plan={plan} 
+              isActive={activePlanId === plan.id}
+              onClick={() => setActivePlanId(plan.id)}
+              billingCycle={billingCycle}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* The Modal for Creating a New Plan */}
+      <AddPlanModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onPlanCreated={handlePlanCreated}
+        allFeatures={feature} // Pass the fetched features to the modal
+      />
+    </>
+  );
+}
+
+// --- Data Fetching with getStaticProps ---
+export async function getStaticProps() {
+  const prisma = new PrismaClient();
+  try {
+    // Fetch all plans and their related features
+    const plans = await prisma.plan.findMany({
+      include: {
+        planFeatures: {
+          include: {
+            feature: true, // Include the full feature details
+          },
+        },
+      },
+    });
+
+    // Fetch all available features for the modal's Kanban board
+    const features = await prisma.feature.findMany();
+    
+    // Format features for the Kanban board in the modal
+    const formattedFeatures = features.map(feature => ({
+      id: feature.id,
+      title: feature.name,
+      description: feature.description || 'No description available.',
+    }));
+
+    return {
+      props: {
+        initialPlans: JSON.parse(JSON.stringify(plans)), // Serialize data
+        initialFeatures: formattedFeatures,
+      },
+      // revalidate: 60, // Regenerate the page every 60 seconds to fetch new data
+    };
+  } catch (error) {
+    console.error("Failed to fetch data for PackagesPage:", error);
+    return {
+      props: {
+        initialPlans: [],
+        initialFeatures: [],
+      },
+    };
+  }
+}

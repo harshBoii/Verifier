@@ -45,12 +45,15 @@ enum VerificationStatus {
 }
 
 
-// enum Role {
-//   ADMIN
-//   SUPER_ADMIN
-//   EMPLOYEE
-//   COMPANY
-// }
+enum TemplateType {
+  Verification_Request
+  Verification_Result
+  Request_Hr_Mail
+  WELCOME_EMAIL
+  PASSWORD_RESET
+  SUBSCRIPTION_CONFIRMATION
+  GENERAL_NOTIFICATION
+}
 
 enum SkillType {
   INTEREST  
@@ -59,6 +62,25 @@ enum SkillType {
 
 
 // -- MODELS (Tables) --
+
+
+model EmailTemplate {
+  id        Int      @id @default(autoincrement())
+  name      String   // e.g., "Welcome Email for New Users"
+  type      TemplateType // Categorizes the template for easy lookup
+  subject   String   @db.Text
+  body      String   @db.Text // Stores the HTML content of the email
+  
+  // Relation to Company: Each template belongs to one company
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId Int      @map("company_id")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([companyId, type]) // Ensures a company has only one template of each type
+}
+
 
 model RolePermission {
   id              Int     @id @default(autoincrement())
@@ -119,14 +141,38 @@ model Plan {
 
   // Feature flags based on your design
   verificationLimit   Int     @default(5)
-  hasCustomSmtp       Boolean @default(false)
-  canSetRates         Boolean @default(false)
-  hasAgentConnect     Boolean @default(false)
-  hasAdvancedStats    Boolean @default(false)
 
   // Relation: Many subscriptions can be based on this one plan
   subscriptions Subscription[]
+  planFeatures  PlanFeature[]
 }
+
+model Feature {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique   // e.g. "Custom SMTP", "Advanced Stats"
+  description String? @db.Text
+  cost          Decimal?                  // if it’s an add-on, cost per month
+
+  // Relation: many plans can include this feature
+  planFeatures PlanFeature[]
+}
+
+model PlanFeature {
+  id         Int      @id @default(autoincrement())
+  
+  plan       Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+  planId     Int      @map("plan_id")
+  
+  feature    Feature  @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  featureId  Int      @map("feature_id")
+
+  // Pricing/limits for this feature in this plan
+  isIncluded Boolean  @default(true)   // whether feature is included by default
+  limit      Int?                      // e.g. "5 SMTP accounts", "1000 reports"
+
+  @@unique([planId, featureId])
+}
+
 
 // This model tracks the active subscription for each company
 model Subscription {
@@ -144,6 +190,8 @@ model Subscription {
   // Relation to a Plan
   plan   Plan @relation(fields: [planId], references: [id])
   planId Int  @map("plan_id")
+  verifications_left     Int     @default(0)
+
 }
 
 
@@ -181,15 +229,15 @@ model CampaignUser {
 
 
 model Company {
-  id    Int     @id @default(autoincrement())
-  name  String  @unique
+  id            Int     @id @default(autoincrement())
+  name          String  @unique
 
   // Relation: A company has many users (employees).
-  users User[]  @relation("CompanyUsers")
+  users         User[]  @relation("CompanyUsers")
 
   // Relation: A company has ONE designated admin (who is also a user).
-  admin   User? @relation("CompanyAdmin", fields: [adminId], references: [id])
-  adminId Int?  @unique @map("admin_id")
+  admin         User?   @relation("CompanyAdmin", fields: [adminId], references: [id])
+  adminId       Int?    @unique @map("admin_id")
 
   smtpHost      String?
   smtpPort      Int?
@@ -197,12 +245,11 @@ model Company {
   smtpPassword  String? // IMPORTANT: This will be stored encrypted
   senderEmail   String?
 
-
-
   campaigns Campaign[]
   userRoles   UserRole[]
 
   subscription Subscription?
+  emailTemplates EmailTemplate[]
 
 }
 

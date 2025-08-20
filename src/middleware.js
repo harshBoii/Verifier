@@ -20,6 +20,7 @@ export async function middleware(request) {
 }
 
 
+
 // This config ensures the middleware runs on all API routes
 export const config = {
   matcher: '/api/:path*',

@@ -1,112 +1,95 @@
+// File: /app/api/plans/route.js
+
 import { NextResponse } from 'next/server';
-import prisma from '@/app/lib/prisma';
+import { PrismaClient, Prisma } from '@prisma/client';
 
-/**
- * A helper function to transform the database plan model into the structure
- * the frontend component expects.
- */
-const transformPlanForFrontend = (plan, billingCycle) => {
-    const isMonthly = billingCycle === 'monthly';
-    
-    const features = [
-        { text: `Verification Limited (${plan.verificationLimit})`, included: true },
-        { text: 'Custom Mail config (SMTP)', included: plan.hasCustomSmtp },
-        { text: 'Set your rates', included: plan.canSetRates },
-        { text: 'Agent Connect', included: plan.hasAgentConnect },
-        { text: 'Advanced Statistics', included: plan.hasAdvancedStats },
-    ];
+const prisma = new PrismaClient();
 
-    const isPrimary = plan.name.toLowerCase() === 'primary';
-
-    return {
-        id: plan.id,
-        name: plan.name,
-        price: isMonthly ? plan.priceMonthly : plan.priceAnnually,
-        features: features,
-        isPrimary: isPrimary,
-        saveAmount: isPrimary && !isMonthly ? 50 : (isPrimary && isMonthly ? 40 : null),
-    };
-};
-
-/**
- * Handles GET requests to fetch all pricing plans from the database.
- */
-export async function GET() {
+// --- Handle GET Requests to Fetch All Plans ---
+export async function GET(request) {
   try {
-    const plansFromDB = await prisma.plan.findMany();
-
-    const responseData = {
-        monthly: plansFromDB.map(plan => transformPlanForFrontend(plan, 'monthly')),
-        annually: plansFromDB.map(plan => transformPlanForFrontend(plan, 'annually')),
-    };
-
-    return NextResponse.json(responseData);
+    const plans = await prisma.plan.findMany({
+      // Include all related features for each plan
+      include: {
+        planFeatures: {
+          include: {
+            feature: true,
+          },
+        },
+      },
+      orderBy: {
+        priceMonthly: 'asc',
+      },
+    });
+    const PlanToSend = plans.filter(i=>!/Custom/.test(i.name ))
+    console.log(PlanToSend)
+    return NextResponse.json(PlanToSend, { status: 200 });
   } catch (error) {
-    console.error("API Get Packages Error:", error);
-    return NextResponse.json({ error: 'Failed to fetch packages.' }, { status: 500 });
+    console.error('Failed to fetch plans:', error);
+    return NextResponse.json({ error: 'An internal server error occurred while fetching plans.' }, { status: 500 });
   }
 }
 
-/**
- * Handles POST requests to CREATE a new pricing plan.
- */
+// --- Handle POST Requests to Create a New Plan ---
 export async function POST(request) {
-    try {
-        const body = await request.json();
-        const { name, priceMonthly, priceAnnually, ...features } = body;
+  try {
+    const body = await request.json();
+    const { 
+      name, 
+      priceMonthly, 
+      priceAnnually, 
+      verificationLimit, 
+      featureIds 
+    } = body;
 
-        if (!name || priceMonthly === undefined || priceAnnually === undefined) {
-            return NextResponse.json({ error: 'Name and prices are required.' }, { status: 400 });
-        }
-
-        const newPlan = await prisma.plan.create({
-            data: {
-                name,
-                priceMonthly,
-                priceAnnually,
-                verificationLimit: 5,
-                hasCustomSmtp: features.hasCustomSmtp || false,
-                canSetRates: features.canSetRates || false,
-                hasAgentConnect: features.hasAgentConnect || false,
-                hasAdvancedStats: features.hasAdvancedStats || false,
-            },
-        });
-
-        return NextResponse.json(newPlan, { status: 201 });
-
-    } catch (error) {
-        console.error("API Create Package Error:", error);
-        return NextResponse.json({ error: 'Failed to create package.' }, { status: 500 });
+    // --- Input Validation ---
+    if (!name || priceMonthly === undefined || priceAnnually === undefined || verificationLimit === undefined) {
+      return NextResponse.json({ 
+        error: 'Missing required fields: name, priceMonthly, priceAnnually, and verificationLimit are required.' 
+      }, { status: 400 });
     }
-}
-
-/**
- * Handles PUT requests to UPDATE existing pricing plans.
- */
-export async function PUT(request) {
-    try {
-        const updatedPlans = await request.json();
-        const monthlyPlans = updatedPlans.monthly;
-
-        const updatePromises = monthlyPlans.map(plan => {
-            return prisma.plan.update({
-                where: { id: plan.id },
-                data: {
-                    name: plan.name,
-                    priceMonthly: plan.price,
-                    hasCustomSmtp: plan.features.find(f => f.text.includes('SMTP'))?.included || false,
-                    canSetRates: plan.features.find(f => f.text.includes('rates'))?.included || false,
-                    hasAgentConnect: plan.features.find(f => f.text.includes('Agent'))?.included || false,
-                    hasAdvancedStats: plan.features.find(f => f.text.includes('Statistics'))?.included || false,
-                },
-            });
-        });
-
-        await prisma.$transaction(updatePromises);
-        
-        return NextResponse.json({ message: 'Packages updated successfully!' });
-    } catch (error) {
-        console.error("API Update Packages Error:", error);
-        return NextResponse.json({ error: 'Failed to update packages.' }, { status: 500 });
+    if (!Array.isArray(featureIds)) {
+      return NextResponse.json({ error: 'featureIds must be an array of numbers.' }, { status: 400 });
     }
+
+    // --- Database Operation ---
+    const newPlan = await prisma.plan.create({
+      data: {
+        name,
+        priceMonthly,
+        priceAnnually,
+        verificationLimit: parseInt(verificationLimit, 10),
+        planFeatures: {
+          create: featureIds.map(id => ({
+            feature: { connect: { id: parseInt(id, 10) } },
+            isIncluded: true,
+          })),
+        },
+      },
+      include: {
+        planFeatures: {
+          include: {
+            feature: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json(newPlan, { status: 201 });
+
+  } catch (error) {
+    console.error('Failed to create plan:', error);
+
+    // --- Error Handling ---
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') { // Unique constraint failed
+        return NextResponse.json({ error: `A plan with the name "${error.meta.target}" already exists.` }, { status: 409 });
+      }
+      if (error.code === 'P2025') { // Foreign key constraint failed
+        return NextResponse.json({ error: 'One of the provided feature IDs is invalid and does not exist.' }, { status: 400 });
+      }
+    }
+    
+    return NextResponse.json({ error: 'An internal server error occurred while creating the plan.' }, { status: 500 });
+  }
 }
