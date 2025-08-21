@@ -245,6 +245,14 @@ model Company {
   smtpPassword  String? // IMPORTANT: This will be stored encrypted
   senderEmail   String?
 
+
+  defaultVerificationRequestTemplateId  Int?
+  defaultVerificationResultTemplateId   Int?
+  defaultRequestHrMailTemplateId        Int?
+  defaultWelcomeEmailTemplateId         Int?
+  defaultPasswordResetTemplateId        Int?
+
+
   campaigns Campaign[]
   userRoles   UserRole[]
 
