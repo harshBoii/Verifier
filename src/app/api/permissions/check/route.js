@@ -48,7 +48,8 @@ export async function POST(request) {
     // Destructure `permissionNeeded` and the new `apiRoute` from the body
     const { permissionNeeded, apiRoute } = await request.json();
     const token = request.cookies.get('token')?.value;
-
+    console.log(permissionNeeded)
+    console.log("Checking Route",apiRoute)
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -106,12 +107,13 @@ export async function POST(request) {
         }
 
         // 2. Check for feature-specific permissions based on the API route being accessed
+        console.log("api route is :",apiRoute)
         if (apiRoute) {
             const subscribedFeatures = subscription.plan.planFeatures.map(pf => pf.feature.name.toLowerCase());
             
-            // Rule: Check for SMTP features
             const requiresSmtp = /smtp/i.test(apiRoute);
             const hasSmtp = subscribedFeatures.some(name => /smtp/i.test(name));
+            console.log(subscribedFeatures)
             if (requiresSmtp && !hasSmtp) {
                 return NextResponse.json({ error: 'Forbidden: Your plan does not include SMTP features.' }, { status: 403 });
             }

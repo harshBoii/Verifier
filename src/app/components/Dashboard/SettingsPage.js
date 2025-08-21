@@ -117,13 +117,20 @@ const SmtpForm = () => {
             try {
                 setLoading(true);
                 const response = await fetch('/api/settings/smtp');
-                if (!response.ok) throw new Error('Could not load SMTP settings.');
+                if (!response.ok) {
+                    {
+                        const error = await response.json();
+                        Swal.fire('Loading Error!', error.error, 'error');
+                        return;
+                    }
+                };
                 const data = await response.json();
                 setSettings(prev => ({
                     ...prev, ...data,
                     smtpPass: data.passwordIsSet ? '••••••••' : '',
                 }));
             } catch (error) {
+
                 Swal.fire('Loading Error!', error.message, 'error');
             } finally {
                 setLoading(false);

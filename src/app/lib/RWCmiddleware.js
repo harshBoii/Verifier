@@ -22,8 +22,7 @@ export async function permissionMiddleware(request) {
 
   // The permission required for this specific route
   const permissionNeeded = routePerm.permission;
-  console.log(routePerm)
-
+  const apiRoute = pathname
   // Construct the absolute URL for the internal API call to our check route
   const checkUrl = new URL('/api/permissions/check', request.url);
 
@@ -36,7 +35,7 @@ export async function permissionMiddleware(request) {
         // Forward the original request's cookies so the check API knows who is logged in
         'Cookie': request.headers.get('cookie'),
       },
-      body: JSON.stringify({ permissionNeeded }),
+      body: JSON.stringify({ permissionNeeded,apiRoute }),
 
     });
 

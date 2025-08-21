@@ -76,12 +76,11 @@ export default function EmailTemplateManager({ templates, onSaveSelection }) {
       for (const type in selectedTemplates) {
         const templateId = selectedTemplates[type];
         
-        // Use the API endpoint for setting the template preference
         const response = await fetch('/api/templates/set', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            companyId: currentUser.companyId, // Use the dynamically fetched companyId
+            companyId: currentUser.companyId, 
             templateId: templateId,
           }),
         });

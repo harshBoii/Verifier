@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -7,7 +7,18 @@ import Login from '../Login';
 
 // An SVG icon component for the password visibility toggle
 const EyeIcon = ({ closed }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="text-gray-500"
+  >
     {closed ? (
       <>
         <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
@@ -58,26 +69,24 @@ const SignInPage = () => {
 
       console.log('Login successful:', result);
 
-      // --- NEW: Role-based redirection logic ---
       const userRole = result.user.role;
-      const id = result.user.id
+      const id = result.user.id;
       switch (userRole) {
         case 'ADMIN':
-          router.push('/admin')
-          break
+          router.push('/admin');
+          break;
         case 'SUPER_ADMIN':
-          router.push('/superadmin'); // Redirect admins
+          router.push('/superadmin');
           break;
         case 'EMPLOYEE':
-          router.push(`/employee/${id}/profile`); // Redirect employees
+          router.push(`/employee/${id}/profile`);
           break;
         case 'COMPANY':
-          router.push('/company/overview'); // Redirect company users
+          router.push('/company/overview');
           break;
         default:
-          router.push('/dashboard'); // Default redirect
+          router.push('/dashboard');
       }
-
     } catch (err) {
       setError(err.message);
     } finally {
@@ -90,38 +99,45 @@ const SignInPage = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[radial-gradient(circle_at_bottom,_#3b82f6_0%,_#bfdbfe_40%,_#ffffff_80%)] font-sans">
-      <div className="relative flex w-full max-w-4xl h-[65vh] m-4 sm:m-8 bg-white rounded-2xl shadow-2xl overflow-hidden">
+    <div className="min-h-screen w-full flex items-center justify-center bg-[radial-gradient(circle_at_bottom,_#3b82f6_0%,_#bfdbfe_40%,_#ffffff_80%)] font-sans p-4">
+      {/* --- RESPONSIVE CHANGE ---
+        - From `h-[65vh]` to `min-h-[65vh]` to prevent content overflow on small screens.
+        - Added `flex-col md:flex-row` to stack elements on mobile.
+        - Removed fixed `m-4 sm:m-8` as parent `p-4` now handles outer spacing.
+      */}
+      <div className="relative flex flex-col md:flex-row w-full max-w-4xl min-h-[65vh] bg-white rounded-2xl shadow-2xl overflow-hidden">
         {/* Left decorative panel */}
-        <div className="w-1/2 hidden md:flex flex-col rounded-2xl justify-between  mt-3 mb-3 ml-4 p-12 text-white bg-gradient-to-br from-blue-300 to-blue-800">
+        {/* --- RESPONSIVE CHANGE ---
+          - `hidden md:flex` correctly hides this panel on mobile.
+          - Padding adjusted from `p-12` to `p-8 md:p-12`.
+          - Font sizes adjusted for better readability on medium screens.
+        */}
+        <div className="w-full md:w-1/2 hidden md:flex flex-col rounded-2xl justify-between mt-3 mb-3 ml-0 md:ml-4 p-8 md:p-12 text-white bg-gradient-to-br from-blue-300 to-blue-800">
           <div>
-            <div className='font-extrabold text-[30px] align-middle text-center'>
-              <FiCheckCircle className='absolute ml-13 mt-2'/>VETTIFY
+            <div className="font-extrabold text-2xl md:text-[30px] align-middle text-center flex items-center justify-center">
+              <FiCheckCircle className="mr-2" /> VETTIFY
             </div>
-            <h1 className="text-4xl font-bold mt-8">Welcome Back</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mt-8">Welcome Back</h1>
             <p className="mt-4 text-orange-100">
-                Login to track your progress, stay ahead, and keep your growth curve soaring.
-                Whether you're leading the way or making it happen, your journey starts here.
+              Login to track your progress, stay ahead, and keep your growth curve soaring. Whether you're leading the way or making it happen, your journey starts here.
             </p>
           </div>
-          {/* <img 
-            src="Svg/signin.svg" 
-            alt="Sign In Illustration" 
-            className="w-full max-w-xs mx-auto -mt-25]"
-            onError={(e) => e.target.src='https://placehold.co/400x300?text=Illustration'}
-          /> */}
-          <Login/>
+          <Login />
         </div>
 
         {/* Right Sign-in Form Panel */}
-        <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-8 sm:p-12">
+        {/* --- RESPONSIVE CHANGE ---
+          - `w-full md:w-1/2` ensures it takes full width on mobile.
+          - Padding adjusted from `p-8 sm:p-12` to a more consistent `p-6 sm:p-12`.
+          - Font sizes adjusted to be smaller on mobile (`text-2xl sm:text-3xl`).
+        */}
+        <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 sm:p-12">
           <div className="w-full max-w-sm text-center">
-            <h1 className="text-3xl font-bold text-gray-800">Sign In</h1>
-            <p className="mt-2 text-gray-500">Log in to  track, manage, and grow like never before.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Sign In</h1>
+            <p className="mt-2 text-gray-500">Log in to track, manage, and grow like never before.</p>
           </div>
 
           <form onSubmit={handleLogin} className="w-full max-w-sm mt-8 space-y-4">
-            {/* Email Input */}
             <div>
               <input
                 type="email"
@@ -133,11 +149,9 @@ const SignInPage = () => {
                 required
               />
             </div>
-            
-            {/* Password Input */}
             <div className="relative">
               <input
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
                 name="password"
                 className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 placeholder="Password"
@@ -153,11 +167,7 @@ const SignInPage = () => {
                 <EyeIcon closed={showPassword} />
               </button>
             </div>
-            
-            {/* Error Message */}
             {error && <p className="text-sm text-red-500">{error}</p>}
-
-            {/* Sign In Button */}
             <button
               type="submit"
               disabled={loading}
@@ -167,7 +177,11 @@ const SignInPage = () => {
             </button>
           </form>
 
-          <div className="w-full max-w-sm mt-6 flex justify-between items-center text-sm">
+          {/* --- RESPONSIVE CHANGE ---
+            - Stacks vertically on small screens (`flex-col sm:flex-row`).
+            - Adds spacing for the stacked layout (`space-y-2 sm:space-y-0`).
+          */}
+          <div className="w-full max-w-sm mt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm space-y-2 sm:space-y-0">
             <div className="flex items-center">
               <input
                 id="keep-signed-in"
@@ -186,7 +200,7 @@ const SignInPage = () => {
             </button>
           </div>
 
-          <p className="mt-8 text-sm text-gray-500">
+          <p className="mt-8 text-sm text-gray-500 text-center">
             Don’t have an account?{' '}
             <a href="#" className="font-bold text-gray-700 hover:underline">
               Contact Administrator
@@ -198,7 +212,8 @@ const SignInPage = () => {
   );
 };
 
-// A separate component for the Forgot Password flow
+// The ForgotPasswordComponent is already quite responsive due to its simple, centered layout.
+// No major changes are needed here.
 const ForgotPasswordComponent = ({ onBack }) => {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -210,7 +225,6 @@ const ForgotPasswordComponent = ({ onBack }) => {
     setLoading(true);
     setError('');
     try {
-      // API call to your backend to send a password reset link
       const response = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -228,14 +242,14 @@ const ForgotPasswordComponent = ({ onBack }) => {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-100 p-4">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-2xl text-center">
-        <img 
-          src="https://placehold.co/100x40/ffffff/000000?text=Logo" 
-          alt="Company Logo" 
+        <img
+          src="https://placehold.co/100x40/ffffff/000000?text=Logo"
+          alt="Company Logo"
           className="w-24 mx-auto mb-6"
-          onError={(e) => e.target.src='https://placehold.co/100x40?text=Logo'}
+          onError={(e) => (e.target.src = 'https://placehold.co/100x40?text=Logo')}
         />
         <h1 className="text-2xl font-bold text-gray-800">Forgot Password?</h1>
-        
+
         {!submitted ? (
           <>
             <p className="mt-4 text-gray-500">
@@ -273,7 +287,7 @@ const ForgotPasswordComponent = ({ onBack }) => {
             </button>
           </>
         )}
-        
+
         <button onClick={onBack} className="mt-4 text-sm text-gray-500 hover:underline">
           Go Back
         </button>
@@ -281,6 +295,5 @@ const ForgotPasswordComponent = ({ onBack }) => {
     </div>
   );
 };
-
 
 export default SignInPage;
