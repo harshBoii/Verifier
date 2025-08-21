@@ -1,10 +1,10 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import styles from './SettingsPage.module.css';
-import { FiUser, FiFileText, FiMail, FiLogOut, FiX } from 'react-icons/fi';
+import { FiUser, FiFileText, FiMail, FiLogOut, FiX, FiPenTool } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 import LoadingGlass from '../LoadingGlass';
-import EmailSettingsPage from '@/app/settings/email';
+import EmailSettingsPage from '@/app/settings/components/email';
 // A functional sub-component for the User Profile form
 const UserProfileForm = () => {
     const [profile, setProfile] = useState({

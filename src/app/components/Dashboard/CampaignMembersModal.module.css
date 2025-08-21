@@ -29,6 +29,16 @@
     flex-grow: 1;
     margin-left: 15px;
 }
+
+.clickableRow {
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.clickableRow:hover {
+    background-color: #f9fafb; /* A light gray on hover */
+}
+
 .memberName {
     display: block;
     font-weight: 600;

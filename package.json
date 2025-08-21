@@ -19,6 +19,9 @@
     "@prisma/client": "^6.13.0",
     "@prisma/extension-accelerate": "^2.0.2",
     "@radix-ui/react-slot": "^1.2.3",
+    "@tiptap/extension-text-align": "^3.2.1",
+    "@tiptap/react": "^3.2.1",
+    "@tiptap/starter-kit": "^3.2.1",
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
     "chart.js": "^4.5.0",
@@ -39,6 +42,7 @@
     "react-dom": "19.1.0",
     "react-icons": "^5.5.0",
     "react-markdown": "^10.1.0",
+    "recharts": "^3.1.2",
     "remark-gfm": "^4.0.1",
     "sweetalert2": "^11.22.2",
     "tailwind-merge": "^3.3.1"

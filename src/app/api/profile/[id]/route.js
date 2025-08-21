@@ -136,3 +136,13 @@ export async function PUT(request, { params }) {
     return NextResponse.json({ error: 'An internal server error occurred.' }, { status: 500 });
   }
 }
+
+export async function DELETE(request, { params }) {
+  const id = parseInt(params.id); // params is available here
+
+  const deletedUser = await prisma.user.delete({
+    where: { id },
+  });
+
+  return Response.json(deletedUser);
+}
