@@ -4,7 +4,7 @@ import styles from './SettingsPage.module.css';
 import { FiUser, FiFileText, FiMail, FiLogOut, FiX } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 import LoadingGlass from '../LoadingGlass';
-
+import EmailSettingsPage from '@/app/settings/email';
 // A functional sub-component for the User Profile form
 const UserProfileForm = () => {
     const [profile, setProfile] = useState({
@@ -161,6 +161,7 @@ const SmtpForm = () => {
             setIsSaving(false);
         }
     };
+
     
     if (loading) return <LoadingGlass/>;
 
@@ -231,7 +232,7 @@ const SettingsPage = () => {
             <main className={styles.mainContent}>
                 {activeTab === 'profile' && <UserProfileForm />}
                 {activeTab === 'smtp' && <SmtpForm />}
-                {activeTab === 'templates' && <div className={styles.header}><h2>Templates</h2><p>Template management form goes here...</p></div>}
+                {activeTab === 'templates' && <EmailSettingsPage/>}
             </main>
         </div>
     );

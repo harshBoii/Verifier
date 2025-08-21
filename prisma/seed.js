@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 const templates = [
   // ========== CATEGORY: Verification_Request ==========
 
-  // Template 1: Your Original Design (Enhanced)
+  // Template 1: Your Original Design (Enhanced)f
   {
     name: 'Verification Request - Standard',
     type: TemplateType.Verification_Request,
@@ -229,4 +229,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-s
