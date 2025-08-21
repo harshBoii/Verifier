@@ -92,8 +92,13 @@ const ExperienceCard = ({ experience, onVerifyClick, onAddVerifierClick }) => {
 
 
             {experience.is_verified ? (
-              <span className={`${styles.status} ${styles.verified}`}>
-                <FiCheckCircle /> Verified
+              <span className="group relative cursor-pointer">
+                <FiCheckCircle /> 
+                      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 
+                      opacity-0 group-hover:opacity-100 transition 
+                      bg-black text-white text-sm rounded-lg px-2 py-1">
+                      Verified
+                    </div>
               </span>
             ) : (
               <button className={styles.verifyButton} onClick={() => onVerifyClick(experience)}>

@@ -12,12 +12,46 @@ import Link from 'next/link';
 import LoadingGlass from '../LoadingGlass';
 
 const renderStatusIcon = (status) => {
-    switch (status) {
-        case 'verified': return <FiCheckCircle className={styles.statusVerified} />;
-        case 'rejected': return <FiXCircle className={styles.statusRejected} />;
-        case 'pending': return <FiCheck className={styles.statusPending} />;
-        default: return null;
-    }
+switch (status) {
+  case "verified":
+    return (
+      <span className="relative group inline-flex items-center cursor-pointer">
+        <FiCheckCircle className={styles.statusVerified} />
+        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 
+                        opacity-0 group-hover:opacity-100 transition 
+                        bg-black text-white text-xs rounded-lg px-2 py-1 whitespace-nowrap">
+          Verified
+        </div>
+      </span>
+    );
+
+  case "rejected":
+    return (
+      <span className="relative group inline-flex items-center cursor-pointer">
+        <FiXCircle className={styles.statusRejected} />
+        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 
+                        opacity-0 group-hover:opacity-100 transition 
+                        bg-black text-white text-xs rounded-lg px-2 py-1 whitespace-nowrap">
+          Rejected
+        </div>
+      </span>
+    );
+
+  case "pending":
+    return (
+      <span className="relative group inline-flex items-center cursor-pointer">
+        <FiCheck className={styles.statusPending} />
+        <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 
+                        opacity-0 group-hover:opacity-100 transition 
+                        bg-black text-white text-xs rounded-lg px-2 py-1 whitespace-nowrap">
+          Pending
+        </div>
+      </span>
+    );
+
+  default:
+    return null;
+}
 };
 
 const ActionMenu = ({ onVerifyClick, onGetHrEmail, user }) => (

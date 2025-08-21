@@ -25,7 +25,6 @@ const UserSearchBar = ({ user }) => {
         <input type="text" placeholder="Search" />
       </div>
       <div className={styles.userSection}>
-        <button className={styles.addButton}><FiPlus /></button>
         <div className={styles.iconWrapper}>
             <FiBell />
         </div>
