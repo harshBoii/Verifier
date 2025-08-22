@@ -70,7 +70,7 @@ export default function ChatPage() {
     try {
       // Step 1: Fetch the dynamic experience data from your Next.js API
       const experienceResponse = await fetch(`/api/experience/${id}`);
-      console.log(experienceData)
+      console.log(experienceResponse)
       if (!experienceResponse.ok) {
         throw new Error(`Failed to fetch experience data. Status: ${experienceResponse.status}`);
       }

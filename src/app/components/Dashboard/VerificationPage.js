@@ -11,7 +11,7 @@ import { FiCheck, FiCheckCircle, FiXCircle, FiMoreVertical, FiX , FiClock} from 
 import Swal from 'sweetalert2';
 import LoadingGlass from '../LoadingGlass';
 import { Search,Loader2 } from 'lucide-react';
-
+import Link from 'next/link';
 
 // --- Helper Components (No Changes Needed) ---
 const renderStatusIcon = (status) => {
@@ -45,11 +45,15 @@ const ActionMenu = ({ onEditClick, onVerifyClick, onGetHrEmail, onDeleteClick })
     <div className={styles.actionMenu}>
         <button onClick={onEditClick}>Edit Details</button>
         <button onClick={onVerifyClick}>Send Verification</button>
+        <button onClick={()=>GoVerify(user.id)}>View Exp</button> 
         <button onClick={onGetHrEmail}>Get HR Email</button>
         <button onClick={onDeleteClick} className={styles.delete}>Delete User</button>
     </div>
 );
 
+const GoVerify=(id)=>{
+    window.location.href=`/admin/verify-experience/${id}`
+}
 
 export default function VerificationPage() {
     // --- STATE MANAGEMENT ---
@@ -176,9 +180,34 @@ export default function VerificationPage() {
         setActiveMenu(null);
     };
 
-    const handleRequestFromEmployee = async () => { /* ... existing code ... */ };
-    const handleSendDirectly = () => { /* ... existing code ... */ };
-    const handleVerifyClick = (user) => { /* ... existing code ... */ };
+    const handleRequestFromEmployee = async () => {
+        if (!selectedUser) return;
+        setIsHrChoiceModalOpen(false);
+        try {
+            const response = await fetch('/api/request-hr-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: selectedUser.id }),
+            });
+            if (!response.ok) throw new Error('Failed to send request.');
+            Swal.fire('Sent!', `An email has been sent to ${selectedUser.name} asking for their HR's email.`, 'success');
+        } catch (error) {
+            Swal.fire('Error!', error.message, 'error');
+        }
+        setSelectedUser(null);
+    };
+
+    const handleSendDirectly = () => {
+        setIsHrChoiceModalOpen(false);
+        setIsDirectSendModalOpen(true);
+    };
+    
+    // This now opens the direct send modal
+    const handleVerifyClick = (user) => {
+        setSelectedUser(user);
+        setIsDirectSendModalOpen(true);
+        setActiveMenu(null);
+    };
 
     return (
         <>
@@ -222,7 +251,9 @@ export default function VerificationPage() {
                                     {/* --- RENDER THE FILTERED LIST --- */}
                                     {filteredUsers.length > 0 ? (
                                         filteredUsers.map((user, index) => (
-                                            <tr key={user.id} className={editingId === user.id ? styles.editingRow : ''}>
+
+                                            <tr key={user.id} className="hover:bg-blue-100 pointer-events-auto  " onClick={() => window.location.href=`/admin/verify-experience/${user.id}`}>
+
                                                 <td>
                                                     <div className={styles.userCell}>
                                                         <Image src={`https://ui-avatars.com/api/?name=${(editingId === user.id ? editFormData.name : user.name).replace(' ', '+')}&background=random`} alt={user.name} width={30} height={30} className={styles.avatar} unoptimized={true} />
@@ -253,6 +284,7 @@ export default function VerificationPage() {
                                                         </div>
                                                     )}
                                                 </td>
+
                                             </tr>
                                         ))
                                     ) : (
