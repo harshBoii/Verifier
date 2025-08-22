@@ -81,6 +81,11 @@
     font-weight: 500;
     color: #333;
 }
+.userCell:hover{
+    color: #28a745;
+    font-weight: 900;
+    cursor: pointer;
+}
 
 .avatar {
     border-radius: 50%;

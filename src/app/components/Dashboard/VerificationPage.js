@@ -252,10 +252,10 @@ export default function VerificationPage() {
                                     {filteredUsers.length > 0 ? (
                                         filteredUsers.map((user, index) => (
 
-                                            <tr key={user.id} className="hover:bg-blue-100 pointer-events-auto  " onClick={() => window.location.href=`/admin/verify-experience/${user.id}`}>
+                                            <tr key={user.id} className="hover:bg-blue-100 pointer-events-auto  ">
 
                                                 <td>
-                                                    <div className={styles.userCell}>
+                                                    <div className={styles.userCell} onClick={() => window.location.href=`/admin/verify-experience/${user.id}`}>
                                                         <Image src={`https://ui-avatars.com/api/?name=${(editingId === user.id ? editFormData.name : user.name).replace(' ', '+')}&background=random`} alt={user.name} width={30} height={30} className={styles.avatar} unoptimized={true} />
                                                         {editingId === user.id ? <input type="text" name="name" value={editFormData.name} onChange={handleEditFormChange} className={styles.editInput} /> : user.name}
                                                     </div>

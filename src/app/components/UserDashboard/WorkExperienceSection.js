@@ -114,7 +114,21 @@ const WorkExperienceSection = ({ experiences = [], refetchData, user }) => {
     setIsVerifierModalOpen(true);
   };
 
-  const handleVerifierSelect = async (email) => { /* ... existing code ... */ };
+  const handleVerifierSelect = async (email) => {
+    if (!selectedExperience) return;
+    try {
+        const response = await fetch(`/api/experience/${selectedExperience.id}/update-hr-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ hrEmail: email }),
+        });
+        if (!response.ok) throw new Error('Failed to update verifier email.');
+        Swal.fire('Success!', 'Verifier email has been updated.', 'success');
+        refetchData(); // Refetch all data to show the update
+    } catch (error) {
+        Swal.fire('Error!', error.message, 'error');
+    }
+  };
 
   return (
     <div>
