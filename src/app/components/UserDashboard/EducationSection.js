@@ -4,12 +4,12 @@ import Image from 'next/image';
 import styles from './UserProfile.module.css';
 import { FiEdit2, FiPlus, FiCheckCircle } from 'react-icons/fi';
 import AddEducationModal from './AddEducationModal';
-import EditEducationModal from './EditEducationModal'; // 1. Import the new Edit Modal
+import EditEducationModal from './editEducationModal';
 import UserGetVerifiedModal from './UserGetVerifiedModal';
 import WrapButton from '@/components/ui/wrap-button';
 
-// --- EducationCard Sub-component (Updated) ---
-// It now receives an onEditClick prop to handle the edit action.
+
+
 const EducationCard = ({ education, onEditClick, onVerifyClick }) => {
   const logoUrl = `https://placehold.co/40x40/7E57C2/FFFFFF?text=${education.institution.charAt(0)}`;
   // This should eventually come from your data, but is hardcoded for now.
