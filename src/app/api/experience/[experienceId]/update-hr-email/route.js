@@ -4,7 +4,12 @@ import prisma from '@/app/lib/prisma';
 export async function POST(request, { params }) { // <-- This line is fixed
   try {
     const { experienceId } = params; // This now works correctly
-    const { hrEmail } = await request.json();
+    const { data } = await request.json();
+    const hrEmail = data.verifier_email
+    const ver_relation = data.ver_relation
+    console.log("data is " , data)
+    console.log("Ver Relation is ",ver_relation)
+    console.log("Hr Email Is ",hrEmail)
 
     if (!hrEmail) {
       return NextResponse.json({ error: 'HR Email is required.' }, { status: 400 });
@@ -21,6 +26,7 @@ export async function POST(request, { params }) { // <-- This line is fixed
       },
       data: {
         verifier_email: hrEmail,
+        ver_relation:ver_relation
       },
     });
 

@@ -66,6 +66,12 @@ enum CampaignStatus {
   Upcoming
 }
 
+enum Relation {
+  team_leader
+  managed_me_directly
+  ex_cxo_VP
+  same_team
+}
 
 // -- MODELS (Tables) --
 
@@ -345,6 +351,7 @@ model WorkExperience {
   is_verified      Boolean   @default(false)
   mail_sent        Boolean   @default(false)
   job_title        String?   @default("")
+  ver_relation     Relation  @default(same_team)
   // Relation to User
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int  @map("user_id")
