@@ -60,6 +60,12 @@ enum SkillType {
   ROLE 
 }
 
+enum CampaignStatus {
+  Finished
+  Active
+  Upcoming
+}
+
 
 // -- MODELS (Tables) --
 
@@ -209,6 +215,7 @@ model Campaign {
 
   company   Company @relation(fields: [companyId], references: [id])
   companyId Int     @map("company_id")
+  status    CampaignStatus @default(Active)
 
 }
 

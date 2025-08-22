@@ -64,22 +64,36 @@ export async function GET(request, { params }) {
 /**
  * Handles PUT requests to update a campaign's name.
  */
+// ... (your GET and DELETE methods remain the same)
+
 export async function PUT(request, { params }) {
   try {
     const { campaignId } = params;
-    const { name } = await request.json();
+    const body = await request.json();
+    const { name, status } = body;
 
-    if (!name) {
-      return NextResponse.json({ error: 'Campaign name is required.' }, { status: 400 });
+    // Build the data object for the update dynamically
+    const updateData = {};
+    if (name) {
+      updateData.name = name;
+    }
+    if (status) {
+      // Validate that the status is one of the allowed enum values
+      if (!['Active', 'Upcoming', 'Finished'].includes(status)) {
+        return NextResponse.json({ error: 'Invalid status value.' }, { status: 400 });
+      }
+      updateData.status = status;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ error: 'No data provided for update.' }, { status: 400 });
     }
 
     const updatedCampaign = await prisma.campaign.update({
       where: {
         id: parseInt(campaignId, 10),
       },
-      data: {
-        name: name,
-      },
+      data: updateData, // Use the dynamically built object
     });
 
     return NextResponse.json(updatedCampaign);

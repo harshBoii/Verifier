@@ -7,7 +7,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import GetVerifiedModal from './GetVerifiedModal';
 import GetHrEmailModal from '../GetHrEmailModal';
-import { FiCheck, FiCheckCircle, FiXCircle, FiMoreVertical, FiX} from 'react-icons/fi';
+import { FiCheck, FiCheckCircle, FiXCircle, FiMoreVertical, FiX , FiClock} from 'react-icons/fi';
 import Swal from 'sweetalert2';
 import LoadingGlass from '../LoadingGlass';
 import { Search,Loader2 } from 'lucide-react';
@@ -33,7 +33,7 @@ const renderStatusIcon = (status) => {
       case "pending":
         return (
           <span className="relative group inline-flex items-center cursor-pointer">
-            <FiCheck className={styles.statusPending} />
+            <FiClock className={styles.statusPending} />
             <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition bg-black text-white text-xs rounded-lg px-2 py-1 whitespace-nowrap">Pending</div>
           </span>
         );

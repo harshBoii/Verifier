@@ -62,6 +62,7 @@ export async function GET(request) {
           totalMembers: totalMembers,
           totalVerified: verifiedCount,
           notVerified: notVerifiedCount,
+          status:campaign.status
         };
       })
     );
