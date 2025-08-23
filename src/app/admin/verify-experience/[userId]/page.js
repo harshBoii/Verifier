@@ -15,6 +15,7 @@ import Header from '@/app/components/Dashboard/Header';
 import GetVerifiedModal from '@/app/components/Dashboard/GetVerifiedModal';
 import GetHrEmailModal from '@/app/components/GetHrEmailModal';
 import { Router } from 'next/router';
+import ProgressStepper from '@/app/components/Dashboard/ProgressStepper';
 
 const VerifyExperiencePage = () => {
     const [user, setUser] = useState(null);
@@ -118,6 +119,7 @@ const VerifyExperiencePage = () => {
 
                 <div className={styles.experienceList}>
                     {user.workExperiences.map(exp => (
+                        <div className='border-1 border-zinc-500 rounded-2xl'>
                         <div key={exp.id} className={styles.card}>
                             <Link href={`/admin/experience/${exp.id}`}>
                             <div>
@@ -136,6 +138,11 @@ const VerifyExperiencePage = () => {
                                     <button className={styles.declineButton} onClick={() => handleVerification(exp.id, false)}>Decline</button>
                                 </div>
                             </div>
+                        </div>
+                                <div className="mt-4">
+                                    <ProgressStepper currentProgress={exp.progress} />
+                                </div>
+
                         </div>
                     ))}
                 </div>

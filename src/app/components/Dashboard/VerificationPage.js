@@ -64,6 +64,7 @@ export default function VerificationPage() {
     const [selectedUser, setSelectedUser] = useState(null);
     const [isDirectSendModalOpen, setIsDirectSendModalOpen] = useState(false);
     const [isHrChoiceModalOpen, setIsHrChoiceModalOpen] = useState(false);
+    const [statusFilter, setStatusFilter] = useState('');
 
     // --- NEW STATE FOR SEARCH ---
     const [searchQuery, setSearchQuery] = useState('');
@@ -96,15 +97,34 @@ export default function VerificationPage() {
 
     // --- NEW: FILTERED DATA LOGIC ---
     // useMemo ensures this expensive filtering operation only runs when users or the query change.
+    // const filteredUsers = useMemo(() => {
+    //     if (!searchQuery) {
+    //         return users; // If search is empty, return all users
+    //     }
+    //     return users.filter(user =>
+    //         user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    //         user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    //     );
+    // }, [users, searchQuery]);
+
+    
+
     const filteredUsers = useMemo(() => {
-        if (!searchQuery) {
-            return users; // If search is empty, return all users
-        }
-        return users.filter(user =>
-            user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-    }, [users, searchQuery]);
+    return users.filter(user => {
+    const matchesSearch =
+      !searchQuery ||
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesStatus =
+      !statusFilter || user.status.toLowerCase() === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+}, [users, searchQuery, statusFilter]);
+
+
+    // -----------------------------------------
 
     // --- EVENT HANDLERS (All existing handlers are preserved) ---
     const toggleMenu = (index) => setActiveMenu(activeMenu === index ? null : index);
@@ -218,12 +238,12 @@ export default function VerificationPage() {
                     {/* --- UPDATED TITLE BAR WITH SEARCH --- */}
                     <div className={styles.titleBar}>
                         <div className="flex-grow">
-                            <h2>Till Now Verified</h2>
+                            <h2>Let's Verify ! </h2>
                             <p className="text-sm text-gray-500">Manage and verify your company's employees.</p>
                         </div>
                         <div className="flex items-center space-x-4">
-                            <div className="relative">
-                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <div className="relative border-1 border-blue-300 rounded-2xl ">
+                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 ">
                                     <Search className="h-5 w-5 text-gray-400" />
                                 </div>
                                 <input
@@ -231,9 +251,20 @@ export default function VerificationPage() {
                                     placeholder="Search by name or email..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="block w-full rounded-md border-gray-300 pl-10 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                    className="block rounded-md border-gray-300 pl-10 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-7 w-55 sm:text-sm"
                                 />
                             </div>
+                              <select
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                                className="border-blue-300 border-1 rounded-2xl shadow-sm h-7 w-35 focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                            >
+                                <option value="">All Statuses</option>
+                                <option value="verified">Verified</option>
+                                <option value="pending">Pending</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+
                             <button className={styles.bulkVerifyButton}>Bulk Verify</button>
                         </div>
                     </div>

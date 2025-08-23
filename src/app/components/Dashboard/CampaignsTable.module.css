@@ -29,6 +29,8 @@
     font-weight: 700;
     font-size: 0.95rem;
     border-bottom: 1px solid #EAEAEA;
+    border-collapse: collapse; /* recommended */
+
 }
 
 .table tbody tr {
@@ -44,7 +46,14 @@
     align-items: center;
     gap: 10px;
     font-weight: 500;
+    color: #333;
 }
+
+.userCell:hover {
+    cursor:pointer;
+    color:blue
+}
+
 
 .avatar {
     border-radius: 50%;

@@ -8,6 +8,7 @@ import EditExperienceModal from './editExperienceModal';
 import UserGetVerifiedModal from './UserGetVerifiedModal';
 import VerifierModal from './VerifierModal';
 import Swal from 'sweetalert2';
+import ProgressStepper from '../Dashboard/ProgressStepper';
 
 // formatDateRange function (No changes needed)
 const formatDateRange = (startDateISO, endDateISO, isCurrentlyWorking) => {
@@ -36,6 +37,7 @@ const ExperienceCard = ({ experience, onEditClick, onVerifyClick, onAddVerifierC
   const isRoleVerified = experience.skills.some(s => s.verificationStatus === 'VERIFIED');
   
   return (
+    <div className=' border-1 border-zinc-500 rounded-2xl'>
     <div className={styles.card}>
       <div className={styles.cardHeader}>
         <Image src={logoUrl} alt={`${experience.companyName} logo`} width={40} height={40} className={styles.companyLogo} unoptimized={true}/>
@@ -85,6 +87,10 @@ const ExperienceCard = ({ experience, onEditClick, onVerifyClick, onAddVerifierC
             )}
             </div>
         </div>
+    </div>
+      <div className="mt-4">
+          <ProgressStepper currentProgress={experience.progress} />
+      </div>    
     </div>
   );
 };
@@ -174,6 +180,8 @@ const WorkExperienceSection = ({ experiences = [], refetchData, user }) => {
         isOpen={isVerifierModalOpen}
         onClose={() => setIsVerifierModalOpen(false)}
         onVerifierSelect={handleVerifierSelect}
+        experience={selectedExperience}
+
       />
     </div>
   );

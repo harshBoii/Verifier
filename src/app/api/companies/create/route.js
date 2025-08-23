@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 
 export async function POST(request) {
   try {
-    const { companyName, adminFullName, adminEmail, adminPassword, adminPosition } = await request.json();
+    const { companyName, adminFullName, adminEmail, adminPassword, adminPosition , companyType } = await request.json();
 
     if (!companyName || !adminFullName || !adminEmail || !adminPassword) {
       return NextResponse.json({ error: 'All fields are required.' }, { status: 400 });
@@ -25,7 +25,7 @@ export async function POST(request) {
 
       // 2. Create the company first.
       const company = await tx.company.create({
-        data: { name: companyName },
+        data: { name: companyName,type:companyType },
       });
 
       // 3. Create the Admin User for this company.

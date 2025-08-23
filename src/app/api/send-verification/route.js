@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
 import { getVerificationHtml } from '@/app/lib/email-template';
 import { sendMailWithCompanySmtp } from '@/app/lib/mailer'; // 1. Import the new mailer helper
+import { Prisma } from '../../../../generated/prisma';
 
 export async function POST(request) {
   try {
@@ -41,7 +42,8 @@ export async function POST(request) {
         where: { id: parseInt(exp_id, 10) },
         data: { 
             verifier_email: verifierEmail,
-            mail_sent: true 
+            mail_sent: true, 
+            progress:'Mail_sent'
         },
     });
 

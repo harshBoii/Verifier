@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation'; 
+import PredefinedActions from '@/app/components/Dashboard/PredefinedActions';
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center space-x-2">
@@ -97,6 +98,13 @@ export default function ChatPage() {
       if (!feedbackResponse.ok) throw new Error('Failed to start conversation');
 
       const data = await feedbackResponse.json();
+
+      await fetch('/api/start-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ experienceId: id }), // Send the work experience ID
+      });
+
       
       setSession({
         sessionId: data.session_id,
@@ -234,7 +242,12 @@ export default function ChatPage() {
                 Submit
               </button>
             </div>
-          ) : (
+          ) :(<>
+              <PredefinedActions 
+                onSelect={(value) => setUserInput(value)} 
+                disabled={isLoading || !session} 
+              />
+
             <form onSubmit={handleSendMessage} className="flex items-center space-x-4">
               <input
                 type="text"
@@ -254,6 +267,7 @@ export default function ChatPage() {
                 </svg>
               </button>
             </form>
+            </>
           )}
         </div>
       </footer>

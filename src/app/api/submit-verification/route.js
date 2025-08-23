@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { getVerificationResultHtml } from '@/app/lib/email-template'; // Corrected path
 import prisma from '@/app/lib/prisma'; // 1. Import your Prisma client
+import { Prisma } from '../../../../generated/prisma/edge';
 
 export async function POST(request) {
   try {
@@ -81,7 +82,7 @@ export async function POST(request) {
         }),
         prisma.workExperience.update({
           where:{id:expId},
-          data:{hr_comment:revisionComment}
+          data:{hr_comment:revisionComment,progress:'Summary_added',chat_finished:true},
         })
         ])
 

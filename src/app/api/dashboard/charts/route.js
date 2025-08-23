@@ -88,7 +88,8 @@ export async function GET() {
     const totalSkills = user.workExperiences.reduce((acc, exp) => acc + exp._count.skills, 0);
     return {
         name: user.fullName,
-        skillCount: totalSkills
+        skillCount: totalSkills,
+        id:user.id
         }
     })
 
@@ -103,8 +104,10 @@ export async function GET() {
       campaignMembers: campaigns.map(c => ({
         name: c.name,
         members: c._count.members,
+        id:c.id
       })),
-      topEmployeesBySkills: topEmployeesBySkills    
+      topEmployeesBySkills: topEmployeesBySkills
+
     };
 
 

@@ -3,10 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Swal from 'sweetalert2';
-import { FiUser, FiBriefcase, FiCheck, FiX, FiAward, FiMessageSquare } from 'react-icons/fi';
+// Added FiActivity and FiCheckCircle for the new section
+import { FiUser, FiBriefcase, FiCheck, FiX, FiAward, FiMessageSquare, FiActivity, FiCheckCircle } from 'react-icons/fi';
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-
+import { Zap } from 'lucide-react';
 
 // Spinner component for loading states
 const Spinner = () => (
@@ -16,6 +17,7 @@ const Spinner = () => (
     </svg>
 );
 
+
 const ExperienceVerificationPage = () => {
     const [experience, setExperience] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -24,6 +26,7 @@ const ExperienceVerificationPage = () => {
     const params = useParams();
     const router = useRouter();
     const { experienceId } = params;
+
 
     useEffect(() => {
         if (experienceId) {
@@ -44,6 +47,7 @@ const ExperienceVerificationPage = () => {
         }
     }, [experienceId]);
 
+
     const handleVerification = async (isVerified) => {
         setIsSubmitting(true);
         try {
@@ -61,8 +65,9 @@ const ExperienceVerificationPage = () => {
                 confirmButtonColor: '#3B82F6'
             });
 
-            // Optionally redirect after success
+
             router.push('/dashboard'); 
+
 
         } catch (err) {
             Swal.fire('Error!', err.message, 'error');
@@ -71,17 +76,48 @@ const ExperienceVerificationPage = () => {
         }
     };
 
+
     if (loading) {
         return <div className="flex items-center justify-center min-h-screen bg-gray-100"><p>Loading Verification Details...</p></div>;
     }
+
 
     if (error) {
         return <div className="flex items-center justify-center min-h-screen bg-gray-100"><p className="text-red-500">{error}</p></div>;
     }
 
+
     if (!experience) return null;
 
+
     const { user } = experience;
+
+    // --- NEW: Activity generation logic ---
+    const getActivities = () => {
+        const activities = [];
+        if (experience.verifier_email) {
+            if (experience.apollo_used) {
+                activities.push("Candidate fetched referee details from Apollo.");
+            } else {
+                activities.push("Candidate entered referee details manually.");
+            }
+        }
+        if (experience.chat_started) {
+            activities.push("Referee initiated conversation with the feedback agent.");
+        }
+        // If the chat started but didn't finish, it implies the referee exited early.
+        if (experience.chat_started && !experience.chat_finished) {
+            activities.push("Referee exited before completing the feedback session.");
+        }
+        if (experience.chat_started && experience.chat_finished) {
+            activities.push("Referee Submitted The Verification.");
+        }
+
+        // Note: "Candidate added another referee" cannot be determined from the provided data structure.
+        return activities;
+    };
+
+    const activityLog = getActivities();
 
     return (
         <div className="min-h-screen bg-gray-100 font-sans p-4 sm:p-8">
@@ -101,9 +137,8 @@ const ExperienceVerificationPage = () => {
                     </div>
                 </header>
 
-                {/* Main Content */}
+
                 <main className="p-8 space-y-8">
-                    {/* Work Experience Details */}
                     <section>
                         <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-3 mb-4">
                             <FiBriefcase className="text-blue-500" />
@@ -117,7 +152,7 @@ const ExperienceVerificationPage = () => {
                         </div>
                     </section>
 
-                    {/* Skills Section */}
+
                     <section>
                         <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-3 mb-4">
                             <FiAward className="text-blue-500" />
@@ -132,7 +167,29 @@ const ExperienceVerificationPage = () => {
                         </div>
                     </section>
 
-                    {/* HR Comment Section */}
+                    {/* --- NEW ACTIVITY LOG SECTION --- */}
+                    <section>
+                        <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-3 mb-4">
+                            <FiActivity className="text-blue-500" />
+                            Activity Log
+                        </h2>
+                        <div className="border border-gray-200 rounded-lg p-6 bg-gray-50">
+                            {activityLog.length > 0 ? (
+                                <ul className="space-y-3">
+                                    {activityLog.map((activity, index) => (
+                                        <li key={index} className="flex items-center gap-3">
+                                            <Zap className="text-blue-500 h-5 w-5 flex-shrink-0" />
+                                            <span className="text-gray-700">{activity}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-gray-500">No verification activities have been recorded yet.</p>
+                            )}
+                        </div>
+                    </section>
+                    {/* --- END OF NEW SECTION --- */}
+
                     {experience.hr_comment && (
                             <section>
                                 <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-3 mb-4">
@@ -148,7 +205,7 @@ const ExperienceVerificationPage = () => {
                     )}
                 </main>
 
-                {/* Action Footer */}
+
                 <footer className="bg-gray-50 p-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end items-center gap-4">
                     <p className="text-sm text-gray-500">Please confirm the details of this experience.</p>
                     <div className="flex gap-4">
@@ -172,5 +229,6 @@ const ExperienceVerificationPage = () => {
         </div>
     );
 };
+
 
 export default ExperienceVerificationPage;

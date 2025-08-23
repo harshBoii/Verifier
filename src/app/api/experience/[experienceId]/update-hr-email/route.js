@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
+import { Prisma } from '@/generated/prisma';
 
 export async function POST(request, { params }) { // <-- This line is fixed
   try {
@@ -26,7 +27,8 @@ export async function POST(request, { params }) { // <-- This line is fixed
       },
       data: {
         verifier_email: hrEmail,
-        ver_relation:ver_relation
+        ver_relation:ver_relation,
+        progress:'Email_added'
       },
     });
 

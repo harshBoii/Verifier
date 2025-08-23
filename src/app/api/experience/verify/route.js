@@ -1,5 +1,5 @@
-// import { NextResponse } from 'next/server';
-// import prisma from '@/app/lib/prisma';
+import { NextResponse } from 'next/server';
+import prisma from '@/app/lib/prisma';
 
 // export async function POST(request) {
 //   try {
@@ -106,7 +106,7 @@ export async function POST(request) {
       // Step A: Update the specific work experience
       const updatedExperience = await tx.workExperience.update({
         where: { id: numericId },
-        data: { is_verified: isVerified },
+        data: { is_verified: isVerified , progress:'Verified'},
         select: { 
           userId: true,
           user: {

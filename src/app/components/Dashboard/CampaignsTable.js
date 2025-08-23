@@ -170,8 +170,8 @@ export default function CampaignsTable() {
                                         </div>
                                     </td>
                                     <td>{Number(campaign.totalVerified) + Number(campaign.notVerified)} Members</td>
-                                    <td className="text-green-600 font-semibold">{campaign.totalVerified} Verified</td>
-                                    <td className="text-amber-600 font-semibold">{campaign.notVerified} Pending</td>
+                                    <td className="text-green-600 font-semibold ">{campaign.totalVerified}</td>
+                                    <td className="text-amber-600 font-semibold ">{campaign.notVerified}</td>
                                     <td>
                                         <button
                                             onClick={(e) => {

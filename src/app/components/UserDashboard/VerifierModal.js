@@ -11,7 +11,7 @@ const Spinner = () => (
     </svg>
 );
 
-export default function VerifierModal({ isOpen, onClose, onVerifierSelect }) {
+export default function VerifierModal({ isOpen, onClose, onVerifierSelect,experience }) {
     const [mode, setMode] = useState('direct');
     const [directEmail, setDirectEmail] = useState('');
     const [website, setWebsite] = useState('');
@@ -25,7 +25,7 @@ export default function VerifierModal({ isOpen, onClose, onVerifierSelect }) {
     const handleFindSeniors = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`/api/find-verifiers?website=${website.replace(/^(https?:\/\/)?(www\.)?/, '')}`);
+            const response = await fetch(`/api/find-verifiers?website=${website.replace(/^(https?:\/\/)?(www\.)?/, '')}&experienceId=${experience.id}`);
             if (!response.ok) throw new Error('Could not find company.');
             const data = await response.json();
             setSeniors(data);
