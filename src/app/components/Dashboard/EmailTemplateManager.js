@@ -164,7 +164,7 @@ export default function EmailTemplateManager({ templates, onSaveSelection, onTem
 
         {/* Full-size Preview Modal */}
         {previewTemplate && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4  bg-black bg-opacity-60">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4  backdrop-blur-md bg-opacity-10">
             <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] h-full flex flex-col">
               <div className="flex justify-between items-center p-4 border-b ">
                 <h3 className="text-lg font-bold text-gray-900">{previewTemplate.name}</h3>
