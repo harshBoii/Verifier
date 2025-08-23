@@ -49,7 +49,7 @@ export default function Modal({ isOpen, onClose, children, title }) {
         onClick={(e) => e.stopPropagation()} // Prevents clicks inside the modal from closing it.
       >
         {/* Modal Header with optional title and a close button */}
-        <div className="flex justify-between items-center p-4 border-b border-gray-200 h-80">
+        <div className="flex justify-between items-center p-4 border-b border-gray-200">
           {title ? (
             <h2 id="modal-title" className="text-xl font-semibold text-gray-800">
               {title}
