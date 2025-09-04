@@ -31,6 +31,64 @@ export async function POST(request, { params }) { // <-- This line is fixed
       },
     });
 
+    // --- Publish job to QStash ---
+    // try {
+    //   const payload = {
+    //     type: "progressUpdate",
+    //     expId: updatedExperience.id,
+    //     userId: updatedExperience.userId,
+    //     progress: updatedExperience.progress,
+    //   };
+
+    //   await fetch("https://qstash.upstash.io/v2/publish/progress-updates", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       Authorization: `Bearer ${process.env.QSTASH_TOKEN}`,
+    //     },
+    //     body: JSON.stringify({
+    //       body: payload,
+    //       delivery: {
+    //         url: process.env.QSTASH_DELIVERY_URL, // your worker route
+    //       },
+    //     }),
+    //   });
+
+    //   console.log(`Published HR Email update for experienceId=${updatedExperience.id}`);
+    // } catch (err) {
+    //   console.error("Failed to publish HR Email update to QStash:", err);
+    // }
+    // --- Publish job to QStash ---
+try {
+  const payload = {
+    type: "progressUpdate",
+    expId: updatedExperience.id, // Corrected from 'experienceId'
+    userId: updatedExperience.userId,
+    progress: `Verifier Email Updated for ${updatedExperience.companyName}`,
+  };
+
+  // The destination URL from your environment variables
+  const deliveryUrl = process.env.QSTASH_DELIVERY_URL;
+
+  // CONSTRUCT THE CORRECT PUBLISH URL HERE
+  const publishUrl = `https://qstash.upstash.io/v2/publish/${deliveryUrl}`;
+
+  await fetch(publishUrl, { // Use the newly constructed URL
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.QSTASH_TOKEN}`,
+    },
+    // The body now only needs to contain the payload for your worker
+    body: JSON.stringify(payload), 
+  });
+
+  console.log(`Published HR Email update for experienceId=${updatedExperience.id}`);
+} catch (err) {
+  console.error("Failed to publish HR Email update to QStash:", err);
+}
+
+
     return NextResponse.json({ message: 'HR Email updated successfully!', data: updatedExperience });
   } catch (error) {
     console.error("API Update HR Email Error:", error);

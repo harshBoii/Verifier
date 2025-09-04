@@ -38,7 +38,7 @@ export async function POST(request) {
     });
 
     // 4. Update the database to record that the email was sent
-    await prisma.workExperience.update({
+    const updatedExperience=await prisma.workExperience.update({
         where: { id: parseInt(exp_id, 10) },
         data: { 
             verifier_email: verifierEmail,
@@ -47,6 +47,34 @@ export async function POST(request) {
         },
     });
 
+try {
+  const payload = {
+    type: "progressUpdate",
+    expId: updatedExperience.id, // Corrected from 'experienceId'
+    userId: updatedExperience.userId,
+    progress: `Mail Sent for ${updatedExperience.companyName}`,
+  };
+
+  // The destination URL from your environment variables
+  const deliveryUrl = process.env.QSTASH_DELIVERY_URL;
+
+  // CONSTRUCT THE CORRECT PUBLISH URL HERE
+  const publishUrl = `https://qstash.upstash.io/v2/publish/${deliveryUrl}`;
+
+  await fetch(publishUrl, { // Use the newly constructed URL
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.QSTASH_TOKEN}`,
+    },
+    // The body now only needs to contain the payload for your worker
+    body: JSON.stringify(payload), 
+  });
+
+  console.log(`Published HR Email update for experienceId=${updatedExperience.id}`);
+} catch (err) {
+  console.error("Failed to publish HR Email update to QStash:", err);
+}
     return NextResponse.json({ message: 'Email sent successfully!' });
 
   } catch (error) {

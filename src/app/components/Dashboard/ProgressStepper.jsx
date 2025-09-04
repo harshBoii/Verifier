@@ -2,9 +2,9 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FiCheck } from 'react-icons/fi'; // Using a cleaner check icon
+import { FiCheck, FiX, FiMinus } from 'react-icons/fi';
 
-// We use a plain object for the enum-like structure in JavaScript
+// Enum-like object for primary progress stages
 export const Progress = {
   Beginning: 'Beginning',
   Email_added: 'Email_added',
@@ -13,73 +13,152 @@ export const Progress = {
   Verified: 'Verified',
 };
 
-// Define the order of the stages
+// The order of the primary stages
 const progressStages = Object.values(Progress);
 
-// Define more readable labels for each stage
+// Readable labels for the primary stages
 const progressLabels = {
-  [Progress.Beginning]: 'Started',
+  [Progress.Beginning]: 'Process Started',
   [Progress.Email_added]: 'Email Added',
   [Progress.Mail_sent]: 'Mail Sent',
   [Progress.Summary_added]: 'Summary Added',
-  [Progress.Verified]: 'Verified',
+  [Progress.Verified]: 'Verified & Complete',
 };
 
-const ProgressStepper = ({ currentProgress }) => {
-  const currentIndex = progressStages.indexOf(currentProgress);
+const ProgressStepper = ({
+  currentProgress,
+  apollo_used = false,
+  chat_started = false,
+  chat_finished = false,
+}) => {
+  const mainProgressIndex = progressStages.indexOf(currentProgress);
+
+  // --- Step 1: Build a dynamic list of all steps and milestones ---
+  const allSteps = [];
+  progressStages.forEach((stage, index) => {
+    const isCompleted = index < mainProgressIndex;
+    const isCurrent = index === mainProgressIndex;
+
+    // Add the primary progress step
+    allSteps.push({
+      key: stage,
+      label: progressLabels[stage],
+      isCompleted,
+      isCurrent,
+      isMilestone: false,
+    });
+
+    // --- Conditionally add milestones if their parent step is visible ---
+    const parentIsVisible = isCompleted || isCurrent;
+
+    // Apollo usage milestone
+    if (stage === Progress.Email_added && parentIsVisible) {
+      allSteps.push({
+        key: 'apollo_milestone',
+        label: apollo_used ? 'Apollo Used' : 'Apollo Not Used',
+        isCompleted: isCompleted,
+        isMilestone: true,
+        success: apollo_used,
+      });
+    }
+
+    // Chat started milestone
+    if (stage === Progress.Mail_sent && parentIsVisible) {
+      allSteps.push({
+        key: 'chat_milestone',
+        label: chat_started ? 'Chat Started' : 'Chat Not Started',
+        isCompleted: isCompleted,
+        isMilestone: true,
+        success: chat_started,
+      });
+    }
+
+    // Chat finished milestone
+    if (stage === Progress.Summary_added && parentIsVisible) {
+      allSteps.push({
+        key: 'chat_finished_milestone',
+        label: chat_finished ? 'Chat Finished' : 'Chat Not Finished',
+        isCompleted: isCompleted,
+        isMilestone: true,
+        success: chat_finished,
+      });
+    }
+  });
 
   return (
-    <div className="w-full px-4 py-5 font-sans">
-      <div className="relative flex items-center">
-        {/* Gradient Progress Bar */}
-        <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-200" style={{ transform: 'translateY(-50%)' }}>
-          <div
-            className="h-full bg-gradient-to-r from-blue-200 to-blue-600 transition-all duration-700 ease-out rounded-2xl"
-            // Calculate the width of the gradient bar based on the current step
-            style={{ width: `${(currentIndex / (progressStages.length - 1)) * 100}%` }}
-          ></div>
-        </div>
+    <div className="w-full  p-4 font-sans bg-white ">
+      <div className="flex flex-col">
+        {allSteps.map((step, index) => {
+          const isLastItem = index === allSteps.length - 1;
 
-        {/* Steps */}
-        <div className="relative flex justify-between w-full">
-          {progressStages.map((stage, index) => {
-            const isCompleted = index < currentIndex;
-            const isCurrent = index === currentIndex;
-
+          if (step.isMilestone) {
+            // --- Render a Milestone ---
             return (
-              <div key={stage} className="flex flex-col items-center text-center">
-                {/* Step Circle */}
-                <div
-                  className={`
-                    flex items-center justify-center w-10 h-10 rounded-full border-2 
-                    transition-all duration-500 ease-in-out
-                    ${isCompleted ? 'bg-green-500 border-blue-600' : ''}
-                    ${isCurrent ? 'bg-blue-500  border-zinc-600 ring-4 ring-zinc-300 text-white' : ''}
-                    ${!isCompleted && !isCurrent ? 'bg-white border-gray-300' : ''}
-                  `}
-                >
-                  {isCompleted ? (
-                    <FiCheck className="w-6 h-6 text-white" />
-                  ) : (
-                    <span className={`font-bold transition-colors ${isCurrent ? 'text-white' : 'text-gray-400'}`}>
-                      {index + 1}
-                    </span>
-                  )}
+              <div key={step.key} className="flex items-start pl-6">
+                {/* Vertical line for milestone */}
+                <div className="flex flex-col items-center mr-4">
+                  <div className={`w-px h-6 ${!isLastItem ? 'bg-gray-300' : 'bg-transparent'}`}></div>
                 </div>
-
-                {/* Step Label */}
-                <p
-                  className={`
-                    mt-2 text-xs font-semibold w-20 transition-colors
-                    ${isCompleted || isCurrent ? 'text-blue-600' : 'text-gray-500'}
-                  `}
-                >
-                  {progressLabels[stage]}
-                </p>
+                {/* Milestone Icon and Label */}
+                <div className={`flex items-center pb-6 ${step.isCompleted ? 'opacity-100' : 'opacity-50'}`}>
+                  <div
+                    className={`
+                      flex items-center justify-center w-5 h-5 rounded-full mr-3
+                      ${step.success ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}
+                    `}
+                  >
+                    {step.success ? (
+                      <FiCheck className="w-3 h-3" />
+                    ) : (
+                      <FiX className="w-3 h-3" />
+                    )}
+                  </div>
+                  <p className="text-sm font-medium text-gray-600">{step.label}</p>
+                </div>
               </div>
             );
-          })}
-        </div>
+          } else {
+            // --- Render a Primary Progress Step ---
+            return (
+              <div key={step.key} className="flex items-start">
+                {/* Step Circle and Connecting Line */}
+                <div className="flex flex-col items-center mr-4">
+                  <div
+                    className={`
+                      flex items-center justify-center w-8 h-8 rounded-full border-2
+                      transition-all duration-300
+                      ${step.isCompleted ? 'bg-green-500 border-green-500 text-white' : ''}
+                      ${step.isCurrent ? 'bg-white border-blue-500 ring-4 ring-blue-100' : ''}
+                      ${!step.isCompleted && !step.isCurrent ? 'bg-white border-gray-300' : ''}
+                    `}
+                  >
+                    {step.isCompleted ? (
+                      <FiCheck className="w-5 h-5" />
+                    ) : (
+                      <div className={`w-2 h-2 rounded-full ${step.isCurrent ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
+                    )}
+                  </div>
+                  {/* Vertical Line */}
+                  {!isLastItem && (
+                    <div className={`w-px h-full ${step.isCompleted ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                  )}
+                </div>
+                {/* Step Label */}
+                <div className="pt-1 pb-8">
+                  <p
+                    className={`
+                      font-semibold
+                      ${step.isCurrent ? 'text-blue-600' : 'text-gray-800'}
+                      ${!step.isCompleted && !step.isCurrent ? 'text-gray-400' : ''}
+                    `}
+                  >
+                    {step.label}
+                  </p>
+                </div>
+              </div>
+            );
+          }
+        })}
       </div>
     </div>
   );
@@ -88,6 +167,9 @@ const ProgressStepper = ({ currentProgress }) => {
 // PropTypes for runtime type-checking
 ProgressStepper.propTypes = {
   currentProgress: PropTypes.oneOf(progressStages).isRequired,
+  apollo_used: PropTypes.bool,
+  chat_started: PropTypes.bool,
+  chat_finished: PropTypes.bool,
 };
 
 export default ProgressStepper;

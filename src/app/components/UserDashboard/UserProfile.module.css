@@ -14,6 +14,9 @@
     padding: 20px;
     align-self: flex-start; /* Aligns to the top */
     text-align: center;
+    position: sticky;
+    top: 20px;   /* 👈 adjust as needed */
+
 }
 
 .avatarSection {
@@ -42,6 +45,8 @@
 .profileNav {
     display: flex;
     flex-direction: column;
+    position: sticky;
+    top:10vh
 }
 
 .navLink {

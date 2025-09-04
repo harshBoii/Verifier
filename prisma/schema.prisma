@@ -397,3 +397,13 @@ model WorkExperienceSkill {
   // Define a composite primary key to ensure a skill is only added once per experience
   @@id([workExperienceId, skillId])
 }
+model Notification {
+  id               Int      @id @default(autoincrement())
+  employeeId       Int
+  workExperienceId Int
+  channel          String
+  status           String
+  payload          String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}

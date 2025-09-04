@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/app/lib/prisma';
+import { Redis } from "@upstash/redis";
+const redis = Redis.fromEnv();
+
 
 export async function GET(request, { params }) {
   try {
@@ -9,6 +12,11 @@ export async function GET(request, { params }) {
     if (isNaN(userId)) {
       return NextResponse.json({ error: 'Invalid user ID format.' }, { status: 400 });
     }
+
+    const cached = await redis.get(`user:${userId}`);
+    if (cached) {
+      return NextResponse.json(cached, { status: 200 });
+  }
 
     // --- FIXED LOGIC ---
 
@@ -39,12 +47,8 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: 'Profile not found.' }, { status: 404 });
     }
 
-    // Step 2: Directly fetch all unique skills associated with this user's work experiences.
-    // This is a more robust way to ensure all skill fields are included.
     const userSkills = await prisma.skill.findMany({
       where: {
-        // Find skills where at least one of their workExperience relations
-        // is linked to the current user's work experiences.
         workExperiences: {
           some: {
             workExperience: {
@@ -73,6 +77,8 @@ export async function GET(request, { params }) {
     
     // Return the complete and correctly structured profile data.
     console.log(finalProfileData)
+    await redis.set(`user:${userId}`, userProfile, { ex: 900 });
+
     return NextResponse.json(finalProfileData, { status: 200 });
 
   } catch (error) {

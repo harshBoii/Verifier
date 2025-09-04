@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import styles from './UserProfile.module.css';
-import { FiEdit2, FiPlus, FiCheckCircle, FiUserPlus } from 'react-icons/fi';
+import { FiEdit2, FiPlus, FiCheckCircle, FiUserPlus , FiX } from 'react-icons/fi';
 import AddExperienceModal from './AddExperienceModal';
 import EditExperienceModal from './editExperienceModal';
 import UserGetVerifiedModal from './UserGetVerifiedModal';
@@ -35,7 +35,8 @@ const formatDateRange = (startDateISO, endDateISO, isCurrentlyWorking) => {
 const ExperienceCard = ({ experience, onEditClick, onVerifyClick, onAddVerifierClick }) => { // 2. Add onEditClick prop
   const logoUrl = `https://placehold.co/40x40/3F51B5/FFFFFF?text=${experience.companyName.charAt(0)}`;
   const isRoleVerified = experience.skills.some(s => s.verificationStatus === 'VERIFIED');
-  
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <div className=' border-1 border-zinc-500 rounded-2xl'>
     <div className={styles.card}>
@@ -88,8 +89,22 @@ const ExperienceCard = ({ experience, onEditClick, onVerifyClick, onAddVerifierC
             </div>
         </div>
     </div>
-      <div className="mt-4">
-          <ProgressStepper currentProgress={experience.progress} />
+      <div className="mt-4 text-center bg-white rounded-3xl p-3 ">
+      <button
+        className="text-zinc-600 px-4 py-2 w-full  rounded-md text-xl font-extrabold align-middle hover:text-md hover:text-blue-600 bg-zinc-100 hover:bg-zinc-300"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {isOpen ? "Hide":"Track Progress" }
+      </button>
+      <div
+        className={`transition-max-height duration-500 overflow-hidden ${
+          isOpen ? "max-h-150" : "max-h-0"
+        }`}
+      >
+        <div className="mt-3 bg-gray-100 p-3 rounded-md">
+          <ProgressStepper currentProgress={experience.progress} apollo_used={experience.apollo_used} chat_started={experience.chat_started} chat_finished={experience.chat_finished} />
+        </div>
+      </div>
       </div>    
     </div>
   );
@@ -100,7 +115,7 @@ const WorkExperienceSection = ({ experiences = [], refetchData, user }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedExperience, setSelectedExperience] = useState(null);
   const [isVerifierModalOpen, setIsVerifierModalOpen] = useState(false);
-  
+
   // 4. Add state to control the new Edit Modal
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 

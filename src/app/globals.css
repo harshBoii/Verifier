@@ -120,3 +120,6 @@
     @apply bg-background text-foreground;
   }
 }
+.transition-max-height {
+  transition: max-height 0.5s ease-in-out;
+}

@@ -23,6 +23,7 @@ const VerifyExperiencePage = () => {
     const [error, setError] = useState('');
     const params = useParams();
     const { userId } = params;
+    const [isOpen, setIsOpen] = useState(false);
 
     // State for modals
     const [selectedExperience, setSelectedExperience] = useState(null);
@@ -140,7 +141,23 @@ const VerifyExperiencePage = () => {
                             </div>
                         </div>
                                 <div className="mt-4">
-                                    <ProgressStepper currentProgress={exp.progress} />
+                                    <div className="mt-4 text-center bg-white rounded-3xl p-3 ">
+                                    <button
+                                        className="text-zinc-600 px-4 py-2 w-full  rounded-md text-xl font-extrabold align-middle hover:text-md hover:text-blue-600 bg-zinc-100 hover:bg-zinc-300"
+                                        onClick={() => setIsOpen(!isOpen)}
+                                    >
+                                        {isOpen ? "Hide":"Track Progress" }
+                                    </button>
+                                    <div
+                                        className={`transition-max-height duration-500 overflow-hidden ${
+                                        isOpen ? "max-h-150" : "max-h-0"
+                                        }`}
+                                    >
+                                        <div className="mt-3 bg-gray-100 p-3 rounded-md">
+                                        <ProgressStepper currentProgress={exp.progress} apollo_used={exp.apollo_used} chat_started={exp.chat_started} chat_finished={exp.chat_finished} />
+                                        </div>
+                                    </div>
+                                    </div>    
                                 </div>
 
                         </div>
