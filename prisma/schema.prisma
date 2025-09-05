@@ -82,6 +82,21 @@ enum Progress {
   Verified
 }
 
+enum WorkflowNodeType {
+  ACTION
+  CONDITION
+  DELAY
+  START
+  END
+}
+
+enum EdgeCondition {
+  TRUE
+  FALSE
+  ALWAYS
+}
+
+
 // -- MODELS (Tables) --
 
 
@@ -280,6 +295,8 @@ model Company {
 
   subscription Subscription?
   emailTemplates EmailTemplate[]
+  workflows Workflow[]
+
 
 }
 
@@ -327,6 +344,9 @@ model User {
   workExperiences WorkExperience[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+
+  workflowProgress UserWorkflowProgress[]
+
 }
 
 model Education {
@@ -357,6 +377,7 @@ model WorkExperience {
   currentlyWorking Boolean   @default(false) @map("currently_working")
   description      String?   @db.Text
   verifier_email   String?   @default("")
+  verifier_number  BigInt?    @default(8102244713)
   is_verified      Boolean   @default(false)
   mail_sent        Boolean   @default(false)
   job_title        String?   @default("")
@@ -378,6 +399,9 @@ model WorkExperience {
 
   // Many-to-many relation to Skill through the join table
   skills WorkExperienceSkill[]
+
+  workflowProgress WorkExperienceWorkflowProgress[]
+
 }
 
 // This is the "join table" for the many-to-many relationship
@@ -406,4 +430,95 @@ model Notification {
   payload          String
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+}
+
+model Workflow {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int     @map("company_id")
+
+  // REMOVE onDelete from here
+  nodes WorkflowNode[]
+  edges WorkflowEdge[]
+  userProgress             UserWorkflowProgress[]
+  workExperienceProgress   WorkExperienceWorkflowProgress[]
+}
+
+model WorkflowNode {
+  id        String           @id @unique
+  type      WorkflowNodeType
+  positionX Int              @map("position_x")
+  positionY Int              @map("position_y")
+  config    Json
+
+  // ADD onDelete: Cascade HERE
+  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  workflowId Int      @map("workflow_id")
+
+  sourceEdges      WorkflowEdge[]         @relation("SourceNode")
+  targetEdges      WorkflowEdge[]         @relation("TargetNode")
+  userProgress     UserWorkflowProgress[]
+  workExperienceProgress   WorkExperienceWorkflowProgress[]
+}
+
+model WorkflowEdge {
+  id        String        @id @unique
+  condition EdgeCondition @default(ALWAYS)
+
+  sourceNode   WorkflowNode @relation("SourceNode", fields: [sourceNodeId], references: [id])
+  sourceNodeId String       @map("source_node_id")
+
+  targetNode   WorkflowNode @relation("TargetNode", fields: [targetNodeId], references: [id])
+  targetNodeId String       @map("target_node_id")
+
+  // ADD onDelete: Cascade HERE
+  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  workflowId Int      @map("workflow_id")
+
+  @@index([workflowId])
+}
+
+model UserWorkflowProgress {
+  id          Int      @id @default(autoincrement())
+  status      String // e.g., "in-progress", "completed", "failed"
+  startedAt   DateTime @default(now()) @map("started_at")
+  completedAt DateTime? @map("completed_at")
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @map("user_id")
+
+  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  workflowId Int      @map("workflow_id")
+
+  currentNode   WorkflowNode @relation(fields: [currentNodeId], references: [id])
+  currentNodeId String       @map("current_node_id")
+
+  @@unique([userId, workflowId]) // A user can only be in a workflow once at a time
+}
+
+model WorkExperienceWorkflowProgress {
+  id          Int      @id @default(autoincrement())
+  status      String   // e.g., "in-progress", "completed", "failed"
+  startedAt   DateTime @default(now()) @map("started_at")
+  completedAt DateTime? @map("completed_at")
+
+  // Link to the specific WorkExperience
+  workExperience   WorkExperience @relation(fields: [workExperienceId], references: [id], onDelete: Cascade)
+  workExperienceId Int            @map("work_experience_id")
+
+  // Link to the workflow being executed
+  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  workflowId Int      @map("workflow_id")
+
+  // Link to the current node/step in the workflow
+  currentNode   WorkflowNode @relation(fields: [currentNodeId], references: [id])
+  currentNodeId String       @map("current_node_id")
+
+  // Ensures one work experience can only be in a workflow once at a time
+  @@unique([workExperienceId, workflowId])
 }
