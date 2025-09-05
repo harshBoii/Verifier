@@ -99,6 +99,7 @@ export async function PUT(request) {
     return NextResponse.json({ error: 'An internal server error occurred.' }, { status: 500 });
   }
 }
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -114,6 +115,31 @@ export async function GET(request) {
     const workflows = await prisma.workflow.findMany({
       where: {
         companyId: parseInt(companyId, 10),
+      },
+      include: {
+        // --- ADD THIS SECTION TO INCLUDE THE WORKFLOW GRAPH ---
+        nodes: true,
+        edges: true,
+        // --- END ADDED SECTION ---
+
+        // This part can remain as it is
+        workExperienceProgress: {
+          include: {
+            workExperience: {
+              select: {
+                id: true,
+                role: true,
+                companyName: true,
+                progress: true,
+                user: {
+                  select: {
+                    fullName: true,
+                  }
+                }
+              }
+            }
+          }
+        }
       },
       orderBy: {
         updatedAt: 'desc',

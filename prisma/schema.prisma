@@ -376,8 +376,10 @@ model WorkExperience {
   endDate          DateTime? @map("end_date")
   currentlyWorking Boolean   @default(false) @map("currently_working")
   description      String?   @db.Text
+
   verifier_email   String?   @default("")
-  verifier_number  BigInt?    @default(8102244713)
+  verifier_number  String?    @default("+918102244713")
+
   is_verified      Boolean   @default(false)
   mail_sent        Boolean   @default(false)
   job_title        String?   @default("")

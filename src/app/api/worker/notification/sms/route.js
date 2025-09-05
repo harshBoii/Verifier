@@ -19,7 +19,7 @@ export async function POST(request) {
     const isValid = await receiver.verify({
       signature,
       body,
-      url: `${process.env.NEXT_PUBLIC_APP_URL}/api/worker/notifications/sms`,
+      url: `${process.env.NEXT_PUBLIC_APP_URL}/api/worker/notification/sms`,
     });
 
     if (!isValid) {

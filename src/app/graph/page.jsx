@@ -273,14 +273,35 @@ const EdgeLabel = {
   FALSE: "false",
 };
 
-// --- Action Node Component ---
 function ActionNode({ id, data }) {
   const updateField = (field, value) => {
-    data.onChange(id, { ...data.config, [field]: value });
+  const newConfig = { ...data.config, [field]: value };
+  console.log("Updating field", field, "to", value, newConfig);
+  data.onChange(id, { ...data.config, [field]: value });
   };
 
+  const handleTemplateChange = (e) => {
+    const selectedTemplateId = e.target.value;
+    const selectedTemplate = data.emailTemplates.find(t => t.id === parseInt(selectedTemplateId, 10));
+
+    if (selectedTemplate) {
+      // When a template is selected, update both the message and the templateId
+      console.log("selectedTemplate is" , selectedTemplate)
+      updateField("templateId", selectedTemplate.id);
+      updateField("message", selectedTemplate.body);
+
+    } else {
+      // If "-- Custom Message --" is selected, clear the message and templateId
+      updateField("message", "");
+      updateField("templateId", null);
+    }
+  };
+
+  const isEmailChannel = data.config.channel === 'email';
+  console.log("data is" , data.config)
+
   return (
-    <div className="bg-white border shadow-md rounded-lg p-3 w-60">
+    <div className="bg-white border shadow-md rounded-lg p-3 w-64">
       <h3 className="font-bold text-sm mb-2 text-blue-600">Action</h3>
       <label className="block text-xs mb-1">Channel</label>
       <select
@@ -292,25 +313,66 @@ function ActionNode({ id, data }) {
         <option value="sms">SMS</option>
         <option value="whatsapp">WhatsApp</option>
       </select>
-      <label className="block text-xs mb-1">Message</label>
-      <textarea
-        value={data.config.message || ''}
-        onChange={(e) => updateField("message", e.target.value)}
-        rows={3}
-        className="border rounded w-full p-1 text-sm"
-      />
+
+      {/* --- Conditional UI for Email Channel --- */}
+      {isEmailChannel ? (
+        <>
+          <label className="block text-xs mb-1">Email Template</label>
+          <select
+            value={data.config.templateId || ''}
+            onChange={handleTemplateChange}
+            className="border rounded w-full p-1 mb-2 text-sm"
+          >
+            <option value="">-- Type a Custom Message --</option>
+            {data.emailTemplates?.map(template => (
+              // The option value is the template's unique ID
+              <option key={template.id} value={template.id}>
+                {template.name}
+              </option>
+            ))}
+          </select>
+          <textarea
+            placeholder="Select a template or type a custom message..."
+            value={data.config.message || ''}
+            onChange={(e) => {
+              // When the user types, clear the templateId selection
+              updateField("message", e.target.value);
+              updateField("templateId", null);
+            }}
+            rows={3}
+            className="border rounded w-full p-1 text-sm mb-2"
+          />
+          <button
+            onClick={() => data.onPreview(data.config.message)}
+            disabled={!data.config.message}
+            className="w-full text-xs bg-gray-200 hover:bg-gray-300 py-1 rounded"
+          >
+            Preview Email
+          </button>
+        </>
+      ) : (
+        <>
+          <label className="block text-xs mb-1">Message</label>
+          <textarea
+            value={data.config.message || ''}
+            onChange={(e) => updateField("message", e.target.value)}
+            rows={3}
+            className="border rounded w-full p-1 text-sm"
+          />
+        </>
+      )}
+      {/* --- End Conditional UI --- */}
+
       <Handle type="target" position={Position.Top} />
       <Handle type="source" position={Position.Bottom} />
     </div>
   );
 }
-
 // --- Delay Node Component ---
 function DelayNode({ id, data }) {
     const updateDelay = (newDelay) => {
         data.onChange(id, { ...data.config, delay: parseInt(newDelay, 10) || 0 });
     };
-
     return (
         <div className="bg-white border shadow-md rounded-lg p-4 w-60 text-center">
             <h3 className="font-bold text-sm mb-2 text-yellow-600">Delay</h3>
@@ -327,29 +389,23 @@ function DelayNode({ id, data }) {
     );
 }
 
-// --- NEW: Condition Node Component ---
+// --- Condition Node Component ---
 function ConditionNode({ id, data }) {
-    // This node is purely for branching logic, so it has no editable config.
-    // The logic is handled by the edge labels ('TRUE'/'FALSE').
     return (
         <div className="bg-white border-2 border-purple-500 shadow-xl rounded-full p-4 w-48 h-24 flex items-center justify-center text-center">
             <h3 className="font-bold text-sm text-purple-600">Condition</h3>
             <Handle type="target" position={Position.Top} style={{ borderRadius: 0 }} />
-            {/* We add custom handles for TRUE and FALSE paths */}
             <Handle type="source" position={Position.Bottom} id="true" style={{ left: '25%' }} />
             <Handle type="source" position={Position.Bottom} id="false" style={{ left: '75%' }} />
         </div>
     );
 }
 
-
 const nodeTypes = {
   actionNode: ActionNode,
   delayNode: DelayNode,
-  conditionNode: ConditionNode, // <-- Register the new node type
+  conditionNode: ConditionNode,
 };
-
-
 
 // --- MAIN COMPONENT ---
 export default function FlowBuilder() {
@@ -363,21 +419,39 @@ export default function FlowBuilder() {
   const [companyId, setCompanyId] = useState(null);
   const [nextEdgeType, setNextEdgeType] = useState(EdgeLabel.ALWAYS);
 
+  // --- New state for email templates and preview modal ---
+  const [emailTemplates, setEmailTemplates] = useState([]);
+  const [previewHtml, setPreviewHtml] = useState(null);
+
   // --- Handlers and Effects ---
   const addStartNode = (prefix) => {
     setNodes([{ id: `${prefix}_node-1`, type: "input", data: { label: "Start" }, position: { x: 250, y: 0 } }]);
   };
   
   useEffect(() => {
-    const fetchCompany = async () => {
+    // --- Updated to fetch company and templates ---
+    const fetchInitialData = async () => {
       try {
-        const response = await fetch('/api/auth/company');
-        if (!response.ok) throw new Error('Failed to fetch company info');
-        const data = await response.json();
-        setCompanyId(data.company.id);
-      } catch (error) { console.error("Error fetching company:", error); }
+        const companyResponse = await fetch('/api/auth/company');
+        if (!companyResponse.ok) throw new Error('Failed to fetch company info');
+        const companyData = await companyResponse.json();
+        const cid = companyData.company.id;
+        setCompanyId(cid);
+
+        if (cid) {
+          const templateResponse = await fetch(`/api/templates?companyId=${cid}`);
+          if (templateResponse.ok) {
+            const templateData = await templateResponse.json();
+            setEmailTemplates(templateData.templates);
+          } else {
+            console.error("Failed to fetch email templates");
+          }
+        }
+      } catch (error) { 
+        console.error("Error fetching initial data:", error); 
+      }
     };
-    fetchCompany();
+    fetchInitialData();
   }, []);
   
   useEffect(() => {
@@ -387,6 +461,10 @@ export default function FlowBuilder() {
   const onNodesDataChange = useCallback((nodeId, newConfig) => {
     setNodes((nds) => nds.map((n) => n.id === nodeId ? { ...n, data: { ...n.data, config: newConfig } } : n));
   }, [setNodes]);
+
+  const handlePreview = (html) => {
+    setPreviewHtml(html);
+  };
 
   const onConnect = useCallback((params) =>
     setEdges((eds) => addEdge({ ...params, id: `${sessionPrefix}_edge-${Date.now()}`, label: nextEdgeType, type: 'smoothstep', markerEnd: { type: 'arrowclosed' } }, eds)),
@@ -398,15 +476,20 @@ export default function FlowBuilder() {
     setNextEdgeType(edgeTypes[(edgeTypes.indexOf(nextEdgeType) + 1) % edgeTypes.length]);
   };
 
-  // --- Functions to add nodes ---
+  // --- Updated to pass templates and preview handler to ActionNode ---
   const addActionStep = () => {
     setNodes((nds) => [
       ...nds,
       {
         id: `${sessionPrefix}_node-${nds.length + 1}`,
         type: "actionNode",
-        position: { x: 250, y: nds.length * 200 },
-        data: { config: { channel: "email", message: "" }, onChange: onNodesDataChange },
+        position: { x: 250, y: nds.length * 220 },
+        data: { 
+          config: { channel: "email", message: "" }, 
+          onChange: onNodesDataChange,
+          emailTemplates: emailTemplates,
+          onPreview: handlePreview,
+        },
       },
     ]);
   };
@@ -423,7 +506,6 @@ export default function FlowBuilder() {
     ]);
   };
   
-  // --- NEW: Function to add a Condition node ---
   const addConditionStep = () => {
     setNodes((nds) => [
         ...nds,
@@ -436,7 +518,6 @@ export default function FlowBuilder() {
     ]);
   };
 
-
   const resetWorkflow = () => {
     const newPrefix = `flow_${Date.now()}`;
     setSessionPrefix(newPrefix);
@@ -445,23 +526,20 @@ export default function FlowBuilder() {
     addStartNode(newPrefix);
   };
 
-  // --- UPDATED: saveFlow to handle all node types ---
   const saveFlow = async () => {
     if (!companyId) {
       alert("Company ID is not available.");
       return;
     }
-
     const getNodeTypeForPrisma = (node) => {
         switch (node.type) {
             case 'input': return 'START';
             case 'actionNode': return 'ACTION';
             case 'delayNode': return 'DELAY';
-            case 'conditionNode': return 'CONDITION'; // <-- Handle the new type
+            case 'conditionNode': return 'CONDITION';
             default: return 'ACTION';
         }
     };
-
     const flowData = {
       id: workflowId,
       name: workflowName,
@@ -481,7 +559,6 @@ export default function FlowBuilder() {
         condition: edge.label.toUpperCase(),
       })),
     };
-
     try {
       const response = await fetch('/api/workflow', {
         method: workflowId ? 'PUT' : 'POST',
@@ -501,9 +578,29 @@ export default function FlowBuilder() {
     }
   };
 
-  // --- RENDER (with the new "Add Condition" button) ---
+  // --- RENDER ---
   return (
     <div style={{ width: "100%", height: "100vh" }}>
+      {/* --- Preview Modal --- */}
+      {previewHtml && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-20 flex items-center justify-center" onClick={() => setPreviewHtml(null)}>
+          <div className="bg-white p-4 rounded-lg shadow-2xl max-w-4xl w-full m-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-lg font-bold">Email Preview</h3>
+              <button 
+                onClick={() => setPreviewHtml(null)}
+                className="text-gray-500 hover:text-gray-800 font-bold text-2xl leading-none"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="border rounded p-4 h-[70vh] overflow-y-auto bg-gray-50"
+                 dangerouslySetInnerHTML={{ __html: previewHtml }} />
+          </div>
+        </div>
+      )}
+
+      {/* --- Main UI --- */}
       <div className="absolute top-4 left-4 z-10 bg-white p-4 rounded-lg shadow-md flex flex-col gap-2">
         <h2 className="text-lg font-bold">Workflow Details</h2>
         <input type="text" value={workflowName} onChange={(e) => setWorkflowName(e.target.value)} placeholder="Workflow Name" className="border rounded p-2 text-sm"/>
