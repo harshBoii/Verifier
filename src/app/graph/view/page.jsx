@@ -11,6 +11,7 @@ import ReactFlow, {
   Position,
 } from "reactflow";
 import "reactflow/dist/style.css";
+import LoadingGlass from '@/app/components/LoadingGlass';
 
 
 // You would typically move these node components to a separate file (e.g., /components/workflow/nodes.jsx)
@@ -183,7 +184,7 @@ export default function WorkflowManagementPage() {
     fetchWorkflows();
   }, [companyId]);
 
-  if (loading) return <div className="text-center p-8">Loading...</div>;
+  if (loading) return <LoadingGlass/>;
   if (error) return <div className="text-center p-8 text-red-500">Error: {error}</div>;
 
   return (

@@ -11,8 +11,11 @@ import ReactFlow, {
   Position,
 } from "reactflow";
 import "reactflow/dist/style.css";
+import Swal from "sweetalert2";
+
 
 // --- ENUMS AND NODE COMPONENTS ---
+
 
 const EdgeLabel = {
   ALWAYS: "always",
@@ -20,22 +23,24 @@ const EdgeLabel = {
   FALSE: "false",
 };
 
+
 function ActionNode({ id, data }) {
   const updateField = (field, value) => {
   const newConfig = { ...data.config, [field]: value };
-  console.log("Updating field", field, "to", value, newConfig);
   data.onChange(id, { ...data.config, [field]: value });
   };
+
 
   const handleTemplateChange = (e) => {
     const selectedTemplateId = e.target.value;
     const selectedTemplate = data.emailTemplates.find(t => t.id === parseInt(selectedTemplateId, 10));
 
+
     if (selectedTemplate) {
       // When a template is selected, update both the message and the templateId
-      console.log("selectedTemplate is" , selectedTemplate)
       updateField("templateId", selectedTemplate.id);
       updateField("message", selectedTemplate.body);
+
 
     } else {
       // If "-- Custom Message --" is selected, clear the message and templateId
@@ -44,8 +49,9 @@ function ActionNode({ id, data }) {
     }
   };
 
+
   const isEmailChannel = data.config.channel === 'email';
-  console.log("data is" , data.config)
+
 
   return (
     <div className="bg-white border shadow-md rounded-lg p-3 w-64">
@@ -60,6 +66,7 @@ function ActionNode({ id, data }) {
         <option value="sms">SMS</option>
         <option value="whatsapp">WhatsApp</option>
       </select>
+
 
       {/* --- Conditional UI for Email Channel --- */}
       {isEmailChannel ? (
@@ -110,6 +117,7 @@ function ActionNode({ id, data }) {
       )}
       {/* --- End Conditional UI --- */}
 
+
       <Handle type="target" position={Position.Top} />
       <Handle type="source" position={Position.Bottom} />
     </div>
@@ -136,6 +144,7 @@ function DelayNode({ id, data }) {
     );
 }
 
+
 // --- Condition Node Component ---
 function ConditionNode({ id, data }) {
     return (
@@ -148,11 +157,13 @@ function ConditionNode({ id, data }) {
     );
 }
 
+
 const nodeTypes = {
   actionNode: ActionNode,
   delayNode: DelayNode,
   conditionNode: ConditionNode,
 };
+
 
 // --- MAIN COMPONENT ---
 export default function FlowBuilder() {
@@ -166,9 +177,11 @@ export default function FlowBuilder() {
   const [companyId, setCompanyId] = useState(null);
   const [nextEdgeType, setNextEdgeType] = useState(EdgeLabel.ALWAYS);
 
+
   // --- New state for email templates and preview modal ---
   const [emailTemplates, setEmailTemplates] = useState([]);
   const [previewHtml, setPreviewHtml] = useState(null);
+
 
   // --- Handlers and Effects ---
   const addStartNode = (prefix) => {
@@ -184,6 +197,7 @@ export default function FlowBuilder() {
         const companyData = await companyResponse.json();
         const cid = companyData.company.id;
         setCompanyId(cid);
+
 
         if (cid) {
           const templateResponse = await fetch(`/api/templates?companyId=${cid}`);
@@ -205,13 +219,16 @@ export default function FlowBuilder() {
     if (companyId && nodes.length === 0) addStartNode(sessionPrefix);
   }, [companyId, nodes.length, sessionPrefix]);
 
+
   const onNodesDataChange = useCallback((nodeId, newConfig) => {
     setNodes((nds) => nds.map((n) => n.id === nodeId ? { ...n, data: { ...n.data, config: newConfig } } : n));
   }, [setNodes]);
 
+
   const handlePreview = (html) => {
     setPreviewHtml(html);
   };
+
 
   const onConnect = useCallback((params) =>
     setEdges((eds) => addEdge({ ...params, id: `${sessionPrefix}_edge-${Date.now()}`, label: nextEdgeType, type: 'smoothstep', markerEnd: { type: 'arrowclosed' } }, eds)),
@@ -222,6 +239,7 @@ export default function FlowBuilder() {
     const edgeTypes = Object.values(EdgeLabel);
     setNextEdgeType(edgeTypes[(edgeTypes.indexOf(nextEdgeType) + 1) % edgeTypes.length]);
   };
+
 
   // --- Updated to pass templates and preview handler to ActionNode ---
   const addActionStep = () => {
@@ -240,6 +258,7 @@ export default function FlowBuilder() {
       },
     ]);
   };
+
 
   const addDelayStep = () => {
     setNodes((nds) => [
@@ -265,6 +284,7 @@ export default function FlowBuilder() {
     ]);
   };
 
+
   const resetWorkflow = () => {
     const newPrefix = `flow_${Date.now()}`;
     setSessionPrefix(newPrefix);
@@ -273,9 +293,34 @@ export default function FlowBuilder() {
     addStartNode(newPrefix);
   };
 
+  // --- NEW: Function to delete selected elements ---
+  const deleteSelectedElements = () => {
+    const selectedNodes = nodes.filter(n => n.selected);
+    if (selectedNodes.some(n => n.type === 'input')) {
+        ("The 'Start' node cannot be deleted.");
+        return;
+    }
+    setNodes((nds) => nds.filter((n) => !n.selected));
+    setEdges((eds) => eds.filter((e) => !e.selected));
+  };
+
+
   const saveFlow = async () => {
     if (!companyId) {
-      alert("Company ID is not available.");
+    Swal.fire({
+      title: 'Oops! 😕',
+      text: 'Company ID is not available.',
+      icon: 'error',
+      confirmButtonText: 'Try Again',
+      confirmButtonColor: '#3085d6',
+      background: '#fdfdfd',
+      color: '#333',
+      customClass: {
+        popup: 'rounded-2xl shadow-xl',
+        title: 'text-xl font-semibold',
+        confirmButton: 'px-6 py-2 rounded-lg'
+      }
+    });
       return;
     }
     const getNodeTypeForPrisma = (node) => {
@@ -318,12 +363,46 @@ export default function FlowBuilder() {
       }
       const result = await response.json();
       setWorkflowId(result.id);
-      alert(`Workflow ${workflowId ? 'updated' : 'created'}!`);
+      // alert(`Workflow ${workflowId ? 'updated' : 'created'}!`);
+      Swal.fire({
+        title: workflowId ? '✨ Workflow Updated!' : '🎉 Workflow Created!',
+        text: `Your workflow has been ${workflowId ? 'successfully updated' : 'successfully created'}!`,
+        icon: 'success',
+        confirmButtonText: 'Great!',
+        confirmButtonColor: '#10b981', // Tailwind emerald-500
+        background: '#ffffff',
+        color: '#1f2937', // Tailwind gray-800
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp'
+        },
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl p-6',
+          title: 'text-2xl font-bold text-emerald-600',
+          confirmButton: 'px-6 py-2 rounded-lg font-semibold'
+        }
+      });
     } catch (error) {
       console.error("Error saving workflow:", error);
-      alert(`Error: ${error.message}`);
+      Swal.fire({
+        title: 'Error ⚠️',
+        text: `Error: ${error.message}`,
+        icon: 'error',
+        confirmButtonText: 'Ok',
+        confirmButtonColor: '#e11d48', // Tailwind rose-600
+        background: '#fff',
+        color: '#1f2937', // Tailwind gray-800
+        customClass: {
+          popup: 'rounded-2xl shadow-2xl p-6',
+          title: 'text-xl font-semibold text-red-600',
+          confirmButton: 'px-6 py-2 rounded-lg font-semibold'
+        }
+      });
     }
   };
+
 
   // --- RENDER ---
   return (
@@ -347,6 +426,7 @@ export default function FlowBuilder() {
         </div>
       )}
 
+
       {/* --- Main UI --- */}
       <div className="absolute top-4 left-4 z-10 bg-white p-4 rounded-lg shadow-md flex flex-col gap-2">
         <h2 className="text-lg font-bold">Workflow Details</h2>
@@ -358,7 +438,7 @@ export default function FlowBuilder() {
         <Controls />
         <Background />
       </ReactFlow>
-      <div className="absolute bottom-4 left-4 flex gap-4 z-10">
+      <div className="absolute bottom-4 left-4 flex gap-2 z-10">
         <button onClick={resetWorkflow} className="bg-gray-500 text-white px-4 py-2 rounded">
           Reset / New
         </button>
@@ -371,13 +451,18 @@ export default function FlowBuilder() {
         <button onClick={addConditionStep} className="bg-purple-600 text-white px-4 py-2 rounded">
             Add Condition
         </button>
+        {/* --- NEW: Delete button --- */}
+        <button onClick={deleteSelectedElements} className="bg-red-500 text-white px-4 py-2 rounded">
+          Delete Selected
+        </button>
         <button onClick={saveFlow} className="bg-green-500 text-white px-4 py-2 rounded">
           Save Flow
         </button>
-        <button onClick={toggleNextEdgeType} className="bg-purple-500 text-white px-4 py-2 rounded">
+        <button onClick={toggleNextEdgeType} className="bg-gray-400 text-white px-4 py-2 rounded">
           Next Edge: {nextEdgeType.toUpperCase()}
         </button>
       </div>
     </div>
   );
 }
+

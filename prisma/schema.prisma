@@ -452,7 +452,7 @@ model Workflow {
 }
 
 model WorkflowNode {
-  id        String           @id @unique
+  id        String           @id @unique @default(cuid())
   type      WorkflowNodeType
   positionX Int              @map("position_x")
   positionY Int              @map("position_y")
@@ -469,7 +469,7 @@ model WorkflowNode {
 }
 
 model WorkflowEdge {
-  id        String        @id @unique
+  id        String        @id @unique @default(cuid())
   condition EdgeCondition @default(ALWAYS)
 
   sourceNode   WorkflowNode @relation("SourceNode", fields: [sourceNodeId], references: [id])
