@@ -39,6 +39,13 @@ export async function POST(request) {
         html: htmlContent,
     });
 
+    await prisma.subscription.update({
+      where:{id:companyId},
+      data:{verifications_left:{
+        decrement:1
+      }}
+    })
+
     console.log(`Email sent successfully to ${verifierEmail}`);
     return NextResponse.json({ success: true });
 

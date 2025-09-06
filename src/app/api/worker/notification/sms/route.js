@@ -27,7 +27,7 @@ export async function POST(request) {
     }
 
     // 2. Parse the payload for the verifier's number and message
-    const { verifierNumber, message } = JSON.parse(body);
+    const { companyId,verifierNumber, message } = JSON.parse(body);
 
     if (!verifierNumber || !message) {
       return NextResponse.json({ error: 'Missing verifierNumber or message' }, { status: 400 });
@@ -39,6 +39,14 @@ export async function POST(request) {
       to: verifierNumber,
       body: message,
     });
+
+    await prisma.subscription.update({
+      where:{id:companyId},
+      data:{verifications_left:{
+        decrement:1
+      }}
+    })
+
 
     console.log(`Sent SMS to ${verifierNumber}`);
     return NextResponse.json({ success: true });

@@ -11,51 +11,6 @@ const receiver = new Receiver({
   nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY,
 });
 
-// --- Helper function with added logging ---
-// async function executeAction(node,exp_id,ver_mail,ver_number,message) {
-
-//   console.log(`[ACTION] Sending via ${channel} to ${recipient}`);
-
-//   if (channel === "SMS") {
-//     // await twilioClient.messages.create({
-//     //   from: process.env.TWILIO_PHONE_NUMBER,
-//     //   to: recipient,
-//     //   body: message,
-//     // });
-//     console.log("SMS")
-//   } else if (channel === "WHATSAPP") {
-//     // await twilioClient.messages.create({
-//     //   from: "whatsapp:" + process.env.TWILIO_WHATSAPP_NUMBER,
-//     //   to: "whatsapp:" + recipient,
-//     //   body: message,
-//     // });
-//     console.log("WHATSAPP")
-//   }
-//   else if (channel === "EMAIL"){
-//   try {
-//     await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/send-email`, {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({
-//           verifierEmail: node.config.verifierEmail,
-//           employeeId: node.config.employeeId,
-//           company: node.config.company,
-//           name: node.config.name,
-//           position: node.config.position,
-//           exp_id: node.config.expId,
-//       }),
-//     });
-
-//     console.log(`Triggered email for exp_id=${step.exp_id}`);
-//   } catch (err) {
-//     console.error("Failed to trigger email:", err);
-//   }
-// }
-
-//   console.log(`[SUCCESS] Message sent for expId=${expId}`);
-//   return { success: true };
-// }
-
 async function executeAction(node, exp_id, ver_mail, ver_number, message) {
   const { channel } = node.config;
   let qstashPayload;
@@ -80,6 +35,7 @@ async function executeAction(node, exp_id, ver_mail, ver_number, message) {
     case 'sms':
       targetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/worker/notification/sms`;
       qstashPayload = {
+        companyId: node_with_wf.workflow.companyId,
         verifierNumber: ver_number,
         message: message,
       };
@@ -87,6 +43,7 @@ async function executeAction(node, exp_id, ver_mail, ver_number, message) {
     case 'whatsapp':
       targetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/worker/notification/whatsapp`;
       qstashPayload = {
+        companyId: node_with_wf.workflow.companyId,
         verifierNumber: ver_number,
         message: message,
       };

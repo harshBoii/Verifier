@@ -34,12 +34,26 @@ export async function POST(req) {
       body: messageBody,
     });
 
+    await prisma.subscription.update({
+      where:{id:user.companyId},
+      data:{verifications_left:{
+        decrement:1
+      }}
+    })
+
     // Send WhatsApp
     await twilioClient.messages.create({
       from: "whatsapp:" + process.env.TWILIO_WHATSAPP_NUMBER,
       to: "whatsapp:" + user.mobile,
       body: messageBody,
     });
+    
+    await prisma.subscription.update({
+      where:{id:user.companyId},
+      data:{verifications_left:{
+        decrement:1
+      }}
+    })
 
     console.log(`Sent SMS & WhatsApp to ${user.mobile} for expId=${expId}`);
 
