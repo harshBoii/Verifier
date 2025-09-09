@@ -50,8 +50,8 @@ const Sidebar = () => {
         <NavItem icon={<FiCreditCard />} href="/admin/subscription" label="Subscription" />
         <NavItem icon={<FiBarChart />} href="/admin/campaigns" label="Campaign" />
         <NavItem icon={<FiSettings />} href="/admin/" label="Integration" />
-        <NavItem icon={<Workflow />} href="/admin/graph" label="Workflows" />
-        <NavItem icon={<TestTube2 />} href="/admin/graph/view" label="Add Workflow" />
+        <NavItem icon={<Workflow />} href="/admin/graph/view" label="Workflows" />
+        <NavItem icon={<TestTube2 />} href="/admin/graph" label="Add Workflow" />
       </nav>
       <div className={styles.footer}>
         <NavItem icon={<FiHelpCircle />} label="Help" /> {/* No href = not a link */}
