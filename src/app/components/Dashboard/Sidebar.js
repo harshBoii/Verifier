@@ -6,7 +6,8 @@ import styles from './Sidebar.module.css';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { FiGrid, FiUploadCloud, FiCheckSquare, FiBarChart2, FiHelpCircle, FiSettings,FiShoppingCart,FiCreditCard ,FiBarChart} from 'react-icons/fi';
+import { FiGrid, FiUploadCloud, FiCheckSquare, FiBarChart2, FiHelpCircle, FiSettings,FiShoppingCart,FiCreditCard ,FiBarChart,} from 'react-icons/fi';
+import { TestTube2, Workflow } from 'lucide-react';
 
 // 2. Modify NavItem to handle links and dynamic active state
 const NavItem = ({ icon, label, href }) => {
@@ -49,6 +50,8 @@ const Sidebar = () => {
         <NavItem icon={<FiCreditCard />} href="/admin/subscription" label="Subscription" />
         <NavItem icon={<FiBarChart />} href="/admin/campaigns" label="Campaign" />
         <NavItem icon={<FiSettings />} href="/admin/" label="Integration" />
+        <NavItem icon={<Workflow />} href="/admin/graph" label="Workflows" />
+        <NavItem icon={<TestTube2 />} href="/admin/graph/view" label="Add Workflow" />
       </nav>
       <div className={styles.footer}>
         <NavItem icon={<FiHelpCircle />} label="Help" /> {/* No href = not a link */}

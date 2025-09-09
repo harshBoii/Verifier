@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { sendMailWithCompanySmtp } from '@/app/lib/mailer'; // Your custom mailer helper
 import { Receiver } from '@upstash/qstash';
-
+import prisma from '@/app/lib/prisma';
 // Initialize the Receiver for signature verification
 const receiver = new Receiver({
   currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY,

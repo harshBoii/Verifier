@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import twilio from 'twilio';
 import { Receiver } from '@upstash/qstash';
+import prisma from '@/app/lib/prisma';
 
 // Initialize the Receiver
 const receiver = new Receiver({
