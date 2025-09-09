@@ -4,11 +4,12 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Swal from 'sweetalert2';
 import styles from './VerifyExperiencePage.module.css';
-import { FiCheck, FiX, FiClock, FiMail } from 'react-icons/fi';
+import { FiCheck, FiX, FiClock, FiMail , FiMess } from 'react-icons/fi';
 import LoadingGlass from '@/app/components/LoadingGlass';
 import SubAlert from '@/app/components/Dashboard/SubAlert';
 import Link from 'next/link';
-
+import { FaPaperPlane } from 'react-icons/fa';
+import { LoaderCircle } from 'lucide-react';
 // 1. Import all necessary components
 import Sidebar from '@/app/components/Dashboard/Sidebar';
 import Header from '@/app/components/Dashboard/Header';
@@ -70,11 +71,13 @@ const VerifyExperiencePage = () => {
     const handleGetHrEmailClick = (experience) => {
         setSelectedExperience(experience);
         setIsHrChoiceModalOpen(true);
+
     };
 
     const handleRequestFromEmployee = async () => {
         if (!selectedExperience) return;
         setIsHrChoiceModalOpen(false);
+        setLoading(true);
         try {
             const response = await fetch(`/api/experience/${selectedExperience.id}/request-hr-email`, {
                 method: 'POST',
@@ -84,7 +87,10 @@ const VerifyExperiencePage = () => {
         } catch (err) {
             Swal.fire('Error!', err.message, 'error');
         }
-        setSelectedExperience(null);
+        finally {
+                    setLoading(false);
+                    setSelectedExperience(null);
+                }    
     };
 
     const handleSendDirectly = () => {
@@ -133,7 +139,7 @@ const VerifyExperiencePage = () => {
                                 <StatusBadge status={exp.is_verified} />
                                 <div className={styles.buttonGroup}>
                                     <button className={styles.greenButton} onClick={() => handleGetHrEmailClick(exp)}>
-                                        <FiMail /> 
+                                        <FaPaperPlane /> 
                                     </button>
                                     <button className={styles.acceptButton} onClick={() => handleVerification(exp.id, true)}>Accept</button>
                                     <button className={styles.declineButton} onClick={() => handleVerification(exp.id, false)}>Decline</button>

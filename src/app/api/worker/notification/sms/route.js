@@ -14,7 +14,7 @@ const twilioClient = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKE
 export async function POST(request) {
   try {
     // 1. Verify the request is from QStash
-    const signature = request.headers.get("upstash-signature");
+    const signature = request.headers.get("upstash-signature") || request.headers.get("Upstash-Signature");
     const body = await request.text();
 
     const isValid = await receiver.verify({

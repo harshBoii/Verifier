@@ -15,9 +15,12 @@ export async function POST(request) {
     const result = await prisma.$transaction(async (tx) => {
       // Step A: Update the specific work experience
       const updatedExperience = await tx.workExperience.update({
+
         where: { id: numericId },
         data: { is_verified: isVerified , progress:'Verified'},
         select: { 
+          companyName:true,
+          id:true,
           userId: true,
           user: {
             select: {
