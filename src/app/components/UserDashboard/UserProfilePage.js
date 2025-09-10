@@ -7,6 +7,7 @@ import EducationSection from './EducationSection';
 import WorkExperienceSection from './WorkExperienceSection';
 import SkillRepositorySection from './SkillRepository';
 import Loading from '../Loading';
+import VerificationDashboard from './VerificationCenter';
 import { FiEdit2, FiPlus, FiCheckCircle } from 'react-icons/fi';
 
 /**
@@ -85,6 +86,9 @@ const UserProfilePage = ({ id }) => {
         return <EducationSection educations={profileData.educations} refetchData={fetchProfileData} user={profileData} />;
       case 'Skill Repository':
         return <SkillRepositorySection skills={profileData.skills} workExperiences={profileData.workExperiences} refetchData={fetchProfileData}  />;
+            case 'Digital Verification':
+      return <VerificationDashboard />;
+
       default:
         return null;
     }
@@ -99,7 +103,7 @@ const UserProfilePage = ({ id }) => {
           <h2 className={styles.profileName}>{profileData.fullName}</h2>
         </div>
         <nav className={styles.profileNav}>
-          {['Basic Profile', 'Education', 'Work Experiences', 'Skill Repository'].map(tab => (
+          {['Basic Profile', 'Education', 'Work Experiences', 'Skill Repository','Digital Verification'].map(tab => (
             <button
               key={tab}
               className={`${styles.navLink} ${activeTab === tab ? styles.active : ''}`}
