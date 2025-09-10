@@ -7,7 +7,7 @@ import { Prisma } from '../../../../generated/prisma';
 export async function POST(request) {
   try {
     // The API still accepts all the original arguments
-    const { verifierEmail, employeeId, company, name, position, exp_id , verifier_number } = await request.json();
+    const { verifierEmail, employeeId, company, name, position, exp_id , verifierNumber } = await request.json();
     console.log(verifierEmail,exp_id,employeeId)
 
     const Verification_text=`Employment Verification Required
@@ -99,6 +99,7 @@ You received this message because our user has identified you as a verifier of t
         where: { id: parseInt(exp_id, 10) },
         data: { 
             verifier_email: verifierEmail,
+            verifier_number: verifierNumber,
             mail_sent: true, 
             progress:'Mail_sent'
         },

@@ -6,10 +6,12 @@ export async function POST(request, { params }) { // <-- This line is fixed
     const { experienceId } = params; // This now works correctly
     const { data } = await request.json();
     const hrEmail = data.verifier_email
+    const hrNumber=data.verifier_number
     const ver_relation = data.ver_relation
     console.log("data is " , data)
     console.log("Ver Relation is ",ver_relation)
     console.log("Hr Email Is ",hrEmail)
+    console.log("data is : ", data)
 
     if (!hrEmail) {
       return NextResponse.json({ error: 'HR Email is required.' }, { status: 400 });
@@ -25,6 +27,7 @@ export async function POST(request, { params }) { // <-- This line is fixed
         id: numericId,
       },
       data: {
+        verifier_number:hrNumber,
         verifier_email: hrEmail,
         ver_relation:ver_relation,
         progress:'Email_added'

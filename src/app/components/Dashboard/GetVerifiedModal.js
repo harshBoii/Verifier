@@ -3,11 +3,12 @@ import React, { useState, useEffect } from 'react';
 import styles from './GetVerifiedModal.module.css';
 import { FiX, FiMail } from 'react-icons/fi';
 import Swal from 'sweetalert2';
-
+import { FaPaperPlane } from 'react-icons/fa';
 const GetVerifiedModal = ({ isOpen, onClose, user, experience }) => {
     const [email, setEmail] = useState('');
     const [isSending, setIsSending] = useState(false);
     const [error, setError] = useState('');
+    const [mob,setMob] = useState('')
 
     // This effect runs when the modal opens or the selected experience changes.
     useEffect(() => {
@@ -24,6 +25,13 @@ const GetVerifiedModal = ({ isOpen, onClose, user, experience }) => {
             else {
                 setEmail('');
             }
+            if (experience?.verifier_number){
+                setMob(experience.verifier_number)
+            }
+            else if (! experience?.verifier_number){
+                setMob('')
+            }
+
         }
     }, [isOpen, user, experience]);
 
@@ -45,6 +53,7 @@ const GetVerifiedModal = ({ isOpen, onClose, user, experience }) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
+                    verifierNumber:mob,
                     verifierEmail: email, // Use the email from the component's state
                     employeeId: user.id,
                     company:experience.companyName,
@@ -61,7 +70,7 @@ const GetVerifiedModal = ({ isOpen, onClose, user, experience }) => {
                 throw new Error(result.error || 'Something went wrong');
             }
 
-            Swal.fire('Success!', `Verification email for "${experience.role}" sent successfully to ${email}!`, 'success');
+            Swal.fire('Success!', `Verification Request for "${experience.role}" sent successfully to ${email}! and ${mob}`, 'success');
             handleClose();
 
         } catch (err) {
@@ -89,7 +98,7 @@ const GetVerifiedModal = ({ isOpen, onClose, user, experience }) => {
                 </div>
 
                 <div className={styles.formBody}>
-                    <h3>Enter Verifier's Email ID</h3>
+                    <h3>Enter Verifier's Detail</h3>
                     <form onSubmit={handleFormSubmit} className={styles.form}>
                         <input
                             type="email"
@@ -100,13 +109,23 @@ const GetVerifiedModal = ({ isOpen, onClose, user, experience }) => {
                             required
                             disabled={isSending}
                         />
+                        <input
+                            type="tel"
+                            placeholder="Enter verifier's Number"
+                            value={mob}
+                            onChange={(e) => setMob(e.target.value)}
+                            className={styles.inputField}
+                            required
+                            disabled={isSending}
+                        />
+
                         <p className={styles.helperText}>
-                            The verification email will be sent to this address.
+                            The verification Request will be sent to these credentials.
                         </p>
                         {error && <p className={styles.errorText}>{error}</p>}
                         <div className={styles.primaryActions}>
                             <button type="submit" className={styles.primaryButton} disabled={isSending}>
-                                <FiMail /> {isSending ? 'Sending...' : 'Send for Verification'}
+                                <FaPaperPlane /> {isSending ? 'Sending...' : 'Send for Verification'}
                             </button>
                         </div>
                     </form>

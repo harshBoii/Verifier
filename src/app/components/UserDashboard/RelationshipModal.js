@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { FiX } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 
-export default function RelationshipModal({ isOpen, onClose, verifierEmail, onConfirm }) {
+export default function RelationshipModal({ isOpen, onClose, verifierEmail,verifierNumber,onConfirm }) {
     // State to hold the selected relationship
     const [relation, setRelation] = useState('same_team'); // Default value
 
@@ -16,7 +16,7 @@ export default function RelationshipModal({ isOpen, onClose, verifierEmail, onCo
             return;
         }
         // Pass both the email and the selected relation back to the parent
-        onConfirm({ verifierEmail, relation });
+        onConfirm({ verifierEmail, relation, verifierNumber });
         onClose(); // Close this modal
     };
     

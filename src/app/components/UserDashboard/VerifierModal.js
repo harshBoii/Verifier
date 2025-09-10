@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { FiX, FiSearch, FiMail } from 'react-icons/fi';
 import RelationshipModal from './RelationshipModal'; // Import the new modal
-
+import { FaPaperPlane } from 'react-icons/fa';
+import { number } from 'prop-types';
 const Spinner = () => (
     <svg className="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -14,6 +15,7 @@ const Spinner = () => (
 export default function VerifierModal({ isOpen, onClose, onVerifierSelect,experience }) {
     const [mode, setMode] = useState('direct');
     const [directEmail, setDirectEmail] = useState('');
+    const [directNumber,setDirectNumber] = useState('')
     const [website, setWebsite] = useState('');
     const [seniors, setSeniors] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -21,6 +23,7 @@ export default function VerifierModal({ isOpen, onClose, onVerifierSelect,experi
     // --- NEW STATE FOR THE SECOND MODAL ---
     const [isRelationshipModalOpen, setIsRelationshipModalOpen] = useState(false);
     const [selectedEmail, setSelectedEmail] = useState(null);
+    const [selectedNumber,setSelectedNumber] = useState(null)
 
     const handleFindSeniors = async () => {
         setLoading(true);
@@ -37,19 +40,20 @@ export default function VerifierModal({ isOpen, onClose, onVerifierSelect,experi
     };
 
     // This function now just prepares for the second step
-    const handleEmailSelect = (email) => {
+    const handleEmailSelect = (email,number) => {
         if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
             alert("Please enter a valid email address.");
             return;
         }
         setSelectedEmail(email);      // Store the selected email
+        setSelectedNumber(number);
         setIsRelationshipModalOpen(true); // Open the relationship modal
     };
 
     // This is the final confirmation handler passed to the RelationshipModal
-    const handleRelationshipConfirm = ({ verifierEmail, relation }) => {
+    const handleRelationshipConfirm = ({ verifierEmail, relation , verifierNumber }) => {
         // Now call the original parent handler with the complete data object
-        onVerifierSelect({ verifier_email: verifierEmail, ver_relation: relation });
+        onVerifierSelect({ verifier_email: verifierEmail, ver_relation: relation , verifier_number:verifierNumber });
         // Close both modals
         setIsRelationshipModalOpen(false);
         onClose();
@@ -72,7 +76,7 @@ export default function VerifierModal({ isOpen, onClose, onVerifierSelect,experi
                             className={`flex-1 p-4 font-semibold text-sm transition-colors ${mode === 'direct' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:bg-gray-50'}`}
                             onClick={() => setMode('direct')}
                         >
-                            I have the email
+                            I have the credentials
                         </button>
                         <button
                             className={`flex-1 p-4 font-semibold text-sm transition-colors ${mode === 'find' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:bg-gray-50'}`}
@@ -85,7 +89,7 @@ export default function VerifierModal({ isOpen, onClose, onVerifierSelect,experi
                     <div className="p-6">
                         {mode === 'direct' && (
                             <div className="space-y-4">
-                                <p className="text-gray-600">Enter the verifier's email address directly.</p>
+                                <p className="text-gray-600">Enter the verifier's Credentials address.</p>
                                 <input
                                     type="email"
                                     value={directEmail}
@@ -93,11 +97,19 @@ export default function VerifierModal({ isOpen, onClose, onVerifierSelect,experi
                                     placeholder="e.g., hr@company.com"
                                     className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                                 />
+                                <input
+                                    type="tel"
+                                    value={directNumber}
+                                    onChange={(e) => setDirectNumber(e.target.value)}
+                                    placeholder="e.g., +9178...."
+                                    className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                />
+
                                 <button
                                     className="w-full flex items-center justify-center gap-2 px-4 py-3 font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg hover:from-blue-600 hover:to-blue-700 transition"
-                                    onClick={() => handleEmailSelect(directEmail)}
+                                    onClick={() => handleEmailSelect(directEmail,directNumber)}
                                 >
-                                    <FiMail /> Next: Select Relationship
+                                    <FaPaperPlane /> Next: Select Relationship
                                 </button>
                             </div>
                         )}
@@ -136,6 +148,7 @@ export default function VerifierModal({ isOpen, onClose, onVerifierSelect,experi
                 isOpen={isRelationshipModalOpen}
                 onClose={() => setIsRelationshipModalOpen(false)}
                 verifierEmail={selectedEmail}
+                verifierNumber={selectedNumber}
                 onConfirm={handleRelationshipConfirm}
             />
         </>
