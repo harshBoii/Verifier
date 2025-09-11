@@ -96,6 +96,20 @@ enum EdgeCondition {
   ALWAYS
 }
 
+enum VerificationType {
+  ADDRESS_AADHAAR
+  BANK_PENNY_DROP
+  PF_EPFO
+}
+
+enum VerificationOutcome {
+  SUCCESS
+  FAILURE
+  PENDING
+  EXPIRED
+}
+
+
 
 // -- MODELS (Tables) --
 
@@ -328,6 +342,24 @@ model User {
   is_verified     Boolean?         @default(false)
   summary         String?          @default("")
 
+
+  // Address Verification Status & Data
+  isAddressVerified    Boolean   @default(false) @map("is_address_verified")
+  verifiedAddress      Json?     @map("verified_address")      // Store the verified address object from the provider as JSON
+
+  // Bank Account Verification Status & Data
+  isBankVerified       Boolean   @default(false) @map("is_bank_verified")
+  verifiedAccountName  String?   @map("verified_account_name") // Store the name returned by the penny drop API
+
+  // PF/EPFO Verification Status
+  isPfVerified         Boolean   @default(false) @map("is_pf_verified")
+  uan                  String?   @unique         // Store the verified UAN
+
+  // Relation to the new log table
+
+  verificationLogs VerificationLog[]
+
+
   roles               UserRole[]
 
   // Relation: A user belongs to ONE company.
@@ -523,4 +555,26 @@ model WorkExperienceWorkflowProgress {
 
   // Ensures one work experience can only be in a workflow once at a time
   @@unique([workExperienceId, workflowId])
+}
+
+model VerificationLog {
+  id               Int                @id @default(autoincrement())
+  
+  // What is being verified and for whom
+  userId           Int                @map("user_id")
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  verificationType VerificationType   @map("verification_type") // e.g., ADDRESS_AADHAAR
+  outcome          VerificationOutcome @default(PENDING)
+  
+  // Timestamps
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  // Data from the provider
+  provider         String?            // e.g., "authbridge", "surepass"
+  providerRefId    String?            @unique @map("provider_ref_id") // The 'client_id' or transaction ID from the provider
+  failureReason    String?            @db.Text @map("failure_reason") // Stores error messages from the provider or your API
+
+  @@index([userId, verificationType])
 }
