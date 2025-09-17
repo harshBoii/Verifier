@@ -8,12 +8,12 @@
 //   );
 // }
 
-import OnboardingComponent from "./components/UserDashboard/onBoardingComponent";
+import EmployeeVerificationLandingPage from "./components/UserDashboard/onBoardingComponent";
 
 export default function LandingPage() {
   return (
     <div>
-      <OnboardingComponent />
+      <EmployeeVerificationLandingPage />
     </div>
   );
 }
