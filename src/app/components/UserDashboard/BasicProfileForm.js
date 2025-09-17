@@ -235,9 +235,14 @@ const BasicProfileForm = ({ profileData }) => {
             />
           </div>
 
-          <div className="text-zinc-500 text-xl">
-            <label>Social Media</label>
-            <WrapButton type="button" className="-ml-50 mt-10" onClick={() => setIsModalOpen(true)}>Manage Social Links</WrapButton>
+          <div className="flex flex-col items-center w-full ml-50 text-zinc-500 text-xl">
+            <WrapButton
+              type="button"
+              className="mt-4"
+              onClick={() => setIsModalOpen(true)}
+            >
+              Manage Social Links
+            </WrapButton>
           </div>
         </div>
       </form>

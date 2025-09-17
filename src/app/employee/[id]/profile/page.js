@@ -28,6 +28,7 @@ async function getLoggedInUser() {
         id: true,
         fullName: true,
         email: true,
+        profilePicture:true,
         roles: {
           select: {
             role: {

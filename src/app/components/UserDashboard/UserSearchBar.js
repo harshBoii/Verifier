@@ -16,8 +16,10 @@ const UserSearchBar = ({ user }) => {
   }
 
   // Dynamically generate the avatar URL from the user's name
-  const avatarUrl = `https://ui-avatars.com/api/?name=${user.fullName.replace(' ', '+')}&background=random&color=fff`;
+const avatarUrl = user.profilePicture? user.profilePicture: `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=random&color=fff`;
   // const avatarUrl = `https://placehold.co/40x40/7E57C2/FFFFFF?text=${user.fullName.charAt(0)}`;
+
+    console.log("profile data is : ",user)
 
   return (
     <header className={styles.header}>

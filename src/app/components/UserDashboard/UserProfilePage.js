@@ -73,8 +73,11 @@ const UserProfilePage = ({ id }) => {
 
 
   // Generate avatar URL dynamically from the user's name
-  const avatarUrl = `https://ui-avatars.com/api/?name=${profileData.fullName.replace(' ', '+')}&background=random&color=fff&size=128`;
+const avatarUrl = profileData?.profilePicture
+  ? profileData.profilePicture
+  : `https://ui-avatars.com/api/?name=${encodeURIComponent(profileData?.fullName || 'User')}&background=random&color=fff&size=128`;
 
+  console.log("profile data is : ",profileData)
   // Conditionally render the main content based on the active tab
   const renderContent = () => {
     switch (activeTab) {
@@ -99,7 +102,7 @@ const UserProfilePage = ({ id }) => {
       {/* Left Profile Sidebar */}
       <aside className={styles.profileSidebar}>
         <div className={styles.avatarSection}>
-          <Image src={avatarUrl} alt={profileData.fullName} width={80} height={80} className={styles.avatar} />
+          <Image src={avatarUrl} alt={profileData.fullName} width={140} height={50} className={styles.avatar} />
           <h2 className={styles.profileName}>{profileData.fullName}</h2>
         </div>
         <nav className={styles.profileNav}>

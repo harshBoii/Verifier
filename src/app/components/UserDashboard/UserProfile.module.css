@@ -28,11 +28,11 @@
 }
 
 .avatar {
-    border-radius: 50%;
+    border-radius: 100%;
     margin-bottom: 10px;
     border: 3px solid #FFFFFF;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        margin-left: 30%;
+        margin-left: 18%;
 
 }
 

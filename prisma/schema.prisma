@@ -335,7 +335,7 @@ model User {
   mobile          String?          @unique
   dob             DateTime?
   gender          Gender?
-
+  profilePicture  String?
   position        String?
   verifier_email  String?
   is_verified     Boolean?         @default(false)

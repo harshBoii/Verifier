@@ -100,6 +100,7 @@ export async function PUT(request, { params }) {
     // Get the updated data from the request body
     const body = await request.json();
     
+    console.log("dp id " , body.profilePicture)
     // Destructure the fields you want to allow updates for.
     // This prevents unwanted fields from being updated.
     const { 
@@ -120,6 +121,7 @@ export async function PUT(request, { params }) {
       data: {
         fullName,
         username,
+        profilePicture: body.profilePicture, // save the URL
         dob: dob ? new Date(dob) : undefined, // Ensure dob is a Date object
         gender,
         mobile,
