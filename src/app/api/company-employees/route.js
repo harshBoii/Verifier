@@ -50,6 +50,16 @@ export async function GET(request) {
         position: true,
         verifier_email: true,
         is_verified: true,
+        profilePicture: true,
+
+        // Verification details
+        isAddressVerified: true,
+        verifiedAddress: true,
+        isBankVerified: true,
+        verifiedAccountName: true,
+        isPfVerified: true,
+        uan: true,
+
         company: {
           select: {
             name: true,
@@ -68,6 +78,21 @@ export async function GET(request) {
         status: getStatus(emp.is_verified),
         companyName: emp.company.name,
         position: emp.position,
+        profilePicture: emp.profilePicture,
+
+        addressVerification: {
+          isVerified: emp.isAddressVerified,
+          details: emp.verifiedAddress,
+        },
+        bankVerification: {
+          isVerified: emp.isBankVerified,
+          accountName: emp.verifiedAccountName,
+        },
+        pfVerification: {
+          isVerified: emp.isPfVerified,
+          uan: emp.uan,
+        },
+
     }));
 
     return NextResponse.json(processedEmployees);

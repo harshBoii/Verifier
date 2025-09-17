@@ -2,7 +2,7 @@
 import SuperSide from '@/app/components/SuperAdmin.js/SuperSide';
 import Header from '@/app/components/SuperAdmin.js/SuperHeader';
 import LoadingGlass from '@/app/components/LoadingGlass';
-
+import UnverifiedEmployeesPage from '@/app/components/Dashboard/agent';
 export default function Agents() {
   return (
     <div style={{ display: 'flex', minHeight:"100vh" }}>
@@ -10,8 +10,7 @@ export default function Agents() {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Header user={{ name: 'Super Admin' }} />
         <div className='text-[90px] text-center align-center'>
-            <LoadingGlass className='-mt-100'/>
-            <div>Agents Coming Soon .......</div>
+            <UnverifiedEmployeesPage />
         </div>
       </div>
     </div>

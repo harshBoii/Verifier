@@ -287,7 +287,23 @@ export default function VerificationPage() {
 
                                                 <td>
                                                     <div className={styles.userCell} onClick={() => window.location.href=`/admin/verify-experience/${user.id}`}>
-                                                        <Image src={`https://ui-avatars.com/api/?name=${(editingId === user.id ? editFormData.name : user.name).replace(' ', '+')}&background=random`} alt={user.name} width={30} height={30} className={styles.avatar} unoptimized={true} />
+                                                    <Image
+                                                    src={
+                                                        user.profilePicture
+                                                        ? user.profilePicture
+                                                        : `https://ui-avatars.com/api/?name=${
+                                                            encodeURIComponent(
+                                                                (editingId === user.id ? editFormData.name : user.name) || "User"
+                                                            )
+                                                            }&background=random`
+                                                    }
+                                                    alt={user.name || "User"}
+                                                    width={30}
+                                                    height={30}
+                                                    className={styles.avatar}
+                                                    unoptimized
+                                                    />
+
                                                         {editingId === user.id ? <input type="text" name="name" value={editFormData.name} onChange={handleEditFormChange} className={styles.editInput} /> : user.name}
                                                     </div>
                                                 </td>

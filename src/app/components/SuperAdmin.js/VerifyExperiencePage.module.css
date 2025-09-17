@@ -1,9 +1,10 @@
 .container {
     padding: 30px;
-    max-width: 900px;
+    /* max-width: 900px; */
     margin: 20px auto;
     background-color: #f9fafb;
     font-family: 'DM Sans', sans-serif;
+    width: 100%;
 }
 .header {
     display: flex;
@@ -64,10 +65,10 @@
     font-size: 0.8rem;
 }
 .verified { background-color: #dcfce7; color: #166534; }
-.declined { background-color: #fee2e2; color: #991b1b; }
+.declined { background-color: #b4b2b2; color: #000000; }
 .pending { background-color: #fef3c7; color: #92400e; }
 .buttonGroup { display: flex; gap: 10px; }
-.acceptButton, .declineButton {
+.acceptButton, .declineButton , .greenButton {
     border: none;
     padding: 8px 16px;
     border-radius: 6px;
@@ -76,3 +77,4 @@
 }
 .acceptButton { background-color: #2563eb; color: white; }
 .declineButton { background-color: #dc2626; color: white; }
+.greenButton { background-color: #35dc26; color: white; }

@@ -6,7 +6,7 @@ import styles from './Sidebar.module.css';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { FiGrid, FiUploadCloud, FiCheckSquare, FiBarChart2, FiHelpCircle, FiSettings,FiShoppingCart,FiCreditCard ,FiBarChart,} from 'react-icons/fi';
+import { FiGrid, FiUploadCloud, FiCheckSquare, FiBarChart2, FiHelpCircle, FiSettings,FiShoppingCart,FiCreditCard ,FiBarChart,FiShield} from 'react-icons/fi';
 import { TestTube2, Workflow } from 'lucide-react';
 
 // 2. Modify NavItem to handle links and dynamic active state
@@ -46,6 +46,7 @@ const Sidebar = () => {
         <NavItem icon={<FiGrid />} href="/admin" label="Dashboard" />
         <NavItem icon={<FiUploadCloud />} href="/admin/import" label="Import Employee" />
         <NavItem icon={<FiCheckSquare />} href="/admin/verification" label="Verification" />
+        <NavItem icon={ <FiShield/>} href="/admin/verify-credentials" label="Emp Credentials " />
         <NavItem icon={<FiBarChart2 />} href="/admin/reports" label="Reports" />
         <NavItem icon={<FiCreditCard />} href="/admin/subscription" label="Subscription" />
         <NavItem icon={<FiBarChart />} href="/admin/campaigns" label="Campaign" />
