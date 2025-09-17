@@ -9,7 +9,7 @@ import EditCampaignModal from './EditCampaignModal';
 import styles from './CampaignsTable.module.css';
 import { FiCameraOff, FiCheck, FiCheckCircle, FiClock,FiThumbsUp,FiWatch} from 'react-icons/fi';
 import { Zap } from 'lucide-react';
-
+import Link from 'next/link';
 import LoadingGlass from '../LoadingGlass';
 // A helper component for the main loading state
 const TableLoadingSpinner = () => (
@@ -127,7 +127,7 @@ export default function CampaignsTable() {
                             filteredData.map((campaign) => (
                                 <tr 
                                     key={campaign.id} 
-                                    className={`${styles.clickableRow} hover:bg-gray-50 transition-colors duration-150`}
+                                    className={`${styles.clickableRow} hover:bg-gray-50 transition-colors duration-150 hover:text-emerald-300`}
                                     onClick={() => setViewingCampaign(campaign)}
                                     tabIndex={0}
                                     onKeyDown={(e) => e.key === 'Enter' && setViewingCampaign(campaign)}

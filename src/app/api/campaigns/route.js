@@ -56,6 +56,15 @@ export async function GET(request) {
         const totalMembers = campaign._count.members;
         const notVerifiedCount = totalMembers - verifiedCount;
 
+        // if (notVerifiedCount==0 && (totalMembers==verifiedCount)){
+        //   prisma.campaign.update({
+        //     where:{companyId:adminCompanyId},
+        //     data:{
+        //       status:"Finished"
+        //     }
+        //   })
+        // }
+
         return {
           id: campaign.id,
           name: campaign.name,

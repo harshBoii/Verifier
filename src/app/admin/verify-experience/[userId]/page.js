@@ -18,6 +18,7 @@ import GetHrEmailModal from '@/app/components/GetHrEmailModal';
 import { Router } from 'next/router';
 import ProgressStepper from '@/app/components/Dashboard/ProgressStepper';
 
+
 const VerifyExperiencePage = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -98,6 +99,42 @@ const VerifyExperiencePage = () => {
         setIsDirectSendModalOpen(true);
     };
 
+const handleVerifyEmployee = async () => {
+  try {
+    const res = await fetch("/api/employee/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: userId }), // 👈 use userId directly
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      Swal.fire({
+        icon: "error",
+        title: "Verification Failed",
+        text: data.message || "Something went wrong",
+        confirmButtonColor: "#d33",
+      });
+    } else {
+      Swal.fire({
+        icon: "success",
+        title: "Verified!",
+        text: "Employee verified successfully ✅",
+        confirmButtonColor: "#3085d6",
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    Swal.fire({
+      icon: "error",
+      title: "Network Error",
+      text: "Please check your connection and try again.",
+      confirmButtonColor: "#d33",
+    });
+  }
+};
+
     const StatusBadge = ({ status }) => {
         const baseClasses = "flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium";
         if (status === true) {
@@ -108,6 +145,7 @@ const VerifyExperiencePage = () => {
         }
         return <span className={`${baseClasses} bg-yellow-100 text-yellow-800`}><FiClock /> Pending</span>;
     };
+
 
     const pageContent = () => {
         if (loading) return <LoadingGlass className='ml-[13vw]'/>;
@@ -122,54 +160,89 @@ const VerifyExperiencePage = () => {
                         <h1>Work Experience Verification</h1>
                         <h2>For: {user.fullName}</h2>
                     </div>
+                    <button onClick={()=>handleVerifyEmployee()}>
+                        <FiCheck/>
+                    </button>
                 </div>
-
-                <div className={styles.experienceList}>
-                    {user.workExperiences.map(exp => (
-                        <div className='border-1 border-zinc-500 rounded-2xl'>
-                        <div key={exp.id} className={styles.card}>
-                            <Link href={`/admin/experience/${exp.id}`}>
-                            <div>
-                                <h3 className={styles.role}>{exp.role} at {exp.companyName}</h3>
-                                <p className={styles.duration}>{new Date(exp.startDate).getFullYear()} - {exp.currentlyWorking ? 'Present' : new Date(exp.endDate).getFullYear()}</p>
-                                <p className={styles.description}>{exp.description}</p>
-                            </div>
-                            </Link>
-                            <div className={styles.actions}>
-                                <StatusBadge status={exp.is_verified} />
-                                <div className={styles.buttonGroup}>
-                                    <button className={styles.greenButton} onClick={() => handleGetHrEmailClick(exp)}>
-                                        <FaPaperPlane /> 
-                                    </button>
-                                    <button className={styles.acceptButton} onClick={() => handleVerification(exp.id, true)}>Accept</button>
-                                    <button className={styles.declineButton} onClick={() => handleVerification(exp.id, false)}>Decline</button>
-                                </div>
-                            </div>
-                        </div>
-                                <div className="mt-4">
-                                    <div className="mt-4 text-center bg-white rounded-3xl p-3 ">
-                                    <button
-                                        className="text-zinc-600 px-4 py-2 w-full  rounded-md text-xl font-extrabold align-middle hover:text-md hover:text-blue-600 bg-zinc-100 hover:bg-zinc-300"
-                                        onClick={() => setIsOpen(!isOpen)}
-                                    >
-                                        {isOpen ? "Hide":"Track Progress" }
-                                    </button>
-                                    <div
-                                        className={`transition-max-height duration-500 overflow-hidden ${
-                                        isOpen ? "max-h-150" : "max-h-0"
-                                        }`}
-                                    >
-                                        <div className="mt-3 bg-gray-100 p-3 rounded-md">
-                                        <ProgressStepper currentProgress={exp.progress} apollo_used={exp.apollo_used} chat_started={exp.chat_started} chat_finished={exp.chat_finished} />
-                                        </div>
-                                    </div>
-                                    </div>    
-                                </div>
-
-                        </div>
-                    ))}
-                </div>
+{user.workExperiences.length > 0 ? (
+  <div className={styles.experienceList}>
+    {user.workExperiences.map((exp) => (
+      <div key={exp.id} className="border-1 border-zinc-500 rounded-2xl">
+        <div className={styles.card}>
+          <Link href={`/admin/experience/${exp.id}`}>
+            <div>
+              <h3 className={styles.role}>
+                {exp.role} at {exp.companyName}
+              </h3>
+              <p className={styles.duration}>
+                {new Date(exp.startDate).getFullYear()} -{" "}
+                {exp.currentlyWorking
+                  ? "Present"
+                  : new Date(exp.endDate).getFullYear()}
+              </p>
+              <p className={styles.description}>{exp.description}</p>
             </div>
+          </Link>
+
+          <div className={styles.actions}>
+            <StatusBadge status={exp.is_verified} />
+            <div className={styles.buttonGroup}>
+              <button
+                className={styles.greenButton}
+                onClick={() => handleGetHrEmailClick(exp)}
+              >
+                <FaPaperPlane />
+              </button>
+              <button
+                className={styles.acceptButton}
+                onClick={() => handleVerification(exp.id, true)}
+              >
+                Accept
+              </button>
+              <button
+                className={styles.declineButton}
+                onClick={() => handleVerification(exp.id, false)}
+              >
+                Decline
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Progress section */}
+        <div className="mt-4">
+          <div className="mt-4 text-center bg-white rounded-3xl p-3 ">
+            <button
+              className="text-zinc-600 px-4 py-2 w-full rounded-md text-xl font-extrabold align-middle hover:text-md hover:text-blue-600 bg-zinc-100 hover:bg-zinc-300"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? "Hide" : "Track Progress"}
+            </button>
+            <div
+              className={`transition-max-height duration-500 overflow-hidden ${
+                isOpen ? "max-h-150" : "max-h-0"
+              }`}
+            >
+              <div className="mt-3 bg-gray-100 p-3 rounded-md">
+                <ProgressStepper
+                  currentProgress={exp.progress}
+                  apollo_used={exp.apollo_used}
+                  chat_started={exp.chat_started}
+                  chat_finished={exp.chat_finished}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+) : (
+  <div className="p-6 text-center text-gray-500">
+    No work experiences found.
+  </div>
+)}
+</div>
         );
     };
 

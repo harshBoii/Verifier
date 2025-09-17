@@ -14,20 +14,31 @@ import Swal from 'sweetalert2';
 import LoadingGlass from '@/app/components/LoadingGlass';
 
 // --- Custom Node Components (Unchanged) ---
-const ActionNode = ({ data }) => (
+const ActionNode = ({ data }) => {
+
+useEffect(()=>{
+  console.log(data)
+},data);
+return(
     <div className="bg-white border shadow-md rounded-lg p-3 w-64">
         <h3 className="font-bold text-sm mb-2 text-blue-600">Action</h3>
         <p className="text-xs text-gray-500">Channel: {data.config.channel}</p>
         {data.config.channel === 'email' ? (
-            <p className="text-xs text-gray-500">Template ID: {data.config.templateId || 'N/A'}</p>
+        <div
+          className="text-xs text-gray-500"
+          dangerouslySetInnerHTML={{
+            __html: `Template: ${data.config.message || "N/A"}`,
+          }}
+        />
         ) : (
             <p className="text-xs text-gray-500 truncate">Message: {data.config.message}</p>
         )}
         <Handle type="target" position={Position.Top} />
         <Handle type="source" position={Position.Bottom} />
+
     </div>
 );
-
+}
 const DelayNode = ({ data }) => (
     <div className="bg-white border shadow-md rounded-lg p-4 w-60 text-center">
         <h3 className="font-bold text-sm mb-2 text-yellow-600">Delay</h3>

@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "npx prisma@6.13.0 generate && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "dev:docs": "npm run gendoc && npm run dev",
+    "gendoc": "node swagger.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -33,6 +35,7 @@
     "cookie": "^1.0.2",
     "crypto-js": "^4.2.0",
     "framer-motion": "^12.23.12",
+    "gsap": "^3.13.0",
     "jose": "^6.0.12",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.539.0",
@@ -43,11 +46,14 @@
     "p-limit": "^7.1.1",
     "papaparse": "^5.5.3",
     "prop-types": "^15.8.1",
-    "react": "19.1.0",
+    "react": "^18.3.1",
     "react-chartjs-2": "^5.3.0",
-    "react-dom": "19.1.0",
+    "react-dom": "^18.3.1",
     "react-icons": "^5.5.0",
+    "react-is": "^19.1.1",
     "react-markdown": "^10.1.0",
+    "react-quill": "^2.0.0",
+    "react-quill-new": "^3.6.0",
     "reactflow": "^11.11.4",
     "recharts": "^3.1.2",
     "remark-gfm": "^4.0.1",
@@ -56,9 +62,10 @@
     "twilio": "^5.8.2"
   },
   "devDependencies": {
+    "@prisma/client": "^6.13.0",
     "@tailwindcss/postcss": "^4",
+    "swagger-autogen": "^2.23.7",
     "tailwindcss": "^4",
-    "tw-animate-css": "^1.3.6",
-    "@prisma/client": "^6.13.0"
+    "tw-animate-css": "^1.3.6"
   }
 }

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Users, UserCheck, UserX, Loader2, ServerCrash, ChevronLeft } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-
+import Link from 'next/link';
 // --- Reusable Sub-components (No changes needed) ---
 const COLORS = { verified: '#16A34A', pending: '#FBBF24' };
 const LoadingState = () => (
@@ -59,10 +59,12 @@ const MemberList = ({ campaignId, status, onBack }) => {
             {!loading && !error && (
                 <ul className="space-y-2 max-h-80 overflow-y-auto">
                     {members.length > 0 ? members.map(member => (
-                        <li key={member.id} className="p-3 bg-white rounded-md border text-sm">
-                            <p className="font-semibold text-gray-800">{member.fullName}</p>
-                            <p className="text-gray-500">{member.email}</p>
-                        </li>
+                      <li key={member.id} className="p-3 bg-white rounded-md border text-sm">
+                        <Link href={`/admin/verify-experience/${member.id}`}>
+                          <p className="font-semibold text-gray-800">{member.fullName}</p>
+                          <p className="text-gray-500">{member.email}</p>
+                        </Link>
+                      </li>
                     )) : <p className="text-gray-500">No {status} members found.</p>}
                 </ul>
             )}

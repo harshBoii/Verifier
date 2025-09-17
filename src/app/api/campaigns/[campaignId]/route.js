@@ -41,6 +41,16 @@ export async function GET(request, { params }) {
     const totalMembers = campaign._count.members;
     const notVerifiedCount = totalMembers - verifiedCount;
 
+
+    if (notVerifiedCount==0 && (totalMembers==verifiedCount)){
+          prisma.campaign.update({
+            where:{id: parseInt(campaignId, 10),},
+            data:{
+              status:"Finished"
+            }
+          })
+        }
+
     // Construct the detailed response object
     const campaignDetails = {
       id: campaign.id,

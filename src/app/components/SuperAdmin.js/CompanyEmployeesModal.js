@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { FiX, FiEdit, FiSave, FiAward, FiSearch } from 'react-icons/fi';
+import { FaInternetExplorer } from 'react-icons/fa';
 import Swal from 'sweetalert2';
-
+import Link from 'next/link';
 const CompanyEmployeesModal = ({ isOpen, onClose, company, onSuccess }) => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -149,6 +150,11 @@ const CompanyEmployeesModal = ({ isOpen, onClose, company, onSuccess }) => {
                         </span>
                         <button onClick={() => handleEditClick(emp)} className="ml-4 text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100 transition-colors" disabled={isSubmitting}>
                           <FiEdit />
+                        </button>
+                        <button>
+                          <Link href={`/admin/verify-experience/${emp.id}`}>
+                              <FaInternetExplorer/>
+                          </Link>   
                         </button>
                       </>
                     )}
