@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { FaUserCheck, FaShieldAlt, FaTasks, FaRobot, FaUsersCog, FaChartLine, FaStar } from 'react-icons/fa';
 import Sparkle from "react-sparkle";
+import Link from 'next/link';
 import Marquee from "react-fast-marquee";
 import { FaTwitter, FaGithub, FaLinkedin } from "react-icons/fa";
 
@@ -56,8 +57,8 @@ const HeroSection = () => (
         <button className="bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:bg-blue-700 transition-colors duration-300">
           Get Started
         </button>
-        <button className="relative bg-transparent border-2 border-gray-300 text-gray-700 font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 hover:border-gray-400 transition-colors duration-300">
-          Watch Demo
+        <button className="relative bg-emerald-200 border-2 border-gray-300 text-gray-700 font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 hover:border-gray-400 transition-colors duration-300">
+          <Link href="/login">Login</Link>
           <Sparkle color="#FFD700" count={3} minSize={20} maxSize={25} flicker fadeOutSpeed={10} style={{ position: "absolute", top: 0, right: 0 }}/>
         </button>
       </div>
