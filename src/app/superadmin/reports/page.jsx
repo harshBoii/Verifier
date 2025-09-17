@@ -1,5 +1,5 @@
 import SuperSide from "@/app/components/SuperAdmin.js/SuperSide";
-import Header from '../components/SuperAdmin.js/SuperHeader';
+import Header from '@/app/components/SuperAdmin.js/SuperHeader';
 import Report from "@/app/components/Dashboard/Report";
 
 export default function RolesPage() {

@@ -50,12 +50,36 @@ const FormSelectGender = ({ label, name, value, options, icon, onChange }) => (
 );
 
 
+
 // The main form component, now with SweetAlert2 integration
 const BasicProfileForm = ({ profileData }) => {
   const [formData, setFormData] = useState(profileData || {});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+  const [previewImage, setPreviewImage] = useState(profileData?.profilePicture || null);
+
+  const handleImageUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch("/api/upload", {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    setFormData((prev) => ({ ...prev, profilePicture: data.url }));
+    setPreviewImage(data.url);
+  } else {
+    console.error("Upload failed:", data.error);
+  }
+};
+
   useEffect(() => {
     if (profileData) {
       setFormData(profileData);
@@ -154,6 +178,28 @@ const BasicProfileForm = ({ profileData }) => {
         </div>
 
         {/* The old status message divs are no longer needed */}
+      <div className={styles.formSection}>
+        <label className="text-zinc-500 text-xl">Profile Picture</label>
+        <div className="flex items-center space-x-4 mt-2">
+          {previewImage ? (
+            <img
+              src={previewImage}
+              alt="Profile Preview"
+              className="w-20 h-20 rounded-full object-cover border"
+            />
+          ) : (
+            <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+              No Image
+            </div>
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="text-sm text-gray-600"
+          />
+        </div>
+      </div>
 
         <div className={styles.formGrid}>
           {/* Form fields remain the same */}
