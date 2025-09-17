@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import twilio from "twilio";
+import { createNotification } from "@/app/lib/notification";
 
 export async function POST(req) {
   try {
@@ -86,6 +87,20 @@ export async function POST(req) {
         },
       },
     });
+    const hrId = req.user?.id || null;
+
+    await createNotification({
+      recipientId: userId,
+      actorId: hrId,
+      workExperienceId: expId,
+      type: "STATUS_UPDATED",
+      title: "Work Experience Updated",
+      message: messageBody,
+    });
+
+    console.log("RecipientId is: ",userId," actor is : ",hrId)
+  
+
 
     console.log(`Finished sending notifications for expId=${expId} with credentials ${user.mobile} and ${user.companyId}`);
     console.log(`notifications are ${notificationPromises}`)

@@ -1,5 +1,5 @@
 import SuperSide from '@/app/components/SuperAdmin.js/SuperSide';
-import Header from '../../components/Dashboard/Header';
+import Header from '../components/SuperAdmin.js/SuperHeader';
 import PackagesPage from '../../components/SuperAdmin.js/PackagesPage';
 
 export default function Packages() {

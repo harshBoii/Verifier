@@ -24,7 +24,7 @@ const ErrorDisplay = ({ message }) => (
 // --- Main Page Component ---
 export default function EmailSettingsPage() {
   const [templates, setTemplates] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null); // 1. State to store the user's data
+  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -33,20 +33,22 @@ export default function EmailSettingsPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      // 2. Fetch both templates and user data in parallel for efficiency
-      const [templatesResponse, userResponse] = await Promise.all([
-        fetch('/api/templates'),
-        fetch('/api/auth/me')
-      ]);
 
-      if (!templatesResponse.ok) throw new Error('Failed to fetch email templates.');
+      // 1. Fetch user first
+      const userResponse = await fetch('/api/auth/me');
       if (!userResponse.ok) throw new Error('Failed to fetch user authentication data.');
-      
-      const templatesData = await templatesResponse.json();
       const userData = await userResponse.json();
+      setCurrentUser(userData);
 
-      setTemplates(templatesData);
-      setCurrentUser(userData); // Set the fetched user data into state
+      // 2. Fetch templates using the user's companyId
+      if (!userData.companyId) {
+        throw new Error('User does not have a companyId.');
+      }
+
+      const templatesResponse = await fetch(`/api/templates?companyId=${userData.companyId}`);
+      if (!templatesResponse.ok) throw new Error('Failed to fetch email templates.');
+      const templatesData = await templatesResponse.json();
+      setTemplates(templatesData.templates || []); // unwrap if backend returns { templates }
 
     } catch (err) {
       setError(err.message);
@@ -81,15 +83,21 @@ export default function EmailSettingsPage() {
   return (
     <main className="p-4 sm:p-6 md:p-8 bg-transparent h-90">
       <div className="mx-auto">
-        
-        <EmailTemplateManager templates={templates} onSaveSelection={handleSave} />
+        <EmailTemplateManager 
+          templates={templates} 
+          onSaveSelection={handleSave} 
+        />
       </div>
       
-      {/* 4. Only render the modal if the editor is open AND we have a companyId */}
+      {/* Render modal only if editor is open AND companyId exists */}
       {isEditorOpen && currentUser?.companyId && (
-        <Modal isOpen={isEditorOpen} onClose={() => setIsEditorOpen(false)} title="Create New Template">
+        <Modal 
+          isOpen={isEditorOpen} 
+          onClose={() => setIsEditorOpen(false)} 
+          title="Create New Template"
+        >
           <EmailTemplateEditor 
-            companyId={currentUser.companyId} // Pass the dynamic companyId
+            companyId={currentUser.companyId} 
             onTemplateCreated={handleTemplateCreated} 
           />
         </Modal>

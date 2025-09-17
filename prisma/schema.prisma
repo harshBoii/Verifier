@@ -310,8 +310,7 @@ model Company {
   subscription Subscription?
   emailTemplates EmailTemplate[]
   workflows Workflow[]
-
-
+  notifications Notification[]
 }
 
 
@@ -342,7 +341,11 @@ model User {
   is_verified     Boolean?         @default(false)
   summary         String?          @default("")
 
+  receivedNotifications Notification[] @relation("UserNotifications")
+  sentNotifications     Notification[] @relation("ActorNotifications")
 
+  user_notification     NotificationSubscription[] @relation("EmployeeSubscriptions")
+  admin_notification    NotificationSubscription[] @relation("AdminSubscriptions")
   // Address Verification Status & Data
   isAddressVerified    Boolean   @default(false) @map("is_address_verified")
   verifiedAddress      Json?     @map("verified_address")      // Store the verified address object from the provider as JSON
@@ -433,7 +436,7 @@ model WorkExperience {
 
   // Many-to-many relation to Skill through the join table
   skills WorkExperienceSkill[]
-
+  notification Notification[]
   workflowProgress WorkExperienceWorkflowProgress[]
 
 }
@@ -457,13 +460,50 @@ model WorkExperienceSkill {
 }
 model Notification {
   id               Int      @id @default(autoincrement())
-  employeeId       Int
-  workExperienceId Int
-  channel          String
-  status           String
-  payload          String
+
+  // Who receives this notification
+  recipient        User     @relation("UserNotifications", fields: [recipientId], references: [id], onDelete: Cascade)
+  recipientId      Int      @map("recipient_id")
+
+  // Optional: who triggered the notification (HR, admin, another user)
+  actor            User?    @relation("ActorNotifications", fields: [actorId], references: [id])
+  actorId          Int?     @map("actor_id")
+
+  // Context: Which WorkExperience / Campaign / etc.
+  workExperience   WorkExperience? @relation(fields: [workExperienceId], references: [id], onDelete: Cascade)
+  workExperienceId Int?     @map("work_experience_id")
+
+  //  New relation to company
+  company          Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId        Int?     @map("company_id")
+
+
+  // Notification content
+  title            String
+  message          String   @db.Text
+  type             String   // e.g. "WORK_VERIFIED", "STATUS_UPDATED", "GENERAL"
+
+  // Status flags
+  isRead           Boolean  @default(false) @map("is_read")
+
+  // Meta
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+}
+model NotificationSubscription {
+  id        Int      @id @default(autoincrement())
+
+  // Admin who subscribes
+  admin     User     @relation("AdminSubscriptions", fields: [adminId], references: [id], onDelete: Cascade)
+  adminId   Int      @map("admin_id")
+
+  // Employee whose notifications the admin wants
+  employee  User     @relation("EmployeeSubscriptions", fields: [employeeId], references: [id], onDelete: Cascade)
+  employeeId Int     @map("employee_id")
+
+  createdAt DateTime @default(now())
+
+  @@unique([adminId, employeeId]) // prevent duplicate subscriptions
 }
 
 model Workflow {
@@ -578,3 +618,4 @@ model VerificationLog {
 
   @@index([userId, verificationType])
 }
+

@@ -1,5 +1,5 @@
 import SuperSide from '../components/SuperAdmin.js/SuperSide';
-import Header from '../components/Dashboard/Header';
+import Header from '../components/SuperAdmin.js/SuperHeader';
 import CompaniesPage from '../components/SuperAdmin.js/CompaniesPage';
 
 export default function Companies() {

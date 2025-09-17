@@ -1,11 +1,12 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import styles from './SettingsPage.module.css';
-import { FiUser, FiFileText, FiMail, FiLogOut, FiX, FiPenTool } from 'react-icons/fi';
+import { FiUser, FiFileText, FiMail, FiLogOut, FiX, FiPenTool , FiHome } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 import LoadingGlass from '../LoadingGlass';
 import EmailSettingsPage from '@/app/settings/components/email';
 // A functional sub-component for the User Profile form
+import Link from 'next/link';
 const UserProfileForm = () => {
     const [profile, setProfile] = useState({
         fullName: '',
@@ -232,7 +233,17 @@ const SettingsPage = () => {
                         <FiMail className={styles.navIcon} /> SMTP
                     </li>
                     <li className={styles.navItem}>
-                        <FiLogOut className={styles.navIcon} /> Logout
+                    <Link href="/" className="flex items-center space-x-2">
+                        <FiLogOut className={styles.navIcon} />
+                        <span>Logout</span>
+                    </Link>
+                    </li>
+
+                    <li className={styles.navItem}>
+                    <Link href="/admin" className="flex items-center space-x-2">
+                        <FiHome className={styles.navIcon} />
+                        <span>Dashboard</span>
+                    </Link>
                     </li>
                 </ul>
             </aside>

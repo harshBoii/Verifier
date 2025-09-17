@@ -3,6 +3,7 @@ import React from 'react';
 import styles from './UserSearchBar.module.css'; // Assuming you have a Header.module.css
 import { FiSearch, FiBell, FiPlus } from 'react-icons/fi';
 import Image from 'next/image';
+import NotificationBell from './notification';
 
 const UserSearchBar = ({ user }) => {
   // If the user data is still loading, you can render a placeholder or nothing
@@ -26,7 +27,7 @@ const UserSearchBar = ({ user }) => {
       </div>
       <div className={styles.userSection}>
         <div className={styles.iconWrapper}>
-            <FiBell />
+          <NotificationBell userId={user.id} />
         </div>
         {/* Wrapper for user avatar and name */}
         <div className={styles.userProfile}>

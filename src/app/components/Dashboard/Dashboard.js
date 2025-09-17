@@ -120,7 +120,7 @@ const Dashboard = () => {
                     <div>
                         <h2>Welcome back, {user ? user.fullName : 'Admin'}!</h2>
                         <p>You can now turn your Verification Process Faster than a Cheetah.</p>
-                        <button className={styles.exploreButton}>Explore Now &rarr;</button>
+
                     </div>
                 </div>
                 <div className={styles.statsGrid}>
