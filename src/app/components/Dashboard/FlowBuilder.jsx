@@ -486,7 +486,7 @@ export default function FlowBuilder() {
                 </button>
                 <button
           onClick={async () => {
-            const res = await fetch("http://localhost:8000/generate-flow", {
+            const res = await fetch("https://questionbotverifier.onrender.com/generate-flow", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ description: "7-day workflow with email, sms, and whatsapp" }),

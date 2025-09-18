@@ -85,7 +85,7 @@ export default function EmailTemplateEditor({ companyId, onTemplateCreated }) {
 
       const company = authData.company
       
-      const response = await fetch('http://127.0.0.1:8000/generate-email', {
+      const response = await fetch('https://questionbotverifier.onrender.com/generate-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
