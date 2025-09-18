@@ -90,7 +90,7 @@ export default function EmailTemplateEditor({ companyId, onTemplateCreated }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           company_name:company.name,
-          company_type:company.type, // Example: You can make this dynamic
+          company_type:company?.type||"IT Company", // Example: You can make this dynamic
           email_type: type, // Uses the currently selected email type
           prompt: aiPrompt,
         }),
