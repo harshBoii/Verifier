@@ -28,8 +28,8 @@ const Header = () => {
   return (
     <header className={styles.header}>
       <div className={styles.searchBar}>
-        <FiSearch className={styles.searchIcon} />
-        <input type="text" placeholder="Search" />
+        {/* <FiSearch className={styles.searchIcon} />
+        <input type="text" placeholder="Search" /> */}
       </div>
       <div className={styles.userSection}>
         <div className={styles.iconWrapper}>

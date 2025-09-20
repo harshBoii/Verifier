@@ -181,7 +181,7 @@ const DashboardChart = () => {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[30vh]">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[30vh] sticky top-45 bg-white">
         <div className="bg-white p-4 rounded-lg shadow-md">
           <Doughnut 
             ref={verificationChartRef}

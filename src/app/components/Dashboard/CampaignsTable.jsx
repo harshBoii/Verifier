@@ -87,24 +87,33 @@ export default function CampaignsTable() {
     return (
         <>
             <div className={styles.tableContainer}>
-                <div className="md:flex md:items-center md:justify-between mb-4">
+                <div className="md:flex md:items-center md:justify-between mb-4 sticky top-135 bg-white rounded-2xl">
                     <div>
                         <h3 className={styles.tableTitle}>Campaigns List</h3>
                         <p className="text-sm text-gray-500">
                             Search for a campaign or click a row to view insights.
                         </p>
                     </div>
-                    <div className="relative mt-4 md:mt-0">
-                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                            <Search className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                            type="text"
-                            placeholder="Search campaigns..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="block w-full rounded-md border-gray-300 pl-10 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                        />
+                    <div className="relative mt-4 md:mt-0 w-full max-w-md">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                        <Search className="h-5 w-5 text-blue-400" />
+                    </div>
+                    <input
+                        type="text"
+                        placeholder="Search campaigns..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="
+                        block w-full rounded-xl 
+                        border border-blue-200 
+                        bg-gradient-to-r from-blue-50 to-blue-100 
+                        pl-10 pr-4 py-2 
+                        text-gray-700 placeholder-gray-400 
+                        shadow-md 
+                        focus:border-blue-400 focus:ring-2 focus:ring-blue-300 focus:outline-none 
+                        transition-all duration-300
+                        "
+                    />
                     </div>
                 </div>
 

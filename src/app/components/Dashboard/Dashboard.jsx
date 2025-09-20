@@ -142,40 +142,9 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                <DashboardCharts className="mb-5"/>
+                <DashboardCharts className="mb-5 "/>
 
                 {/* --- UPDATED SEARCH & FILTERS SECTION --- */}
-                <div className={styles.searchSection}>
-                    <h3 className='mt-10'>Search Campaign</h3>
-                    <div className={styles.filters}>
-                        <select name="campaignId" value={filters.campaignId} onChange={handleFilterChange} className={styles.filterInput}>
-                            <option value="">All Campaigns</option>
-                            {allCampaigns.map(campaign => (
-                                <option key={campaign.id} value={campaign.id}>{campaign.name}</option>
-                            ))}
-                        </select>
-                        <select name="role" value={filters.role} onChange={handleFilterChange} className={styles.filterInput}>
-                            <option value="">All Roles</option>
-                            <option value="EMPLOYEE">Employee</option>
-                            <option value="ADMIN">Admin</option>
-                        </select>
-                        {/* The "Level" select is replaced with this text input */}
-                        <input
-                            type="text"
-                            name="name"
-                            placeholder="Search by name..."
-                            value={filters.name}
-                            onChange={handleFilterChange}
-                            className={styles.filterInput}
-                        />
-                    </div>
-                     <div className={styles.dateFilters}>
-                        <input type="text" placeholder="Select date" className={styles.filterInput} onFocus={(e) => e.target.type = 'date'} onBlur={(e) => e.target.type = 'text'}/>
-                        <span>to</span>
-                        <input type="text" placeholder="Select date" className={styles.filterInput} onFocus={(e) => e.target.type = 'date'} onBlur={(e) => e.target.type = 'text'}/>
-                    </div>
-                </div>
-                
                 {/* CampaignsTable now receives the dynamic and filtered tableData */}
             <CampaignsTable data={tableData} setData={setTableData} />
             </main>
