@@ -132,13 +132,20 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Missing employeeId or expId' }, { status: 400 });
     }
 
-    // 1. Fetch the employee and their company's admin details in one go
     const employee = await prisma.user.findUnique({
       where: { id: parseInt(employeeId, 10) },
       include: {
         company: {
-          include: {
-            admin: true, // Include the full admin user object
+          select: {
+            id: true,
+            name: true,
+            admin: {
+              select: {
+                id: true,
+                fullName: true, 
+                email:true
+              },
+            },
           },
         },
       },
@@ -193,6 +200,18 @@ export async function POST(request) {
         data: { hr_comment: revisionComment, progress: 'Summary_added', chat_finished: true },
       })
     ]);
+
+     await prisma.notification.create({
+      data: {
+        companyId: company.id,       // link to the company
+        recipientId: company.admin.id, // explicitly link to the admin user
+        actorId:  null,   // who triggered it (optional)
+        workExperienceId: expId || null,
+        type: "COMPANY_ADMIN_ONLY", // you can choose a special type
+        title: "Summary Generated",
+        message: `A summary has been generated for employee ${employeeName}'s work experience with id ${employeeId}`,
+      },
+    });
 
     // 5. Send emails and perform database transaction concurrently
     // This is more efficient and robust.
