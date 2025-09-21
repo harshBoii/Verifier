@@ -17,7 +17,7 @@ const sectionAnimation = {
 
 const EmployeeVerificationLandingPage = () => {
   return (
-    <div className="bg-gray-50 text-gray-900 font-sans">
+    <div className=" text-gray-900 font-sans">
       <main>
         <HeroSection />
         <ProblemSection />
@@ -37,11 +37,12 @@ const EmployeeVerificationLandingPage = () => {
 // HERO
 //
 const HeroSection = () => (
-  <section className="min-h-screen flex flex-col justify-center items-center text-center px-4 bg-white mt-40">
+  <section className="min-h-screen flex flex-col justify-center items-center text-center px-4 bg-gradient-to-t from-blue-200 via-blue-100 to-white ">
     <motion.div
       initial={{ opacity: 0, y: -30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: 'easeOut' }}
+      className='mt-40'
     >
       <h1 className="text-5xl md:text-7xl font-bold tracking-tight font-serif mb-4 max-w-4xl mx-auto">
         VETTIFY
@@ -57,7 +58,7 @@ const HeroSection = () => (
         <button className="bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:bg-blue-700 transition-colors duration-300">
           Get Started
         </button>
-        <button className="relative bg-emerald-200 border-2 border-gray-300 text-gray-700 font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 hover:border-gray-400 transition-colors duration-300">
+        <button className="relative bg-gradient-to-bl from-emerald-200 via-emerald-400 to-emerald-100 border-2 border-gray-300 text-gray-700 font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 hover:border-gray-400 transition-colors duration-300">
           <Link href="/login">Login</Link>
           <Sparkle color="#FFD700" count={3} minSize={20} maxSize={25} flicker fadeOutSpeed={10} style={{ position: "absolute", top: 0, right: 0 }}/>
         </button>
@@ -71,7 +72,7 @@ const HeroSection = () => (
     >
       <div className="bg-white rounded-xl shadow-2xl p-2 border border-gray-200 ">
         <img
-          src="https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg"
+          src="/images/Dashboard.png"
           alt="Verification dashboard"
           className="w-full rounded-lg"
         />
@@ -84,7 +85,7 @@ const HeroSection = () => (
 // PROBLEM
 //
 const ProblemSection = () => (
-  <motion.section {...sectionAnimation} className="py-20 sm:py-32 px-4 bg-white">
+  <motion.section {...sectionAnimation} className="py-20 sm:py-32 px-4 bg-gradient-to-b from-blue-200 via-blue-100 to-white-">
     <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
       <div className="text-left">
         <h2 className="text-4xl font-bold mb-6">Say goodbye to <span className='bg-red-200'>manual checks</span> & endless email loops.</h2>
@@ -97,7 +98,7 @@ const ProblemSection = () => (
       </div>
       <div className="bg-white rounded-lg shadow-xl p-2 border border-gray-200">
         <img
-          src="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg"
+          src="/images/WorkFlow.png"
           alt="Problems in manual verification"
           className="rounded-md w-full h-auto"
         />
@@ -121,7 +122,7 @@ const features = [
 const FeaturesSection = () => (
   <motion.section {...sectionAnimation} className="py-20 sm:py-32 px-4">
     <div className="max-w-6xl mx-auto text-center">
-      <h2 className="text-4xl font-bold mb-4">All-in-one platform for <span className="bg-blue-200">employee verification</span></h2>
+      <h2 className="text-4xl font-bold mb-4">All-in-one platform for <span className="bg-amber-200">employee verification</span></h2>
       <p className="text-lg text-gray-600 mb-16 max-w-3xl mx-auto">No more spreadsheets. No more uncertainty.</p>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
         {features.map((f, i) => (
@@ -242,7 +243,7 @@ const AnalyticsSection = () => (
     <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
       <div className="bg-white rounded-lg shadow-xl p-2 border border-gray-200">
         <img
-          src="https://images.pexels.com/photos/3183153/pexels-photo-3183153.jpeg"
+          src="/images/Charts.png"
           alt="Analytics dashboard"
           className="rounded-md w-full h-auto"
         />
