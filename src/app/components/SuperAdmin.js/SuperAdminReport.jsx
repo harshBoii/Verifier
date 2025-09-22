@@ -16,7 +16,17 @@ import {
 import LoadingGlass from '../LoadingGlass';
 
 // Register chart.js modules
-ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend, ArcElement);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
+);
 
 const chartOptions = {
   responsive: true,
@@ -46,31 +56,18 @@ const ChartCard = ({ children }) => (
   </div>
 );
 
-const ComprehensiveDashboard = () => {
+const SuperadminDashboard = () => {
   const [datasets, setDatasets] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [company,setCompany]=useState()
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-
-        // Step 1: Get logged-in companyId
-        const companyRes = await fetch('/api/auth/company');
-        const companyData = await companyRes.json();
-        const id = companyData.company?.id;
-        // console.log("companyData is " , companyData)
-        setCompany(companyData)
-
-        if (!id) throw new Error("No company ID found for this user");
-
-        // Step 2: Fetch charts for that company
-        const res = await fetch(`/api/admin/charts?companyId=${id}`);
+        const res = await fetch('/api/superadmin/charts');
         if (!res.ok) throw new Error('Failed to load dashboard data.');
         const data = await res.json();
-
         setDatasets(data);
       } catch (err) {
         setError(err.message);
@@ -78,7 +75,6 @@ const ComprehensiveDashboard = () => {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
@@ -88,49 +84,26 @@ const ComprehensiveDashboard = () => {
 
   return (
     <div className="p-6 bg-blue-50 min-h-screen">
-      <h1 className="text-3xl font-bold text-gray-600 mb-6">{company.company.name}</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Superadmin Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-        {/* 1. Active Employees */}
+        {/* 1. Total Active Companies */}
         <div className="lg:col-span-1 h-[30vh]">
           <ChartCard>
-            <h2 className="text-lg font-semibold text-gray-700">Active Employees</h2>
-            <p className="text-4xl font-bold text-blue-600 mt-4">{datasets.activeEmployees}</p>
+            <h2 className="text-lg font-semibold text-gray-700">Active Companies</h2>
+            <p className="text-4xl font-bold text-blue-600 mt-4">{datasets.activeCompanies}</p>
           </ChartCard>
         </div>
 
-        {/* 2. Work Experiences by Progress */}
-        <div className="lg:col-span-2 h-[40vh]">
-          <ChartCard>
-            <Bar
-              data={{
-                labels: datasets.workExperienceByProgress.map(p => p.progress),
-                datasets: [{
-                  label: 'Work Experiences',
-                  data: datasets.workExperienceByProgress.map(p => p._count._all),
-                  backgroundColor: '#3B82F6'
-                }]
-              }}
-              options={{
-                ...chartOptions,
-                plugins: {
-                  ...chartOptions.plugins,
-                  title: { ...chartOptions.plugins.title, text: 'Work Experiences by Progress' }
-                }
-              }}
-            />
-          </ChartCard>
-        </div>
-
-        {/* 3. Employee Growth Over Time */}
+        {/* 2. Verification Volume by Type */}
         <div className="lg:col-span-2 h-[40vh]">
           <ChartCard>
             <Line
               data={{
-                labels: datasets.employeeGrowth.labels,
+                labels: datasets.verificationsOverTime.map(v => v.verificationType),
                 datasets: [{
-                  label: 'New Employees',
-                  data: datasets.employeeGrowth.data,
+                  label: 'Verification Volume',
+                  data: datasets.verificationsOverTime.map(v => v._count._all),
                   borderColor: '#3B82F6',
                   backgroundColor: 'rgba(59, 130, 246, 0.2)',
                   fill: true,
@@ -139,17 +112,33 @@ const ComprehensiveDashboard = () => {
               }}
               options={{
                 ...chartOptions,
-                plugins: {
-                  ...chartOptions.plugins,
-                  title: { ...chartOptions.plugins.title, text: 'Employee Growth Over Time' }
-                }
+                plugins: { ...chartOptions.plugins, title: { ...chartOptions.plugins.title, text: 'Verification Volume by Type' } },
+              }}
+            />
+          </ChartCard>
+        </div>
+
+        {/* 3. Verification Success Rate */}
+        <div className="lg:col-span-1 h-[40vh]">
+          <ChartCard>
+            <Doughnut
+              data={{
+                labels: datasets.verificationSuccess.map(v => v.outcome),
+                datasets: [{
+                  data: datasets.verificationSuccess.map(v => v._count._all),
+                  backgroundColor: ['#10B981', '#EF4444', '#F59E0B', '#6B7280'],
+                }]
+              }}
+              options={{
+                ...chartOptions,
+                plugins: { ...chartOptions.plugins, title: { ...chartOptions.plugins.title, text: 'Verification Success Rate' } },
               }}
             />
           </ChartCard>
         </div>
 
         {/* 4. Top Skills by Endorsements */}
-        <div className="lg:col-span-1 h-[40vh]">
+        <div className="lg:col-span-2 h-[40vh]">
           <ChartCard>
             <Bar
               data={{
@@ -157,16 +146,12 @@ const ComprehensiveDashboard = () => {
                 datasets: [{
                   label: 'Endorsements',
                   data: datasets.topSkills.map(s => s.endorsements),
-                  backgroundColor: '#60A5FA'
+                  backgroundColor: '#60A5FA',
                 }]
               }}
               options={{
                 ...chartOptions,
-                indexAxis: 'y', // horizontal bar
-                plugins: {
-                  ...chartOptions.plugins,
-                  title: { ...chartOptions.plugins.title, text: 'Top 5 Skills by Endorsements' }
-                }
+                plugins: { ...chartOptions.plugins, title: { ...chartOptions.plugins.title, text: 'Top 10 Skills Across All Companies' } },
               }}
             />
           </ChartCard>
@@ -175,42 +160,37 @@ const ComprehensiveDashboard = () => {
         {/* 5. Campaigns by Status */}
         <div className="lg:col-span-1 h-[40vh]">
           <ChartCard>
-            <Doughnut
+            <Pie
               data={{
                 labels: datasets.campaignsByStatus.map(c => c.status),
                 datasets: [{
                   data: datasets.campaignsByStatus.map(c => c._count._all),
-                  backgroundColor: ['#3B82F6', '#60A5FA', '#93C5FD']
+                  backgroundColor: ['#3B82F6', '#60A5FA', '#93C5FD'],
                 }]
               }}
               options={{
                 ...chartOptions,
-                plugins: {
-                  ...chartOptions.plugins,
-                  title: { ...chartOptions.plugins.title, text: 'Campaigns by Status' }
-                }
+                plugins: { ...chartOptions.plugins, title: { ...chartOptions.plugins.title, text: 'Campaigns by Status' } },
               }}
             />
           </ChartCard>
         </div>
 
-        {/* 6. Verification Health */}
+        {/* 6. Notifications by Type */}
         <div className="lg:col-span-2 h-[40vh]">
           <ChartCard>
-            <Pie
+            <Bar
               data={{
-                labels: ['Verified', 'Unverified'],
+                labels: datasets.notificationsByType.map(n => n.type),
                 datasets: [{
-                  data: [datasets.verificationHealth.verified, datasets.verificationHealth.unverified],
-                  backgroundColor: ['#3B82F6', '#BFDBFE']
+                  label: 'Notifications',
+                  data: datasets.notificationsByType.map(n => n._count._all),
+                  backgroundColor: '#93C5FD',
                 }]
               }}
               options={{
                 ...chartOptions,
-                plugins: {
-                  ...chartOptions.plugins,
-                  title: { ...chartOptions.plugins.title, text: 'Verification Health' }
-                }
+                plugins: { ...chartOptions.plugins, title: { ...chartOptions.plugins.title, text: 'System-wide Notifications by Type' } },
               }}
             />
           </ChartCard>
@@ -221,4 +201,4 @@ const ComprehensiveDashboard = () => {
   );
 };
 
-export default ComprehensiveDashboard;
+export default SuperadminDashboard;

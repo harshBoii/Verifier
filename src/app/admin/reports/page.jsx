@@ -1,7 +1,7 @@
 // Import your components. Adjust the paths if they are different.
 import Sidebar from '@/app/components/Dashboard/Sidebar';
 import Header from '@/app/components/Dashboard/Header';
-import Report from '@/app/components/Dashboard/Report';
+import ComprehensiveDashboard from '@/app/components/Dashboard/Report';
 import SubAlert from '@/app/components/Dashboard/SubAlert';
 
 
@@ -19,7 +19,7 @@ export default function ImportEmployee() {
         </div>
         {/* The import page component is also inside the main content area */}
         <div style={{ padding: '0 30px 30px 30px' }} >
-          <Report />
+          <ComprehensiveDashboard />
         </div>
       </div>
     </div>

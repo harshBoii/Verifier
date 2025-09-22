@@ -1,6 +1,6 @@
 import SuperSide from "@/app/components/SuperAdmin.js/SuperSide";
 import Header from '@/app/components/SuperAdmin.js/SuperHeader';
-import Report from "@/app/components/Dashboard/Report";
+import SuperadminDashboard from "@/app/components/SuperAdmin.js/SuperAdminReport";
 
 export default function RolesPage() {
   return (
@@ -9,7 +9,7 @@ export default function RolesPage() {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Header user={{ name: 'Super Admin' }} />
         <div style={{ padding: '20px' }}>
-          <Report />
+          <SuperadminDashboard />
         </div>
       </div>
     </div>

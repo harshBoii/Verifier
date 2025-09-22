@@ -1,91 +1,54 @@
-import { NextResponse } from 'next/server';
-import prisma from '@/app/lib/prisma';
+import { NextResponse } from "next/server";
+import prisma from "@/app/lib/prisma";
 
-/**
- * Handles GET requests to fetch chart data for the Super Admin dashboard.
- * This route is open and does not require authentication.
- */
 export async function GET() {
   try {
-    // --- Query 1: Overall Verification Stats Across All Companies ---
-    // This query is now corrected to check the role through the UserRole relation.
-    const verifiedCount = await prisma.user.count({
-      where: { 
-        is_verified: true,
-        roles: {
-            some: {
-                role: {
-                    name: 'EMPLOYEE'
-                }
-            }
-        }
-      },
-    });
-    const unverifiedCount = await prisma.user.count({
-      where: { 
-        is_verified: false,
-        roles: {
-            some: {
-                role: {
-                    name: 'EMPLOYEE'
-                }
-            }
-        }
-      },
+    // 1. Active Companies
+    const activeCompanies = await prisma.company.count();
+
+    // 2. Verification Volume Over Time
+    const verificationsOverTime = await prisma.verificationLog.groupBy({
+      by: ["verificationType"],
+      _count: { _all: true },
     });
 
-    // --- Query 2: Top 5 Campaigns by Member Count Across All Companies ---
-    const campaigns = await prisma.campaign.findMany({
-      include: {
-        _count: {
-          select: { members: true },
-        },
-      },
-      orderBy: {
-        members: {
-          _count: 'desc',
-        },
-      },
-      take: 5,
+    // 3. Verification Success Rate
+    const verificationSuccess = await prisma.verificationLog.groupBy({
+      by: ["outcome"],
+      _count: { _all: true },
     });
 
-    // --- Query 3: Top 7 Companies by Employee Size ---
-    const companies = await prisma.company.findMany({
-      include: {
-        _count: {
-          select: { users: true },
-        },
-      },
-       orderBy: {
-        users: {
-          _count: 'desc',
-        },
-      },
-      take: 7,
+    // 4. Top Skills Across All Companies
+    const topSkills = await prisma.skill.findMany({
+      take: 10,
+      orderBy: { endorsements: "desc" },
     });
 
-    // --- Assemble the final data object ---
-    const chartData = {
-      verificationStats: {
-        verified: verifiedCount,
-        unverified: unverifiedCount,
-      },
-      campaignMembers: campaigns.map(c => ({
-        name: c.name,
-        members: c._count.members,
-      })),
-      companySizes: companies.map(c => ({
-        name: c.name,
-        employees: c._count.users,
-      })),
-    };
+    // 5. Campaigns by Status (system-wide)
+    const campaignsByStatus = await prisma.campaign.groupBy({
+      by: ["status"],
+      _count: { _all: true },
+    });
 
-    return NextResponse.json(chartData);
+    // 6. System-wide Notifications by Type
+    const notificationsByType = await prisma.notification.groupBy({
+      by: ["type"],
+      _count: { _all: true },
+    });
 
-  } catch (error) {
-    console.error("Error generating chart data:", err);
-
-    console.error("API Super Admin Charts Error:", error);
-    return NextResponse.json({ error: 'Failed to fetch super admin chart data.' }, { status: 500 });
+    return NextResponse.json({
+      activeCompanies,
+      verificationsOverTime,
+      verificationSuccess,
+      topSkills,
+      campaignsByStatus,
+      notificationsByType,
+    });
+  } catch (err) {
+    console.error("Superadmin Dashboard API error:", err);
+    return NextResponse.json(
+      { error: "Failed to load superadmin dashboard data" },
+      { status: 500 }
+    );
   }
 }
