@@ -49,8 +49,6 @@ You received this message because our user has identified you as a verifier of t
 
     const { user } = experience;
 
-    // 3. Call the mailer helper with the required details
-    // It will automatically handle fetching and using the company's SMTP settings
     await sendMailWithCompanySmtp({
         companyId: user.companyId,
         to: verifierEmail,

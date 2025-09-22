@@ -426,8 +426,8 @@ model WorkExperience {
   chat_started     Boolean   @default(false)
   chat_finished    Boolean   @default(false)
   // Relation to User
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int  @map("user_id")
+  user   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int?  @map("user_id")
 
   hr_comment       String?   @db.Text // To store the text response ("Good", "Bad", etc.)
   verified_by      String?   // To store the email of the HR who responded
@@ -438,6 +438,9 @@ model WorkExperience {
   skills WorkExperienceSkill[]
   notification Notification[]
   workflowProgress WorkExperienceWorkflowProgress[]
+
+  is_external     Boolean @default(false)
+  external_id     String?
 
 }
 

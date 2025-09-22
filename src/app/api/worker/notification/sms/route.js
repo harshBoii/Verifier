@@ -42,12 +42,14 @@ export async function POST(request) {
       body: message,
     });
 
+    if(companyId){
     await prisma.subscription.update({
       where:{id:companyId},
       data:{verifications_left:{
         decrement:1
       }}
     })
+  }
 
 
     console.log(`Sent SMS to ${verifierNumber}`);

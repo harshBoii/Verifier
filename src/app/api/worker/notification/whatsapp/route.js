@@ -40,13 +40,15 @@ export async function POST(request) {
       to: `whatsapp:${verifierNumber}`,
       body: message,
     });
-
+    
+    if(companyId){
     await prisma.subscription.update({
       where:{id:companyId},
       data:{verifications_left:{
         decrement:1
       }}
     })
+  }
 
     console.log(`Sent WhatsApp message to ${verifierNumber}`);
     return NextResponse.json({ success: true });
