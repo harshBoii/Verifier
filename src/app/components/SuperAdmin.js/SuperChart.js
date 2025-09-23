@@ -61,7 +61,7 @@ const SuperAdminCharts = () => {
       try {
         setLoading(true);
         // This API call will return data for ALL companies because the user is a Super Admin
-        const response = await fetch('/api/superadmin/charts');
+        const response = await fetch('/api/superadmin/charts-dashboard');
         if (!response.ok) throw new Error('Failed to load chart data.');
         const data = await response.json();
         setChartData(data);
@@ -91,7 +91,7 @@ const SuperAdminCharts = () => {
   const verificationChartData = {
     labels: ['Verified Employees', 'Pending Employees'],
     datasets: [{
-      data: [chartData.verificationStats.verified, chartData.verificationStats.unverified],
+      data: [chartData.verificationStats?.verified, chartData.verificationStats?.unverified],
       backgroundColor: ['#3b82f6', '#93c5fd'], 
       borderColor: ['black', 'white'],
       borderWidth: 1,
