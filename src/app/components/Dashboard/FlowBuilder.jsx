@@ -156,26 +156,49 @@ function ActionNode({ id, data }) {
 
 // --- DELAY NODE COMPONENT (with Icon) ---
 function DelayNode({ id, data }) {
-    const updateDelay = (newDelay) => {
-        data.onChange(id, { ...data.config, delay: parseInt(newDelay, 10) || 0 });
-    };
-    return (
-        <div className="bg-white border shadow-md rounded-lg p-4 w-60 text-center">
-            <h3 className="font-bold text-sm mb-2 text-yellow-600 flex items-center justify-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.415L11 9.586V6z" clipRule="evenodd" /></svg>
-                Delay
-            </h3>
-            <label className="block text-xs mb-1">Wait for (seconds)</label>
-            <input
-                type="number"
-                value={data.config.delay || 0}
-                onChange={(e) => updateDelay(e.target.value)}
-                className="border rounded w-full p-1 text-sm text-center"
-            />
-            <Handle type="target" position={Position.Top} />
-            <Handle type="source" position={Position.Bottom} />
-        </div>
-    );
+  const updateDelay = (value, unit = data.config.unit || "seconds") => {
+    let delayInSeconds = parseInt(value, 10) || 0;
+    if (unit === "minutes") delayInSeconds *= 60;
+    if (unit === "hours") delayInSeconds *= 3600;
+
+    data.onChange(id, { ...data.config, delay: delayInSeconds, unit });
+  };
+
+  const currentUnit = data.config.unit || "seconds";
+
+  // Convert back from seconds to display in input
+  const getDisplayValue = () => {
+    if (currentUnit === "minutes") return (data.config.delay || 0) / 60;
+    if (currentUnit === "hours") return (data.config.delay || 0) / 3600;
+    return data.config.delay || 0;
+  };
+
+  return (
+    <div className="bg-white border shadow-md rounded-lg p-4 w-64 text-center">
+      <h3 className="font-bold text-sm mb-2 text-yellow-600 flex items-center justify-center gap-2">
+        ⏳ Delay
+      </h3>
+      <div className="flex gap-2 items-center">
+        <input
+          type="number"
+          value={getDisplayValue()}
+          onChange={(e) => updateDelay(e.target.value, currentUnit)}
+          className="border rounded w-full p-1 text-sm text-center"
+        />
+        <select
+          value={currentUnit}
+          onChange={(e) => updateDelay(getDisplayValue(), e.target.value)}
+          className="border rounded p-1 text-sm"
+        >
+          <option value="seconds">Seconds</option>
+          <option value="minutes">Minutes</option>
+          <option value="hours">Hours</option>
+        </select>
+      </div>
+      <Handle type="target" position={Position.Top} />
+      <Handle type="source" position={Position.Bottom} />
+    </div>
+  );
 }
 
 // --- CONDITION NODE COMPONENT (with Icon) ---
