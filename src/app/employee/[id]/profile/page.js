@@ -1,6 +1,9 @@
-import UserProfilePage from '@/app/components/UserDashboard/UserProfilePage';
-import UserSideBar from '@/app/components/UserDashboard/UserSideBar';
-import UserSearchBar from '@/app/components/UserDashboard/UserSearchBar';
+import dynamic from 'next/dynamic';
+
+// Client-only components — skip SSR to prevent "window is not defined" crashes
+const UserProfilePage = dynamic(() => import('@/app/components/UserDashboard/UserProfilePage'), { ssr: false });
+const UserSideBar     = dynamic(() => import('@/app/components/UserDashboard/UserSideBar'),     { ssr: false });
+const UserSearchBar   = dynamic(() => import('@/app/components/UserDashboard/UserSearchBar'),   { ssr: false });
 
 // Import necessary libraries for server-side data fetching
 import { cookies } from 'next/headers';
@@ -15,7 +18,7 @@ async function getLoggedInUser() {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
   if (!token) {
-    return null; // No user is logged in
+    return null;
   }
 
   try {
@@ -28,7 +31,7 @@ async function getLoggedInUser() {
         id: true,
         fullName: true,
         email: true,
-        profilePicture:true,
+        profilePicture: true,
         roles: {
           select: {
             role: {
@@ -43,7 +46,7 @@ async function getLoggedInUser() {
     return user;
   } catch (error) {
     console.error('Failed to verify token or fetch user:', error);
-    return null; // Invalid token or user not found
+    return null;
   }
 }
 
@@ -51,10 +54,7 @@ async function getLoggedInUser() {
  * This is now an async Server Component.
  */
 export default async function ProfilePage({ params }) {
-  // The 'id' of the profile being viewed
   const { id } = await params;
-
-  // Fetch the data for the currently logged-in user for the header
   const loggedInUser = await getLoggedInUser();
 
   return (
@@ -62,10 +62,8 @@ export default async function ProfilePage({ params }) {
       <UserSideBar />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '20px 30px 0 30px' }}>
-          {/* Pass the dynamic loggedInUser object to the Header */}
           <UserSearchBar user={loggedInUser} />
         </div>
-        {/* Pass the dynamic ID from the URL to the main profile component */}
         <UserProfilePage id={id} />
       </div>
     </div>
