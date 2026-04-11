@@ -1,18 +1,10 @@
-import dynamic from 'next/dynamic';
-
-// Client-only components — skip SSR to prevent "window is not defined" crashes
-const UserProfilePage = dynamic(() => import('@/app/components/UserDashboard/UserProfilePage'), { ssr: false });
-const UserSideBar     = dynamic(() => import('@/app/components/UserDashboard/UserSideBar'),     { ssr: false });
-const UserSearchBar   = dynamic(() => import('@/app/components/UserDashboard/UserSearchBar'),   { ssr: false });
-
-// Import necessary libraries for server-side data fetching
 import { cookies } from 'next/headers';
 import * as jose from 'jose';
 import prisma from '@/app/lib/prisma';
+import ProfilePageClient from './ProfilePageClient';
 
 /**
- * A server-side helper function to get the currently logged-in user.
- * This function securely reads the session cookie and fetches user data.
+ * Server-side helper: reads session cookie and fetches user data.
  */
 async function getLoggedInUser() {
   const cookieStore = await cookies();
@@ -50,22 +42,9 @@ async function getLoggedInUser() {
   }
 }
 
-/**
- * This is now an async Server Component.
- */
 export default async function ProfilePage({ params }) {
   const { id } = await params;
   const loggedInUser = await getLoggedInUser();
 
-  return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#F4F6F8' }}>
-      <UserSideBar />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '20px 30px 0 30px' }}>
-          <UserSearchBar user={loggedInUser} />
-        </div>
-        <UserProfilePage id={id} />
-      </div>
-    </div>
-  );
+  return <ProfilePageClient profileUserId={id} loggedInUser={loggedInUser} />;
 }
