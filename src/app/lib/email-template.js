@@ -39,20 +39,29 @@ export const getVerificationHtml = (Id,company,name,position,exp_id) => {
             color: #555555;
             margin-bottom: 15px;
           }
-          /* Wrapper to center the button */
-          .button-wrapper {
+          /* Two CTAs on one row (inline-block; stacks on very narrow clients) */
+          .button-row {
             text-align: center;
-            margin: 30px 0;
+            margin: 28px 0;
+            line-height: 1.4;
           }
-          /* The button itself */
           .button {
-            background-color: silver;
-            padding: 14px 24px;
+            padding: 14px 22px;
             border-radius: 6px;
             text-decoration: none;
             font-weight: 500;
             display: inline-block;
             font-size: 16px;
+            margin: 6px 8px;
+            vertical-align: middle;
+          }
+          .button.button-chat {
+            background-color: #2563eb;
+            color: #ffffff !important;
+          }
+          .button.button-call {
+            background-color: #0f766e;
+            color: #ffffff !important;
           }
           /* Footer text */
           .footer {
@@ -75,13 +84,11 @@ export const getVerificationHtml = (Id,company,name,position,exp_id) => {
           <p class="paragraph">
             <strong>${name}</strong> has added their experience as a <strong>${position}</strong> in <strong>${company}</strong>. Please verify the details using the following link.
           </p>
-          <div class="button-wrapper">
-            <a href="https://verifier-phi.vercel.app/review/experience/${exp_id}" class="button">
+          <div class="button-row">
+            <a href="https://verifier-phi.vercel.app/review/experience/${exp_id}" class="button button-chat">
               Verify Using Chat
             </a>
-          </div>
-          <div class="button-wrapper" style="margin-top: 12px;">
-            <a href="https://verifier-phi.vercel.app/review/experience/${exp_id}?verify=call" class="button">
+            <a href="https://verifier-phi.vercel.app/review/experience/${exp_id}?verify=call" class="button button-call">
               Verify Using Call
             </a>
           </div>
@@ -192,20 +199,29 @@ export const Public_verificaion = (company_name, employee_name, position , exter
             color: #555555;
             margin-bottom: 15px;
           }
-          /* Wrapper to center the button */
-          .button-wrapper {
+          /* Two CTAs on one row (inline-block; stacks on very narrow clients) */
+          .button-row {
             text-align: center;
-            margin: 30px 0;
+            margin: 28px 0;
+            line-height: 1.4;
           }
-          /* The button itself */
           .button {
-            background-color: silver;
-            padding: 14px 24px;
+            padding: 14px 22px;
             border-radius: 6px;
             text-decoration: none;
             font-weight: 500;
             display: inline-block;
             font-size: 16px;
+            margin: 6px 8px;
+            vertical-align: middle;
+          }
+          .button.button-chat {
+            background-color: #2563eb;
+            color: #ffffff !important;
+          }
+          .button.button-call {
+            background-color: #0f766e;
+            color: #ffffff !important;
           }
           /* Footer text */
           .footer {
@@ -228,13 +244,11 @@ export const Public_verificaion = (company_name, employee_name, position , exter
           <p class="paragraph">
             <strong>${employee_name}</strong> has added their experience as a <strong>${position}</strong> in <strong>${company_name}</strong>. Please verify the details using the following link.
           </p>
-          <div class="button-wrapper">
-            <a href="https://verifier-phi.vercel.app/review/public/experience?externalId=${externalId}" class="button">
+          <div class="button-row">
+            <a href="https://verifier-phi.vercel.app/review/public/experience?externalId=${externalId}" class="button button-chat">
               Verify Using Chat
             </a>
-          </div>
-          <div class="button-wrapper" style="margin-top: 12px;">
-            <a href="https://verifier-phi.vercel.app/review/public/experience?externalId=${externalId}&verify=call" class="button">
+            <a href="https://verifier-phi.vercel.app/review/public/experience?externalId=${externalId}&verify=call" class="button button-call">
               Verify Using Call
             </a>
           </div>
