@@ -7,7 +7,14 @@ export async function permissionMiddleware(request) {
   // --- THIS IS THE FIX ---
   // If the request is for the permission check API itself, do nothing and let it proceed.
   // This prevents an infinite loop.
-  if (pathname === '/api/permissions/check' || pathname === '/api/subscribe' || pathname === '/api/packages' || pathname ==="review/experience" || pathname ==="/api/submit-verification") {
+  if (
+    pathname === '/api/permissions/check' ||
+    pathname === '/api/subscribe' ||
+    pathname === '/api/packages' ||
+    pathname === 'review/experience' ||
+    pathname === '/api/submit-verification' ||
+    pathname.startsWith('/api/webhook/')
+  ) {
     return NextResponse.next();
   }
   // --- END OF FIX ---

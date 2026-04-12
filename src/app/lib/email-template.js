@@ -77,7 +77,12 @@ export const getVerificationHtml = (Id,company,name,position,exp_id) => {
           </p>
           <div class="button-wrapper">
             <a href="https://verifier-phi.vercel.app/review/experience/${exp_id}" class="button">
-              Verify Now
+              Verify Using Chat
+            </a>
+          </div>
+          <div class="button-wrapper" style="margin-top: 12px;">
+            <a href="https://verifier-phi.vercel.app/review/experience/${exp_id}?verify=call" class="button">
+              Verify Using Call
             </a>
           </div>
           <p class="paragraph">
@@ -224,8 +229,13 @@ export const Public_verificaion = (company_name, employee_name, position , exter
             <strong>${employee_name}</strong> has added their experience as a <strong>${position}</strong> in <strong>${company_name}</strong>. Please verify the details using the following link.
           </p>
           <div class="button-wrapper">
-            <a href="👉 https://verifier-phi.vercel.app/review/public/experience?externalId=${externalId}" class="button">
-              Verify Now
+            <a href="https://verifier-phi.vercel.app/review/public/experience?externalId=${externalId}" class="button">
+              Verify Using Chat
+            </a>
+          </div>
+          <div class="button-wrapper" style="margin-top: 12px;">
+            <a href="https://verifier-phi.vercel.app/review/public/experience?externalId=${externalId}&verify=call" class="button">
+              Verify Using Call
             </a>
           </div>
           <p class="paragraph">
